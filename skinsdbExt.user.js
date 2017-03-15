@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.01
+// @version      1.02
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -22,33 +22,38 @@ var site = location.href;
 var mark = " | skinsdbExt";
 
 (function () {
-    include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
+    var opslink3 = site.split("https://opskins.com/");
 
-    if($.cookie('payed') === true){
-        botload(site);
-    }else{
-        var myData = new FormData();
-        myData.append("checkpay", true);
-        GM_xmlhttpRequest({
-            method:"POST",
-            url:scriptUrl+"scripts/opsinc.php",
-            data: myData,
-            onload:function(result){
-                JSONdata = JSON.parse(result.responseText);
-                if(JSONdata['error']){
-                    alert(JSONdata['error']);
+    if(site == "https://opskins.com/"+opslink3[1]){
+        include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
+
+        if($.cookie('payed') === true){
+            opsbotload(site);
+        }else{
+            var myData = new FormData();
+            myData.append("checkpay", true);
+            GM_xmlhttpRequest({
+                method:"POST",
+                url:scriptUrl+"scripts/opsinc.php",
+                data: myData,
+                onload:function(result){
+                    JSONdata = JSON.parse(result.responseText);
+                    if(JSONdata['error']){
+                        alert(JSONdata['error']);
+                    }
+                    if (JSONdata['success']){
+                        opsbotload(site);
+                        console.log("allisgood");
+                        $.cookie("payed",true,{expires: 1});
+                    }
                 }
-                if (JSONdata['success']){
-                    botload(site);
-                    console.log("allisgood");
-                    $.cookie("payed",true,{expires: 1});
-                }
-            }
-        })
+            })
+        }
     }
+    steamAccept();
 }());
 
-function botload(site){
+function opsbotload(site){
     var opslink = site.split("?loc=shop_search");
     var opslink2 = site.split("?loc=good_deals");
     var opslink3 = site.split("https://opskins.com/");
@@ -77,7 +82,6 @@ function botload(site){
     if(site == "https://opskins.com/?loc=sell"){
         last20solds();
     }
-    steamAccept();
 }
 function include(url) {
     var script = document.createElement('script');
@@ -99,7 +103,7 @@ function autoBuyclick(){
     $("#autoBuyclick").on("click",function(){
         var clickInterval = setInterval(function(){
             $("#site_inv_checkout").click();
-        },1000);
+        },600);
         $("#stopAutoBuyclick").on("click",function(){
             clearInterval(clickInterval);
         });

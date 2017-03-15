@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.02
+// @version      1.03
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -18,6 +18,7 @@
 // ==/UserScript==
 
 var scriptUrl = "http://skinsdb.xyz/";
+var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 
@@ -381,4 +382,3 @@ function offerAccept(){
         }
     },3000);
 }
-

@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.0
+// @version      1.01
 // @description  try to hard!
 // @author       BJIAST
-// @match       https://csgopolygon.com/withdraw.php
-// @match       https://skinsdb.000webhostapp.com/*
+// @match       http://skinsdb.xyz/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://cs.money/*
 // @match       https://csgosell.com/*
@@ -14,18 +13,42 @@
 // @match       http://tradeskinsfast.com/*
 // @match       https://cs.money/*
 // @match       https://opskins.com/*
-// @match        https://steamcommunity.com/tradeoffer/*
-// @match        https://steamcommunity.com/trade/*
-// @match        http://skinsdbrebuild/*
+// @match       https://steamcommunity.com/trade/*
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-var scriptUrl = "http://skinsdbrebuild/";
+var scriptUrl = "http://skinsdb.xyz/";
 var site = location.href;
 var mark = " | skinsdbExt";
 
 (function () {
+    include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
+    if($.cookie('payed') === true){
+        botload(site);
+    }else{
+        var myData = new FormData();
+        myData.append("checkpay", true);
+        GM_xmlhttpRequest({
+            method:"POST",
+            url:scriptUrl+"scripts/opsinc.php",
+            data: myData,
+            onload:function(result){
+                JSONdata = JSON.parse(result.responseText);
+                if(JSONdata['error']){
+                    alert(JSONdata['error']);
+                }
+                if (JSONdata['success']){
+                    botload(site);
+                    console.log("allisgood");
+                    $.cookie("payed",true,{expires: 1});
+                }
+            }
+        })
+    }
+}());
+
+function botload(site){
     var opslink = site.split("?loc=shop_search");
     var opslink2 = site.split("?loc=good_deals");
     var opslink3 = site.split("https://opskins.com/");
@@ -42,8 +65,7 @@ var mark = " | skinsdbExt";
         fullpageparse();
     }
     if(site == "https://opskins.com/?loc=shop_browse"){
-        // fullpageparse();
-        mainautoparse();
+        fullpageparse();
     }
     if(site == "https://opskins.com/"+opslink3[1]){
         fulldatemoney();
@@ -55,8 +77,13 @@ var mark = " | skinsdbExt";
     if(site == "https://opskins.com/?loc=sell"){
         last20solds();
     }
-
-}());
+    steamAccept();
+}
+function include(url) {
+    var script = document.createElement('script');
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+}
 
 function autoBuyclick(){
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width:50%; margin-bottom:20px'>Стоп</div>");
@@ -307,44 +334,47 @@ function last20date() {
         }
     })
 }
+function steamAccept() {
+    var        web = location.href,
+        fromWeb = document.referrer,
+        steamsite = location.href.split("/receipt"),
+        sendoffer = location.href.split("/new/"),
+        tradeoffer = location.href.split("tradeoffer/"),
+        FromCut = document.referrer.split("tradeoffer/");
 
-function mainautoparse(){
-    var skinid = 0;
-    var skinsarr;
-    console.log("function loaded"+mark);
-    $(document).ajaxComplete(function(){
-        // console.log("ajax started"+mark);
-        $(".featured-item.scanned").each(function(){
-           var thisDiscBtn = $(this).children(".skinsdbExtDiscount").html();
-            if(typeof thisDiscBtn == "undefined"){
-                var skinname = $(this).children("div").children(".market-link").html().trim();
-                var skincost = $(this).children("div").children(".item-add").children(".item-amount").html();
-                var skinwear = $(this).children("div").children(".item-desc").children(".text-muted").html();
+    if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && web != sendoffer[0] + "/new/" + sendoffer[1] && !jQuery("#your_slot_0 .slot_inner").html()){
+        offerAccept();
 
-
-                if(typeof skincost == "undefined"){
-                    skincost = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
-                }
-                if(skinwear != ""){
-                    skinname = skinname+" ("+skinwear+")";
-                }
-                $(this).prepend("<span class='skinsdbExtDiscount' data-id='"+ skinid +"' style='float:right; margin-right: 20px;'>Загрузка..</span>");
-                skinid++;
-                skinsarr += JSON.stringify({skinid : skinid, skinnname : skinname.replace("'",""), skincost : skincost.replace("$","")});
-            }
-        });
-        console.log("each finished"+mark);
-        var myData = new FormData();
-             myData.append("autoparse", skinsarr);
-        GM_xmlhttpRequest({
-            method:"POST",
-            url:scriptUrl+"scripts/opsinc.php",
-            data: myData,
-            onload:function(result){
-                // JSONdata = result.responseText;
-                // $(".skinsdbExtDiscount[data-id$='"+JSONdata['skinid']+"']").html(JSONdata['skinprice']);
-                console.log(result.responseText);
-            }
-        })
-    })
+    }else if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "https://opskins.com/?loc=sell" || web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "http://cs.money/"){
+        if (jQuery('.error_page_content h3').html() == "О не-е-е-е-е-е-е-т!"){
+            setTimeout(function(){
+                window.close();
+            }, 300);
+            chromemes("Оффер не действителен!");
+        }else if(fromWeb == "https://opskins.com/?loc=sell"){
+            offerAccept();
+        }
+    }else if(web == steamsite[0] + "/receipt" && fromWeb == FromCut[0] + "tradeoffer/" + FromCut[1]){
+        soundAccept.play();
+        setTimeout(function(){
+            window.close();
+        }, 3000);
+        chromemes("Скин забрал!");
+    }
 }
+function offerAccept(){
+    setInterval(function(){
+        if (jQuery('.newmodal_content>div').html() == "Для завершения обмена подтвердите его на странице подтверждений в мобильном приложении Steam."){
+            soundAccept.play();
+            window.close();
+        }else{
+            jQuery(".newmodal").remove();
+            ToggleReady(true);
+            if(jQuery(".newmodal_buttons .btn_green_white_innerfade span")){
+                jQuery(".newmodal_buttons .btn_green_white_innerfade span").click();
+            }
+            ConfirmTradeOffer();
+        }
+    },3000);
+}
+

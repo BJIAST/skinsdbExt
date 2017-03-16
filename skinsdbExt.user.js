@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.03
+// @version      1.04
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -51,6 +51,32 @@ var mark = " | skinsdbExt";
             })
         }
     }
+    if(site == "https://cs.money/" || site == "https://cs.money/#"){
+        include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
+
+        if($.cookie('payed') === true){
+            favskinsmo();
+        }else{
+            var myData = new FormData();
+            myData.append("checkpay", true);
+            GM_xmlhttpRequest({
+                method:"POST",
+                url:scriptUrl+"scripts/opsinc.php",
+                data: myData,
+                onload:function(result){
+                    JSONdata = JSON.parse(result.responseText);
+                    if(JSONdata['error']){
+                        alert(JSONdata['error']);
+                    }
+                    if (JSONdata['success']){
+                        favskinsmo();
+                        $.cookie("payed",true,{expires: 1});
+                    }
+                }
+            })
+        }
+
+    }
     steamAccept();
 }());
 
@@ -90,6 +116,27 @@ function include(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
+function favskinsmo() {
+    $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
+    var myData = new FormData();
+    myData.append("favNames", true);
+    GM_xmlhttpRequest({
+        method:"POST",
+        url:scriptUrl+"scripts/opsinc.php",
+        data: myData,
+        onload:function(result){
+            if (result.responseText === "null"){
+                $(".favSelectDiv").hide();
+            }else{
+                $("#FavSelector").html(result.responseText);
+            }
+        }
+    })
+    $('#FavSelector').on('change', function() {
+        $("#search_right").val(this.value);
+        $("#search_right").focus();
+    })
+}
 function autoBuyclick(){
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width:50%; margin-bottom:20px'>Стоп</div>");
     $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width:50%; margin-bottom:20px'>Автоклик</div>");
@@ -382,3 +429,4 @@ function offerAccept(){
         }
     },3000);
 }
+

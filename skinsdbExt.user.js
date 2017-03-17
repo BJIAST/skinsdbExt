@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.04
+// @version      1.05
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -44,7 +44,6 @@ var mark = " | skinsdbExt";
                     }
                     if (JSONdata['success']){
                         opsbotload(site);
-                        console.log("allisgood");
                         $.cookie("payed",true,{expires: 1});
                     }
                 }
@@ -92,6 +91,7 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=shop_search"+opslink[1]){
         fullpageparse();
+        userdateskins();
     }
     if(site == "https://opskins.com/?loc=good_deals"+opslink2[1]){
         fullpageparse();
@@ -116,6 +116,26 @@ function include(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
+function userdateskins() {
+    var userskins = $(document).find(".fa.fa-user");
+    console.log("start");
+    if(userskins.html() === ""){
+        var myData = new FormData();
+        var skin = $(".fa.fa-user").parent().parent().parent().children(".market-link").html().trim();
+        myData.append("itemOnSale", true);
+        myData.append("skin", skin);
+        console.log("im on if");
+        GM_xmlhttpRequest({
+            method:"POST",
+            url:scriptUrl+"scripts/opsinc.php",
+            data: myData,
+            onload:function(result){
+                JSONdata = JSON.parse(result.responseText);
+                userskins.attr("title",JSONdata['success']);
+            }
+        })
+    }
+}
 function favskinsmo() {
     $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
     var myData = new FormData();

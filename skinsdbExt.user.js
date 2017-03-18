@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.05
+// @version      1.06
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -40,7 +40,12 @@ var mark = " | skinsdbExt";
                 onload:function(result){
                     JSONdata = JSON.parse(result.responseText);
                     if(JSONdata['error']){
-                        alert(JSONdata['error']);
+                        $(".navbar-nav").after("<div class='csmupd'>Последнее обновление базы " + JSONdata['error'] + "</div>");
+                        $(".csmupd").css({
+                            "position": "absolute",
+                            "right": "420px",
+                            "top": "26px"
+                        })
                     }
                     if (JSONdata['success']){
                         opsbotload(site);
@@ -186,13 +191,6 @@ function fulldatemoney(){
         data: myData,
         onload:function(result){
             JSONdata = JSON.parse(result.responseText);
-
-            $(".navbar-nav").after("<div class='csmupd'>Последнее обновление базы " + JSONdata['changer'] + " : " + JSONdata['upd'] + "</div>");
-            $(".csmupd").css({
-                "position": "absolute",
-                "right": "420px",
-                "top": "26px"
-            })
         }
     })
 }

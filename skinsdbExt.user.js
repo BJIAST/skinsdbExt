@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.06
+// @version      1.07
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -40,7 +40,7 @@ var mark = " | skinsdbExt";
                 onload:function(result){
                     JSONdata = JSON.parse(result.responseText);
                     if(JSONdata['error']){
-                        $(".navbar-nav").after("<div class='csmupd'>Последнее обновление базы " + JSONdata['error'] + "</div>");
+                        $(".navbar-nav").after("<div class='csmupd'>" + JSONdata['error'] + "</div>");
                         $(".csmupd").css({
                             "position": "absolute",
                             "right": "420px",
@@ -447,4 +447,3 @@ function offerAccept(){
         }
     },3000);
 }
-

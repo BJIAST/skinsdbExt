@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.07
+// @version      1.08
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -19,6 +19,7 @@
 
 var scriptUrl = "http://skinsdb.xyz/";
 var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
+var soundFound = new Audio('http://skinsdb.xyz/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 
@@ -80,6 +81,9 @@ var mark = " | skinsdbExt";
             })
         }
 
+    }
+    if(site == "http://skinsdb.xyz/?opsSearch"){
+        opsdiscforphp();
     }
     steamAccept();
 }());
@@ -191,6 +195,12 @@ function fulldatemoney(){
         data: myData,
         onload:function(result){
             JSONdata = JSON.parse(result.responseText);
+            $(".navbar-nav").after("<div class='csmupd'>Последнее обновление " + JSONdata['changer'] + ": " + JSONdata['upd'] + "</div>");
+            $(".csmupd").css({
+                "position": "absolute",
+                "right": "420px",
+                "top": "26px"
+            })
         }
     })
 }
@@ -447,3 +457,69 @@ function offerAccept(){
         }
     },3000);
 }
+function opsdiscforphp(){
+$("#startSearch").on("click",function () {
+    $(".loader").html("<img src='/design/images/ajax-loader.gif'>");
+    $(this).attr("disabled","disabled");
+    var skins = $(".rounded-list").children().map(function () {
+        row = {};
+        row['surl'] = $(this).children(".skin-info").attr("title");
+        row['sname'] = $(this).children(".skin-info").html();
+        row['changer_price'] = $(this).children(".changer_price").val();
+        return row;
+    }).get();
+    var dicount = $("#discValues").val();
+    for (var i = 0; i < skins.length; i++) {
+        doSetTimeout(i, skins, dicount);
+    }
+   setTimeout(function () {
+       setTimeout(function () {
+           console.log("started");
+           if ($(".status ul").html() == ""){
+               $("#startSearch").removeAttr("disabled");
+               $("#startSearch").click();
+       }
+       },5000)
+   },8000+skins.length*1200)
+})
+}
+function doSetTimeout(i,array,dicount) {
+    setTimeout(function() {
+        requestforprice(array[i]['surl'], array[i]['sname'],array[i]['changer_price'],dicount);
+    }, 1000);
+}
+function requestforprice(opsUrl,skinname,chprice,discount) {
+    GM_xmlhttpRequest({
+        method:"POST",
+        url:opsUrl,
+        onload:function(result){
+            var res = $(result.responseText).find(".item-amount").html().replace("$","");
+            if(res === "undefined"){
+                window.open(opsUrl);
+            }else{
+                var res = 100 - (res * 100) / (chprice * 0.97);
+                res = Math.round(res*100)/100;
+                var date = new Date();
+                var log = "<span> Лучшее предложение для " + skinname + ": " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
+                var logs = $("#comments");
+                logs.html(logs.html() + log);
+                logs.animate({ scrollTop: $(document).height() }, "slow");
+                if (res > discount){
+                    $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
+                        soundFound.volume = 1;
+                        soundFound.play();
+                        chromemes("Найден скин " + skinname + " в " + res + "%");
+                }
+            }
+        }
+    })
+}
+function chromemes(mesbody){
+    var currentPermission;
+    Notification.requestPermission( function(result) { currentPermission = result } );
+    mailNotification = new Notification("skinsdbExt", {
+        body : mesbody,
+        icon : "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
+    });
+}
+

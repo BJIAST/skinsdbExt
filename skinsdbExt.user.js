@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.09
+// @version      1.10
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -487,18 +487,20 @@ $("#startSearch").on("click",function () {
 function doSetTimeout(i,array,dicount) {
     setTimeout(function() {
         requestforprice(array[i]['surl'], array[i]['sname'],array[i]['changer_price'],dicount);
-    }, 1000);
+    }, 3000);
 }
 function requestforprice(opsUrl,skinname,chprice,discount) {
     GM_xmlhttpRequest({
         method:"POST",
         url:opsUrl,
         onload:function(result){
-            var res = $(result.responseText).find(".item-amount").html().replace("$","");
-            if(res === "undefined"){
-                window.open(opsUrl);
+            var res = $(result.responseText).find(".item-amount").html();
+            if(typeof res === "undefined"){
+                // window.open(opsUrl);
+                requestforprice(opsUrl,skinname,chprice,discount);
             }else{
-                var res = 100 - (res * 100) / (chprice * 0.97);
+                res = res.replace("$","");
+                res = 100 - (res * 100) / (chprice * 0.97);
                 res = Math.round(res*100)/100;
                 var date = new Date();
                 var log = "<span> Лучшее предложение для " + skinname + ": " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
@@ -506,7 +508,7 @@ function requestforprice(opsUrl,skinname,chprice,discount) {
                 logs.html(logs.html() + log);
                 logs.animate({ scrollTop: $(document).height() }, "slow");
                 if (res > discount){
-                    $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
+                    $(".status ul").append("<li data-ops='"+test+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
                         soundFound.volume = 1;
                         soundFound.play();
                         chromemes("Найден скин " + skinname + " в " + res + "%");

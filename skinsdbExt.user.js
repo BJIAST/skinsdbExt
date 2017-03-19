@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.08
+// @version      1.09
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -478,6 +478,7 @@ $("#startSearch").on("click",function () {
            if ($(".status ul").html() == ""){
                $("#startSearch").removeAttr("disabled");
                $("#startSearch").click();
+               $("#comments").html("");
        }
        },5000)
    },8000+skins.length*1200)

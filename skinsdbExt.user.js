@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.10
+// @version      1.11
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -508,7 +508,7 @@ function requestforprice(opsUrl,skinname,chprice,discount) {
                 logs.html(logs.html() + log);
                 logs.animate({ scrollTop: $(document).height() }, "slow");
                 if (res > discount){
-                    $(".status ul").append("<li data-ops='"+test+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
+                    $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
                         soundFound.volume = 1;
                         soundFound.play();
                         chromemes("Найден скин " + skinname + " в " + res + "%");

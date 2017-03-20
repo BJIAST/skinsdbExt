@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.netii.net/
-// @version      1.11
+// @version      1.12
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -503,7 +503,7 @@ function requestforprice(opsUrl,skinname,chprice,discount) {
                 res = 100 - (res * 100) / (chprice * 0.97);
                 res = Math.round(res*100)/100;
                 var date = new Date();
-                var log = "<span> Лучшее предложение для " + skinname + ": " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
+                var log = "<span> Лучшее предложение для <a href='"+opsUrl+"'>" + skinname + "</a>: " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
                 var logs = $("#comments");
                 logs.html(logs.html() + log);
                 logs.animate({ scrollTop: $(document).height() }, "slow");

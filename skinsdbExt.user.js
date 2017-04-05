@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.131
+// @version      1.14
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -29,7 +29,7 @@ var mark = " | skinsdbExt";
     if(site == "https://opskins.com/"+opslink3[1]){
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
-        if($.cookie('payed') === true){
+        if($.cookie('payed') === "true"){
             opsbotload(site);
         }else{
             var myData = new FormData();
@@ -59,8 +59,9 @@ var mark = " | skinsdbExt";
     if(site == "https://cs.money/" || site == "https://cs.money/#"){
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
-        if($.cookie('payed') === true){
+        if($.cookie('payed') ===  "true"){
             favskinsmo();
+            autoreloadcsm();
         }else{
             var myData = new FormData();
             myData.append("checkpay", true);
@@ -75,7 +76,7 @@ var mark = " | skinsdbExt";
                     }
                     if (JSONdata['success']){
                         favskinsmo();
-                        $.cookie("payed",true,{expires: 1});
+                        $.cookie("payed",true,{expires: 0.00034722222});
                     }
                 }
             })
@@ -104,12 +105,15 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=good_deals"+opslink2[1]){
         fullpageparse();
+        loadallprices(5);
     }
     if(site == "https://opskins.com/?loc=shop_browse"){
         fullpageparse();
+        loadallprices(10);
     }
     if(site == "https://opskins.com/"+opslink3[1]){
         fulldatemoney();
+        settingsMenu();
     }
     if(site == "https://opskins.com/?loc=shop_view_item"+opslink4[1]){
         last20date();
@@ -166,6 +170,26 @@ function favskinsmo() {
         $("#search_right").focus();
     })
 }
+function autoreloadcsm() {
+    $(".favSelectDiv").after("<div><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button></div>");
+    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 34px;'>Стоп</button>");
+    $("#stopInt").after("<span style='margin-left: 10px; color: #fff;'>Автообновление инвентаря ботов раз в 10 секунд по минимальной цене. Задайте фильтры и вперед!</span>");
+
+    $("#startInt").on("click",function () {
+        var startint = setInterval(function(){
+            $("#refresh_bots_inventory").click();
+            setTimeout(function(){
+                $(".bot_sort[type_sort='lowest']").click();
+            },1000)
+        },10000);
+        $(this).attr("disabled","disabled");
+        $("#stopInt").on("click",function(){
+            $("#startInt").attr("disabled", false);
+            clearInterval(startint);
+        })
+    })
+}
+
 function autoBuyclick(){
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width:50%; margin-bottom:20px'>Стоп</div>");
     $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width:50%; margin-bottom:20px'>Автоклик</div>");
@@ -259,6 +283,7 @@ function parseprice(red_btn) {
             skinName = skinName.trim();
         }
         skinPrice = skinPrice.replace("$","");
+        skinPrice = skinPrice.replace(",","");
         var myData = new FormData();
         myData.append("data", skinName);
         myData.append("price", skinPrice);
@@ -344,6 +369,7 @@ function las20btn(){
         skinPrice = skinPrice.split("<small");
         skinPrice = skinPrice[0];
         skinPrice = skinPrice.replace("$","");
+        skinPrice = skinPrice.replace(".",",");
 
         if(!$(this).parent().children(".label-success").html()){
             $(this).parent().append(
@@ -458,31 +484,31 @@ function offerAccept(){
     },3000);
 }
 function opsdiscforphp(){
-$("#startSearch").on("click",function () {
-    $(".loader").html("<img src='/design/images/ajax-loader.gif'>");
-    $(this).attr("disabled","disabled");
-    var skins = $(".rounded-list").children().map(function () {
-        row = {};
-        row['surl'] = $(this).children(".skin-info").attr("title");
-        row['sname'] = $(this).children(".skin-info").html();
-        row['changer_price'] = $(this).children(".changer_price").val();
-        return row;
-    }).get();
-    var dicount = $("#discValues").val();
-    for (var i = 0; i < skins.length; i++) {
-        doSetTimeout(i, skins, dicount);
-    }
-   setTimeout(function () {
-       setTimeout(function () {
-           console.log("started");
-           if ($(".status ul").html() == ""){
-               $("#startSearch").removeAttr("disabled");
-               $("#startSearch").click();
-               $("#comments").html("");
-       }
-       },5000)
-   },8000+skins.length*1200)
-})
+    $("#startSearch").on("click",function () {
+        $(".loader").html("<img src='/design/images/ajax-loader.gif'>");
+        $(this).attr("disabled","disabled");
+        var skins = $(".rounded-list").children().map(function () {
+            row = {};
+            row['surl'] = $(this).children(".skin-info").attr("title");
+            row['sname'] = $(this).children(".skin-info").html();
+            row['changer_price'] = $(this).children(".changer_price").val();
+            return row;
+        }).get();
+        var dicount = $("#discValues").val();
+        for (var i = 0; i < skins.length; i++) {
+            doSetTimeout(i, skins, dicount);
+        }
+        setTimeout(function () {
+            setTimeout(function () {
+                console.log("started");
+                if ($(".status ul").html() == ""){
+                    $("#startSearch").removeAttr("disabled");
+                    $("#startSearch").click();
+                    $("#comments").html("");
+                }
+            },5000)
+        },8000+skins.length*1200)
+    })
 }
 function doSetTimeout(i,array,dicount) {
     setTimeout(function() {
@@ -509,9 +535,9 @@ function requestforprice(opsUrl,skinname,chprice,discount) {
                 logs.animate({ scrollTop: $(document).height() }, "slow");
                 if (res > discount){
                     $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
-                        soundFound.volume = 1;
-                        soundFound.play();
-                        chromemes("Найден скин " + skinname + " в " + res + "%");
+                    soundFound.volume = 1;
+                    soundFound.play();
+                    chromemes("Найден скин " + skinname + " в " + res + "%");
                 }
             }
         }
@@ -525,4 +551,159 @@ function chromemes(mesbody){
         icon : "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
     });
 }
+function getallprices(important){
+    $(".featured-item.scanned").each(function (n = 0) {
+        $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").attr("skin-id",n);
+        var skinName = $(this).children("div").children(".market-link").html();
+        var unavailable = $(this).children("div").children(".item-add");
+        if(unavailable.html()){
+            var skinPrice = unavailable.children(".item-amount").html();
+        }else{
+            var skinPrice = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
+        }
+        if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
+            var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
+            skinName = skinName.trim()+" "+exterior;
+        }else{
+            skinName = skinName.trim();
+        }
+        skinPrice = skinPrice.replace("$","");
+        skinPrice = skinPrice.replace(",","");
+        var myData = new FormData();
+        myData.append("data", skinName);
+        myData.append("price", skinPrice);
+        GM_xmlhttpRequest({
+            method:"POST",
+            url:scriptUrl+"scripts/opsinc.php",
+            data: myData,
+            onload:function(result){
+                var res = jQuery.parseJSON(result.responseText);
+                var button = $(".label.label-success[skin-id$='"+ n +"']");
+                if(important === true){
+                    setTimeout(function () {
+                        button.closest(".scanned").css("border","none");
+                    },500)
+                }
+                if ($.cookie("savedDisc")){
+                    savedDiscount = $.cookie("savedDisc");
+                }else{
+                    savedDiscount = 23;
+                }
+                console.log(res);
+                if(res['opsMoney']){
+                    if(button.html() === 'Price' || important === true){
+                        button.html(res['opsMoney']+"%");
+                        if(res['opsMoney'] > savedDiscount){
+                            setTimeout(function () {
+                                button.closest(".scanned").css("border","10px solid green");
+                            },500)
+                        }
+                    }
+                }else if(res['error']){
+                    if(button.html() === 'Price') {
+                        button.html("Not Found");
+                    }
+                } else{
+                    if(button.html() === 'Price') {
+                        button.html("Error");
+                    }
+                }
+            },
+            onerror: function(res) {
+                var msg = "An error occurred."
+                    + "\nresponseText: " + res.responseText
+                    + "\nreadyState: " + res.readyState
+                    + "\nresponseHeaders: " + res.responseHeaders
+                    + "\nstatus: " + res.status
+                    + "\nstatusText: " + res.statusText
+                    + "\nfinalUrl: " + res.finalUrl;
+                alert(msg);
+            }
+        })
+    })
+}
+function loadallprices(ajaxSeconds) {
+    if($.cookie('allprices') !== "true"){
+        getallprices();
+        setTimeout(function () {
+            getallprices(true);
+        },600)
+        $.cookie('allprices',true,{expires: 0.0001736111});
+    }
+    $(document).ajaxComplete(function () {
+        ajaxDay = ajaxSeconds / 86400;
+        if($.cookie('allpricesAjax') !== "true"){
+            getallprices();
+            $.cookie('allpricesAjax',true,{expires: ajaxDay})
+        }
+    });
+}
+function settingsMenu(){
+    var btnText = "Buy this item immediately without using a shopping cart.";
+    if($.cookie("buynow") === "hide") {
+        $(".btn.btn-success[title='"+btnText+"']").hide();
+        setTimeout(function(){
+            $("#buynow").prop("checked", true);
+        },600)
+    }
+    $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
+    if ($.cookie("savedDisc")){
+        savedDiscount = $.cookie("savedDisc");
+    }else{
+        savedDiscount = 23;
+    }
+    $(".nav.navbar-nav").append("<li class='menu'><a>"+savedDiscount+"</a></li>");
+    $("body").append('' +
+        '<div id="skinsDb" class="modal fade" role="dialog">'+
+        '<div class="modal-dialog">'+
+        '<div class="modal-content">'+
+        '<div class="modal-header">'+
+        '<button type="button" class="close" data-dismiss="modal">&times;</button>'+
+        '<h4 class="modal-title">Настройки'+mark+'</h4>'+
+        '</div>'+
+        '<div class="modal-body">'+
+        '<div>'+
+        '<label for="discValues">Искомый процент: </label>'+
+        '&nbsp;<select name="discValues" id="discValues">'+
+        '<option value="21">21+</option>'+
+        '<option value="22">22+</option>'+
+        '<option value="23">23+</option>'+
+        '<option value="24">24+</option>'+
+        '<option value="25">25+</option>'+
+        '<option value="26">26+</option>'+
+        '<option value="27">27+</option>'+
+        '<option value="28">28+</option>'+
+        '<option value="29">29+</option>'+
+        '</select>'+
+        '<input type="button" class="btn btn-primary" id="saveDisc" style="float:right; padding: 3px; height: 25px;" value="Сохранить">'+
+        '</div>'+
+        '<div style="float: right; font-size: 12px;">Только для селектора!</div>'+
+        '<div>'+
+            '<label for="buynow" style="cursor:pointer;">Скрыть Buy Now?'+
+            '<input type="checkbox" id="buynow" name="buynow" style="margin-left: 15px;"></label>'+
+        '</div>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</div>');
 
+    $("#buynow").on("change",function(){
+        if(this.checked) {
+           $.cookie("buynow","hide");
+           $(".btn.btn-success[title='"+btnText+"']").hide();
+        }else{
+            $.removeCookie("buynow");
+            $(".btn.btn-success[title='"+btnText+"']").show();
+        }
+    })
+    $("#saveDisc").on("click",function () {
+        $.cookie("savedDisc",$("#discValues").val());
+        $("#saveDisc").after("<span class='discAlert' style='float: right; margin:2px 6px 0 0;'>Сохранено!</span>");
+        setTimeout(function () {
+            $(".discAlert").remove();
+        },2000)
+    })
+}

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.14
+// @version      1.141
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -60,8 +60,7 @@ var mark = " | skinsdbExt";
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
         if($.cookie('payed') ===  "true"){
-            favskinsmo();
-            autoreloadcsm();
+            csmofunctions();
         }else{
             var myData = new FormData();
             myData.append("checkpay", true);
@@ -119,9 +118,6 @@ function opsbotload(site){
         last20date();
         las20btn();
     }
-    if(site == "https://opskins.com/?loc=sell"){
-        last20solds();
-    }
 }
 function include(url) {
     var script = document.createElement('script');
@@ -149,8 +145,15 @@ function userdateskins() {
         })
     }
 }
+function csmofunctions(){
+    favskinsmo();
+    autoreloadcsm();
+}
 function favskinsmo() {
+    $(".offer_container_main .col_lg_head .row").prepend("<div><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button></div>");
     $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
+    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 34px;'>Стоп</button>");
+    $("#stopInt").after("<span style='margin-left: 10px; color: #fff;'>Автообновление инвентаря ботов раз в 10 секунд по минимальной цене. Задайте фильтры и вперед!</span>");
     var myData = new FormData();
     myData.append("favNames", true);
     GM_xmlhttpRequest({
@@ -171,10 +174,6 @@ function favskinsmo() {
     })
 }
 function autoreloadcsm() {
-    $(".favSelectDiv").after("<div><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button></div>");
-    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 34px;'>Стоп</button>");
-    $("#stopInt").after("<span style='margin-left: 10px; color: #fff;'>Автообновление инвентаря ботов раз в 10 секунд по минимальной цене. Задайте фильтры и вперед!</span>");
-
     $("#startInt").on("click",function () {
         var startint = setInterval(function(){
             $("#refresh_bots_inventory").click();
@@ -369,7 +368,7 @@ function las20btn(){
         skinPrice = skinPrice.split("<small");
         skinPrice = skinPrice[0];
         skinPrice = skinPrice.replace("$","");
-        skinPrice = skinPrice.replace(".",",");
+        skinPrice = skinPrice.replace(",","");
 
         if(!$(this).parent().children(".label-success").html()){
             $(this).parent().append(
@@ -552,74 +551,76 @@ function chromemes(mesbody){
     });
 }
 function getallprices(important){
-    $(".featured-item.scanned").each(function (n = 0) {
-        $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").attr("skin-id",n);
-        var skinName = $(this).children("div").children(".market-link").html();
-        var unavailable = $(this).children("div").children(".item-add");
-        if(unavailable.html()){
-            var skinPrice = unavailable.children(".item-amount").html();
-        }else{
-            var skinPrice = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
-        }
-        if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
-            var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
-            skinName = skinName.trim()+" "+exterior;
-        }else{
-            skinName = skinName.trim();
-        }
-        skinPrice = skinPrice.replace("$","");
-        skinPrice = skinPrice.replace(",","");
-        var myData = new FormData();
-        myData.append("data", skinName);
-        myData.append("price", skinPrice);
-        GM_xmlhttpRequest({
-            method:"POST",
-            url:scriptUrl+"scripts/opsinc.php",
-            data: myData,
-            onload:function(result){
-                var res = jQuery.parseJSON(result.responseText);
-                var button = $(".label.label-success[skin-id$='"+ n +"']");
-                if(important === true){
-                    setTimeout(function () {
-                        button.closest(".scanned").css("border","none");
-                    },500)
-                }
-                if ($.cookie("savedDisc")){
-                    savedDiscount = $.cookie("savedDisc");
-                }else{
-                    savedDiscount = 23;
-                }
-                console.log(res);
-                if(res['opsMoney']){
-                    if(button.html() === 'Price' || important === true){
-                        button.html(res['opsMoney']+"%");
-                        if(res['opsMoney'] > savedDiscount){
-                            setTimeout(function () {
-                                button.closest(".scanned").css("border","10px solid green");
-                            },500)
+    $(".featured-item.scanned.has-wear").each(function (n = 0) {
+        if($(this).children("div").children(".good-deal-discount-pct").html() !== ''){
+            $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").attr("skin-id",n);
+            var skinName = $(this).children("div").children(".market-link").html();
+            var unavailable = $(this).children("div").children(".item-add");
+            if(unavailable.html()){
+                var skinPrice = unavailable.children(".item-amount").html();
+            }else{
+                var skinPrice = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
+            }
+            if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
+                var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
+                skinName = skinName.trim()+" "+exterior;
+            }else{
+                skinName = skinName.trim();
+            }
+            skinPrice = skinPrice.replace("$","");
+            skinPrice = skinPrice.replace(",","");
+            var myData = new FormData();
+            myData.append("data", skinName);
+            myData.append("price", skinPrice);
+            GM_xmlhttpRequest({
+                method:"POST",
+                url:scriptUrl+"scripts/opsinc.php",
+                data: myData,
+                onload:function(result){
+                    var res = jQuery.parseJSON(result.responseText);
+                    var button = $(".label.label-success[skin-id$='"+ n +"']");
+                    if(important === true){
+                        setTimeout(function () {
+                            button.closest(".scanned").css("border","none");
+                        },500)
+                    }
+                    if ($.cookie("savedDisc")){
+                        savedDiscount = $.cookie("savedDisc");
+                    }else{
+                        savedDiscount = 23;
+                    }
+                    console.log(res);
+                    if(res['opsMoney']){
+                        if(button.html() === 'Price' || important === true){
+                            button.html(res['opsMoney']+"%");
+                            if(res['opsMoney'] > savedDiscount){
+                                setTimeout(function () {
+                                    button.closest(".scanned").css("border","10px solid green");
+                                },500)
+                            }
+                        }
+                    }else if(res['error']){
+                        if(button.html() === 'Price') {
+                            button.html("Not Found");
+                        }
+                    } else{
+                        if(button.html() === 'Price') {
+                            button.html("Error");
                         }
                     }
-                }else if(res['error']){
-                    if(button.html() === 'Price') {
-                        button.html("Not Found");
-                    }
-                } else{
-                    if(button.html() === 'Price') {
-                        button.html("Error");
-                    }
+                },
+                onerror: function(res) {
+                    var msg = "An error occurred."
+                        + "\nresponseText: " + res.responseText
+                        + "\nreadyState: " + res.readyState
+                        + "\nresponseHeaders: " + res.responseHeaders
+                        + "\nstatus: " + res.status
+                        + "\nstatusText: " + res.statusText
+                        + "\nfinalUrl: " + res.finalUrl;
+                    alert(msg);
                 }
-            },
-            onerror: function(res) {
-                var msg = "An error occurred."
-                    + "\nresponseText: " + res.responseText
-                    + "\nreadyState: " + res.readyState
-                    + "\nresponseHeaders: " + res.responseHeaders
-                    + "\nstatus: " + res.status
-                    + "\nstatusText: " + res.statusText
-                    + "\nfinalUrl: " + res.finalUrl;
-                alert(msg);
-            }
-        })
+            })
+        }
     })
 }
 function loadallprices(ajaxSeconds) {
@@ -627,7 +628,7 @@ function loadallprices(ajaxSeconds) {
         getallprices();
         setTimeout(function () {
             getallprices(true);
-        },600)
+        },800)
         $.cookie('allprices',true,{expires: 0.0001736111});
     }
     $(document).ajaxComplete(function () {
@@ -646,6 +647,11 @@ function settingsMenu(){
             $("#buynow").prop("checked", true);
         },600)
     }
+    $(document).ajaxComplete(function () {
+        if($.cookie("buynow") === "hide") {
+            $(".btn.btn-success[title='" + btnText + "']").hide();
+        }
+    })
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
     if ($.cookie("savedDisc")){
         savedDiscount = $.cookie("savedDisc");

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.141
+// @version      1.142
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -147,7 +147,9 @@ function userdateskins() {
 }
 function csmofunctions(){
     favskinsmo();
-    autoreloadcsm();
+    setTimeout(function () {
+        autoreloadcsm();
+    },1000)
 }
 function favskinsmo() {
     $(".offer_container_main .col_lg_head .row").prepend("<div><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button></div>");

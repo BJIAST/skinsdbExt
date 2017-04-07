@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.148
+// @version      1.1481
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -762,6 +762,9 @@ function csmopriceView() {
 function csmomenu() {
     if($.cookie("opsbot") === 'on'){
         csmobot();
+        setTimeout(function(){
+            $("#opsbot").prop("checked", true);
+        },600)
     }
     $(".navbar-nav.menu").prepend("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
     $("body").append('' +

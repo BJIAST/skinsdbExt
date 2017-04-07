@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.142
+// @version      1.148
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -22,16 +22,14 @@ var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/maste
 var soundFound = new Audio('http://skinsdb.xyz/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
+var payed = false;
+var skinsLoaded = [];
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
 
     if(site == "https://opskins.com/"+opslink3[1]){
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
-
-        if($.cookie('payed') === "true"){
-            opsbotload(site);
-        }else{
             var myData = new FormData();
             myData.append("checkpay", true);
             GM_xmlhttpRequest({
@@ -50,18 +48,13 @@ var mark = " | skinsdbExt";
                     }
                     if (JSONdata['success']){
                         opsbotload(site);
-                        $.cookie("payed",true,{expires: 1});
                     }
                 }
             })
-        }
     }
     if(site == "https://cs.money/" || site == "https://cs.money/#"){
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
-        if($.cookie('payed') ===  "true"){
-            csmofunctions();
-        }else{
             var myData = new FormData();
             myData.append("checkpay", true);
             GM_xmlhttpRequest({
@@ -74,13 +67,10 @@ var mark = " | skinsdbExt";
                         alert(JSONdata['error']);
                     }
                     if (JSONdata['success']){
-                        favskinsmo();
-                        $.cookie("payed",true,{expires: 0.00034722222});
+                        csmofunctions();
                     }
                 }
             })
-        }
-
     }
     if(site == "http://skinsdb.xyz/?opsSearch"){
         opsdiscforphp();
@@ -147,6 +137,7 @@ function userdateskins() {
 }
 function csmofunctions(){
     favskinsmo();
+    csmomenu();
     setTimeout(function () {
         autoreloadcsm();
     },1000)
@@ -154,8 +145,7 @@ function csmofunctions(){
 function favskinsmo() {
     $(".offer_container_main .col_lg_head .row").prepend("<div><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button></div>");
     $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
-    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 34px;'>Стоп</button>");
-    $("#stopInt").after("<span style='margin-left: 10px; color: #fff;'>Автообновление инвентаря ботов раз в 10 секунд по минимальной цене. Задайте фильтры и вперед!</span>");
+
     var myData = new FormData();
     myData.append("favNames", true);
     GM_xmlhttpRequest({
@@ -176,6 +166,8 @@ function favskinsmo() {
     })
 }
 function autoreloadcsm() {
+    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 34px;'>Стоп</button>");
+    $("#stopInt").after("<span style='margin-left: 10px; color: #fff;'>Автообновление инвентаря ботов раз в 10 секунд по минимальной цене. Задайте фильтры и вперед!</span>");
     $("#startInt").on("click",function () {
         var startint = setInterval(function(){
             $("#refresh_bots_inventory").click();
@@ -513,10 +505,10 @@ function opsdiscforphp(){
 }
 function doSetTimeout(i,array,dicount) {
     setTimeout(function() {
-        requestforprice(array[i]['surl'], array[i]['sname'],array[i]['changer_price'],dicount);
+        requestforprice(array[i]['surl'], array[i]['sname'],array[i]['changer_price'],dicount,true);
     }, 3000);
 }
-function requestforprice(opsUrl,skinname,chprice,discount) {
+function requestforprice(opsUrl,skinname,chprice,discount = false) {
     GM_xmlhttpRequest({
         method:"POST",
         url:opsUrl,
@@ -524,21 +516,45 @@ function requestforprice(opsUrl,skinname,chprice,discount) {
             var res = $(result.responseText).find(".item-amount").html();
             if(typeof res === "undefined"){
                 // window.open(opsUrl);
-                requestforprice(opsUrl,skinname,chprice,discount);
+                if(discount !== false){
+                    requestforprice(opsUrl,skinname,chprice,discount);
+                }else{
+                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Try again");
+                }
             }else{
                 res = res.replace("$","");
-                res = 100 - (res * 100) / (chprice * 0.97);
-                res = Math.round(res*100)/100;
-                var date = new Date();
-                var log = "<span> Лучшее предложение для <a href='"+opsUrl+"' target='_blank'>" + skinname + "</a>: " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
-                var logs = $("#comments");
-                logs.html(logs.html() + log);
-                logs.animate({ scrollTop: $(document).height() }, "slow");
-                if (res > discount){
-                    $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
-                    soundFound.volume = 1;
-                    soundFound.play();
-                    chromemes("Найден скин " + skinname + " в " + res + "%");
+                res = res.replace(",","")
+                if(discount !== false){
+                    res = 100 - (res * 100) / (chprice * 0.97);
+                    res = Math.round(res*100)/100;
+                    var date = new Date();
+                    var log = "<span> Лучшее предложение для <a href='"+opsUrl+"' target='_blank'>" + skinname + "</a>: " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + ":" +  (date.getSeconds()<10?'0':'') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
+                    var logs = $("#comments");
+                    logs.html(logs.html() + log);
+                    logs.animate({ scrollTop: $(document).height() }, "slow");
+                    if (res > discount){
+                        $(".status ul").append("<li data-ops='"+res+"%' data-changer='"+chprice+"'>" + skinname + "</li>");
+                        soundFound.volume = 1;
+                        soundFound.play();
+                        chromemes("Найден скин " + skinname + " в " + res + "%");
+                    }
+                }else{
+                    var opsmo = 100 - (res * 100) / (chprice * 0.97);
+                    opsmo = Math.round(opsmo*100)/100;
+                    var moops = 100 - res*95/chprice;
+                    moops = Math.round(moops*100)/100;
+                    if(moops > 0){
+                        moops = -moops;
+                    }else if(moops < 0){
+                        moops = moops + moops*(-2);
+                    }
+                    var insideArr = [];
+                    insideArr['skinname'] = skinname;
+                    insideArr['opsmo'] = opsmo;
+                    insideArr['moops'] = moops;
+                    skinsLoaded.push(insideArr);
+                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").css("width","100%");
+                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("<span style='color: green;font-weight: bold; background: rgba(255, 255, 255, 0.65); font-size: 13px; float: left; margin-left: -7px;'>"+moops+"% </span><span style='color: red;font-weight: bold;background: rgba(255, 255, 255, 0.65); font-size: 13px; float: right; margin-right: 6px;'>"+opsmo+"%</span>");
                 }
             }
         }
@@ -713,5 +729,69 @@ function settingsMenu(){
         setTimeout(function () {
             $(".discAlert").remove();
         },2000)
+    })
+}
+function csmobot() {
+    setInterval(function () {
+        csmopriceView();
+    },2000)
+
+}
+function csmopriceView() {
+    var mother = $("#inventory_bots");
+    mother.children().each(function () {
+        if(typeof $(this).children(".skindblink").html() === 'undefined' && $(this).attr("cost") > 2){
+            var skinname = $(this).attr("market_hash_name");
+            var skinprice = $(this).attr("cost");
+            var opskinsUrl = "https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+skinname;
+            $(this).prepend("<div style='width: 56px; height: 20px; background: green; position:absolute;z-index: 999; right: 0; top: 22%;' class='skindblink'>Link</div>");
+            $(this).prepend("<a class='opspricelink' style='position:absolute;left:7%; bottom: 25%;z-index: 999;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 20px;'></a>");
+
+            $(this).children(".skindblink").on("click",function () {
+                window.open(opskinsUrl);
+                return false;
+            })
+            $(this).children(".opspricelink").on("click",function () {
+                $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Загрузка..");
+                requestforprice(opskinsUrl,skinname,skinprice);
+                return false;
+            })
+        }
+    })
+}
+function csmomenu() {
+    if($.cookie("opsbot") === 'on'){
+        csmobot();
+    }
+    $(".navbar-nav.menu").prepend("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
+    $("body").append('' +
+        '<div id="skinsDb" class="modal fade" role="dialog">'+
+        '<div class="modal-dialog">'+
+        '<div class="modal-content">'+
+        '<div class="modal-header">'+
+        '<button type="button" class="close" data-dismiss="modal">&times;</button>'+
+        '<h4 class="modal-title">Настройки'+mark+'</h4>'+
+        '</div>'+
+        '<div class="modal-body">'+
+        '<label for="opsbot" style="cursor:pointer; width: 33%;">Отобразить кнопки Opskins?</label>'+
+        '<input type="checkbox" id="opsbot" name="opsbot" style="display: inline-block;">'+
+        '</div>'+
+        '<div class="modal-footer">'+
+        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</div>');
+
+    $("#opsbot").on("change",function(){
+        if(this.checked) {
+            $.cookie("opsbot","on");
+            csmobot();
+        }else{
+            $.removeCookie("opsbot");
+            setTimeout(function () {
+                location.reload();
+            },2000)
+        }
     })
 }

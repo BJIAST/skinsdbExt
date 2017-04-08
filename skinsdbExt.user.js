@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.151
+// @version      1.152
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -298,15 +298,12 @@ function parseprice(red_btn) {
                 if(res['opsMoney']){
                     if(res['opsMoney'] > savedDiscount){
                         if(res['datestatus'] === 'fine'){
-                            setTimeout(function () {
-                                $(".skinDBupd[data-loading='moneyOps']").closest(".scanned").css("border","10px solid green");
-                            },500)
+                            $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid green");
                         }else{
-                            setTimeout(function () {
-                                $(".skinDBupd[data-loading='moneyOps']").closest(".scanned").css("border","10px solid orange");
-                            },500)
+                            $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid orange");
                         }
                     }
+
                     $("[data-loading='moneyOps']").html(res['moneyOps']+"%");
                     $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd']);
                     $("[data-loading='opsMoney']").html(res['opsMoney']+"%");

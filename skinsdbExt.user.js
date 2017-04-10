@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.152
+// @version      1.153
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -66,7 +66,7 @@ include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
             onload:function(result){
                 JSONdata = JSON.parse(result.responseText);
                 if(JSONdata['error']){
-                    alert(JSONdata['error']);
+                    $(".navbar-brand").after("<span style='margin:24px 0 0 40px; font-size:15px; line-height: 56px; font-family: OpenSans-ExtraBold;'>"+JSONdata['error']+"</span>");
                 }
                 if (JSONdata['success']){
                     csmofunctions();
@@ -100,9 +100,9 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=shop_browse"){
         fullpageparse();
+        loadallprices(5);
     }
     if(site == "https://opskins.com/"+opslink3[1]){
-        fulldatemoney();
         settingsMenu();
     }
     if(site == "https://opskins.com/?loc=shop_view_item"+opslink4[1]){
@@ -186,13 +186,10 @@ function autoreloadcsm() {
 }
 
 function autoBuyclick(){
-    $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width:50%; margin-bottom:20px'>Стоп</div>");
-    $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width:50%; margin-bottom:20px'>Автоклик</div>");
+    $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
+    $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width: 99px;position:absolute;left: -185px;top: 13px;border-radius: 3px;'>Автоклик</div>");
     var findthanks = setInterval(function () {
-        if($("#ajaxLoader").html() != "undefined"){
-            $("#ajaxLoader").css("margin-top","70px");
-        }
-        if($("#ajaxLoader").html() == "Thank You!"){
+        if($("#ajaxLoader").html() != "undefined" && $("#ajaxLoader").html() == "Thank You!"){
             clearInterval(findthanks);
         }
     },1000)
@@ -204,24 +201,6 @@ function autoBuyclick(){
             clearInterval(clickInterval);
         });
     });
-}
-function fulldatemoney(){
-    var myData = new FormData();
-    myData.append("fulldatachanger", true);
-    GM_xmlhttpRequest({
-        method:"POST",
-        url:scriptUrl,
-        data: myData,
-        onload:function(result){
-            JSONdata = JSON.parse(result.responseText);
-            $(".navbar-nav").after("<div class='csmupd'>Последнее обновление " + JSONdata['changer'] + ": " + JSONdata['upd'] + "</div>");
-            $(".csmupd").css({
-                "position": "absolute",
-                "right": "420px",
-                "top": "26px"
-            })
-        }
-    })
 }
 function fullpageparse() {
     $(".label-success").each(function(){
@@ -296,15 +275,24 @@ function parseprice(red_btn) {
                 var res = jQuery.parseJSON(result.responseText);
                 // console.log(res);
                 if(res['opsMoney']){
+                    var dif = savedDiscount - res['opsMoney'];
+
                     if(res['opsMoney'] > savedDiscount){
                         if(res['datestatus'] === 'fine'){
                             $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid green");
                         }else{
                             $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid orange");
                         }
+                    }else if(dif < 0.2 && dif > 0){
+                        if(res['datestatus'] === 'fine'){
+                            setTimeout(function () {
+                                $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid lighblue");
+                            },500)
+                        }
                     }
 
                     $("[data-loading='moneyOps']").html(res['moneyOps']+"%");
+                    $(".skinDBupd[data-loading='moneyOps']").remove();
                     $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd']);
                     $("[data-loading='opsMoney']").html(res['opsMoney']+"%");
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
@@ -536,7 +524,12 @@ function requestforprice(opsUrl,skinname,chprice,discount = false) {
                 if(discount !== false){
                     requestforprice(opsUrl,skinname,chprice,discount);
                 }else{
-                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Try again");
+                    if($(result.responseText).find(".error#message").html().trim() === "To ensure you are not a bot, please wait while we check your browser."){
+                        var newWindow = window.open(opsUrl);
+                        $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Try again");
+                    }else{
+                        $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Try again");
+                    }
                 }
             }else{
                 res = res.replace("$","");
@@ -571,7 +564,7 @@ function requestforprice(opsUrl,skinname,chprice,discount = false) {
                     insideArr['moops'] = moops;
                     skinsLoaded.push(insideArr);
                     $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").css("width","100%");
-                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("<span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px; float: left; margin-left: -7px;'>"+moops+"% </span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px;  float: right; margin-right: 6px;'>"+opsmo+"%</span>");
+                    $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("<span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left; margin-left: -7px;'><span class='moopsval'>"+moops+"</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>"+opsmo+"</span>%</span>");
                 }
             }
         }
@@ -585,8 +578,8 @@ function chromemes(mesbody){
         icon : "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
     });
 }
-function getallprices(important){
-    $(".featured-item.scanned.has-wear").each(function (n = 0) {
+var getallprices = function (important){
+    $(".featured-item.scanned").each(function (n = 0) {
         if($(this).children("div").children(".good-deal-discount-pct").html() !== ''){
             $(this).children("div").prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='"+n+"'></div>");
             $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").attr("skin-id",n);
@@ -630,6 +623,7 @@ function getallprices(important){
                         if(button.html() === 'Price' || important === true){
                             button.html(res['opsMoney']+"%");
                             date.html(res['dateupd']);
+                            var dif = savedDiscount - res['opsMoney'];
                             if(res['opsMoney'] > savedDiscount){
                                 if(res['datestatus'] === 'fine'){
                                     setTimeout(function () {
@@ -638,6 +632,12 @@ function getallprices(important){
                                 }else{
                                     setTimeout(function () {
                                         button.closest(".scanned").css("border","10px solid orange");
+                                    },500)
+                                }
+                            }else if(dif < 0.2 && dif > 0){
+                                if(res['datestatus'] === 'fine'){
+                                    setTimeout(function () {
+                                        button.closest(".scanned").css("border","10px solid lighblue");
                                     },500)
                                 }
                             }
@@ -714,15 +714,16 @@ function settingsMenu(){
         '<div>'+
         '<label for="discValues">Искомый процент: </label>'+
         '&nbsp;<select name="discValues" id="discValues">'+
+        '<option value="21">20+</option>'+
         '<option value="21">21+</option>'+
         '<option value="22">22+</option>'+
         '<option value="23">23+</option>'+
         '<option value="24">24+</option>'+
         '<option value="25">25+</option>'+
         '<option value="26">26+</option>'+
-        '<option value="27">27+</option>'+
-        '<option value="28">28+</option>'+
-        '<option value="29">29+</option>'+
+        // '<option value="27">27+</option>'+
+        // '<option value="28">28+</option>'+
+        // '<option value="29">29+</option>'+
         '</select>'+
         '<input type="button" class="btn btn-primary" id="saveDisc" style="float:right; padding: 3px; height: 25px;" value="Сохранить">'+
         '</div>'+
@@ -766,10 +767,10 @@ function csmobot() {
         csmopriceView();
     },2000)
     $("#sortbymoops").on("click",function () {
-        sortUsingNestedTextMin($('#inventory_bots'), "div", "div span.moopsValue");
+        sortUsingNestedText($('#inventory_bots'), "div", "div span.moopsValue .moopsval");
     })
     $("#sortbyopsmo").on("click",function () {
-        sortUsingNestedTextMax($('#inventory_bots'), "div", "div span.opsmoValue");
+        sortUsingNestedText($('#inventory_bots'), "div", "div span.opsmoValue .opsmoval");
     })
     $("#scannerdb").on("click",function () {
         $(this).html("Загрузка...");
@@ -779,12 +780,12 @@ function csmobot() {
             onload:function(result){
                 var res = jQuery.parseJSON(result.responseText);
 
-                var date = new Date(res['time']*1000);
-                var hours = date.getHours();
-                var minutes = "0" + date.getMinutes();
-                var seconds = "0" + date.getSeconds();
-                var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-                $("#scannerdb").html("Готово!"+mark);
+                // var date = new Date(res['time']*1000);
+                // var hours = date.getHours();
+                // var minutes = "0" + date.getMinutes();
+                // var seconds = "0" + date.getSeconds();
+                // var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+                $("#scannerdb").html("Готово"+mark);
                 res = res['response'];
                 _.each(res,function (item,index) {
                     var skins = [];
@@ -810,14 +811,14 @@ function csmobot() {
     })
 }
 function csmopriceView() {
-    var mother = $("#inventory_bots");
+    var mother = $(".invertory_container");
     mother.children().each(function () {
         if(typeof $(this).children(".skindblink").html() === 'undefined'){
             var skinname = $(this).attr("market_hash_name");
             var skinprice = $(this).attr("cost");
             var opskinsUrl = "https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+skinname;
             var loaded;
-            $(this).prepend("<div style='background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff;' class='skindblink'>Link</div>");
+            $(this).prepend("<a href='"+opskinsUrl+"' target='_blank' style='background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;' class='skindblink'>Link</a>");
             if(opsapiLoaded.length <= 0) {
                 if (skinsLoaded.length > 0) {
                     loaded = _.find(skinsLoaded, function (item) {
@@ -826,9 +827,9 @@ function csmopriceView() {
                 }
                 if (typeof loaded !== 'undefined') {
                     $(this).attr("disc-status", 'done');
-                    $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px; float: left; margin-left: -7px;'>" + loaded['moops'] + "% </span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px;  float: right; margin-right: 6px;'>" + loaded['opsmo'] + "%</span></div>");
+                    $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left; margin-left: -7px;'><span class='moopsval'>" + loaded['moops'] + "</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>" + loaded['opsmo'] + "</span>%</span></div>");
                 } else {
-                    $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
+                    $(this).prepend("<a class='opspricelink' target='_blank' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
                 }
             }else{
               loaded = _.find(opsapiLoaded,function (item) {
@@ -845,23 +846,49 @@ function csmopriceView() {
                     }else if(moops < 0){
                         moops = moops + moops*(-2);
                     }
-                    $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px; float: left; margin-left: -7px;'>" + moops + "% </span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 13px;  float: right; margin-right: 6px;'>" + opsmo + "%</span></div>");
+                    $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left; margin-left: -7px;'><span class='moopsval'>" + moops + "</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>" + opsmo + "</span>%</span></div>");
                     $(this).prepend("<span style='position: absolute;top: 33%;left: 0;color: #ff8a37; font-size: 13px;z-index: 999; font-weight: bold;'>"+loaded['skincost']+"$</span>");
                 } else {
                     $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
                 }
             }
-            $(this).children(".skindblink").on("click",function () {
-                window.open(opskinsUrl);
-                return false;
-            })
-            $(this).children(".opspricelink").on("click",function () {
-                $("div[market_hash_name$='"+skinname+"']").attr("disc-status",'done');
-                $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Загрузка..");
-                requestforprice(opskinsUrl,skinname,skinprice);
-                return false;
-            })
+            // $(this).children(".skindblink").on("click",function () {
+            //     window.open(opskinsUrl);
+            //     return false;
+            // })
+            // $(this).children(".skindblink").hover(function () {
+            //     $(this).css("background","rgba(0, 0, 0, 0.52)");
+            // },function () {
+            //     $(this).css("background","rgba(0, 0, 0, 0.32)");
+            // })
+            // $(this).children(".opspricelink").on("click",function () {
+            //     $("div[market_hash_name$='"+skinname+"']").attr("disc-status",'done');
+            //     $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("Загрузка..");
+            //     requestforprice(opskinsUrl,skinname,skinprice);
+            //     return false;
+            // })
         }
+    })
+    $(".skindblink").on("click",function () {
+        var skinname = $(this).parent().attr("market_hash_name");
+        var opskinsUrl = "https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+skinname;
+        var newWindow = window.open(opskinsUrl);
+        return false;
+
+    })
+    $(".skindblink").hover(function () {
+        $(this).css("background","rgba(0, 0, 0, 0.52)");
+    },function () {
+        $(this).css("background","rgba(0, 0, 0, 0.32)");
+    })
+    $(".opspricelink").on("click",function () {
+        var skinname = $(this).parent().attr("market_hash_name");
+        var skinprice = $(this).parent().attr("cost");
+        var opskinsUrl = "https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+skinname;
+        $("div[market_hash_name$='"+skinname+"']").attr("disc-status",'done');
+        $("div[market_hash_name$='"+skinname+"']").children(".opspricelink").html("<span style='font-size:14px; line-height: 20px; font-family: Helvetica;'>Загрузка..</span>");
+        requestforprice(opskinsUrl,skinname,skinprice);
+        return false;
     })
 }
 function csmomenu() {
@@ -913,8 +940,8 @@ function csmocounters(){
     setInterval(function () {
         var counts = 0;
         $("#inventory_user").children().each(function () {
-           counts += Number($(this).attr("cost"));
-           if(counts === 0){
+            counts += Math.round(Number($(this).attr("cost")*$(this).children(".invertory_title_container").children(".invertory_title_text_quantity").children(".count_in_stack").text())*100)/100;
+            if(counts === 0){
                $("#userinv").html("0.00");
            }else{
                $("#userinv").html(counts);
@@ -930,19 +957,19 @@ function csmocounters(){
         }
     },300)
 }
-function sortUsingNestedTextMin(parent, childSelector, keySelector) {
+// function sortUsingNestedTextMin(parent, childSelector, keySelector) {
+//     var items = parent.children(childSelector).sort(function(a, b) {
+//         var vA = $(keySelector, a).text();
+//         var vB = $(keySelector, b).text();
+//         return ((+vA) < (+vB)) ? -1 : ((+vA) > (+vB)) ? 1 : 0;
+//     });
+//     parent.append(items);
+// }
+function sortUsingNestedText(parent, childSelector, keySelector) {
     var items = parent.children(childSelector).sort(function(a, b) {
         var vA = $(keySelector, a).text();
         var vB = $(keySelector, b).text();
-        return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
-    });
-    parent.append(items);
-}
-function sortUsingNestedTextMax(parent, childSelector, keySelector) {
-    var items = parent.children(childSelector).sort(function(a, b) {
-        var vA = $(keySelector, a).text();
-        var vB = $(keySelector, b).text();
-        return (vA > vB) ? -1 : (vA < vB) ? 1 : 0;
+        return ((+vA) > (+vB)) ? -1 : ((+vA) < (+vB)) ? 1 : 0;
     });
     parent.append(items);
 }

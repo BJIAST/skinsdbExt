@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.154
+// @version      1.155
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -768,9 +768,15 @@ function csmobot() {
     },2000)
     $("#sortbymoops").on("click",function () {
         sortUsingNestedText($('#inventory_bots'), "div", "div span.moopsValue .moopsval");
+        $(".offer_container_inventory_steam").animate({
+            scrollTop:0
+        },'fast');
     })
     $("#sortbyopsmo").on("click",function () {
         sortUsingNestedText($('#inventory_bots'), "div", "div span.opsmoValue .opsmoval");
+        $(".offer_container_inventory_steam").animate({
+            scrollTop:0
+        },'fast');
     })
     $("#scannerdb").on("click",function () {
         $(this).html("Загрузка...");
@@ -925,11 +931,11 @@ function csmocounters(){
     setInterval(function () {
         var counts = 0;
         $("#inventory_user").children().each(function () {
-            counts += Math.round(Number($(this).attr("cost")*$(this).children(".invertory_title_container").children(".invertory_title_text_quantity").children(".count_in_stack").text())*100)/100;
+            counts += Number($(this).attr("cost")*$(this).children(".invertory_title_container").children(".invertory_title_text_quantity").children(".count_in_stack").text());
             if(counts === 0){
                $("#userinv").html("0.00");
            }else{
-               $("#userinv").html(counts);
+               $("#userinv").html(Math.round(counts*100)/100);
            }
        })
     },1600)

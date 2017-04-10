@@ -714,7 +714,7 @@ function settingsMenu(){
         '<div>'+
         '<label for="discValues">Искомый процент: </label>'+
         '&nbsp;<select name="discValues" id="discValues">'+
-        '<option value="21">20+</option>'+
+        '<option value="20">20+</option>'+
         '<option value="21">21+</option>'+
         '<option value="22">22+</option>'+
         '<option value="23">23+</option>'+

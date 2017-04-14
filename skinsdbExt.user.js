@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.155
+// @version      1.156
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -92,7 +92,6 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=shop_search"+opslink[1]){
         fullpageparse();
-        userdateskins();
     }
     if(site == "https://opskins.com/?loc=good_deals"+opslink2[1]){
         fullpageparse();
@@ -118,27 +117,6 @@ function include(url) {
     var script = document.createElement('script');
     script.src = url;
     document.getElementsByTagName('head')[0].appendChild(script);
-}
-
-function userdateskins() {
-    var userskins = $(document).find(".fa.fa-user");
-    console.log("start");
-    if(userskins.html() === ""){
-        var myData = new FormData();
-        var skin = $(".fa.fa-user").parent().parent().parent().children(".market-link").html().trim();
-        myData.append("itemOnSale", true);
-        myData.append("skin", skin);
-        console.log("im on if");
-        GM_xmlhttpRequest({
-            method:"POST",
-            url:scriptUrl,
-            data: myData,
-            onload:function(result){
-                JSONdata = JSON.parse(result.responseText);
-                userskins.attr("title",JSONdata['success']);
-            }
-        })
-    }
 }
 function csmofunctions(){
     favskinsmo();
@@ -283,16 +261,17 @@ function parseprice(red_btn) {
                         }else{
                             $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid orange");
                         }
-                    }else if(dif < 0.2 && dif > 0){
-                        if(res['datestatus'] === 'fine'){
-                            setTimeout(function () {
-                                $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid lighblue");
-                            },500)
+                    }else{
+                        if(dif > 0 && dif < 0.2){
+                            if(res['datestatus'] === 'fine'){
+                                setTimeout(function () {
+                                    $(".skinDBupd[data-loading='moneyOps']").parent().css("border","10px solid darkblue");
+                                },500)
+                            }
                         }
                     }
 
                     $("[data-loading='moneyOps']").html(res['moneyOps']+"%");
-                    $(".skinDBupd[data-loading='moneyOps']").remove();
                     $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd']);
                     $("[data-loading='opsMoney']").html(res['opsMoney']+"%");
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
@@ -579,16 +558,22 @@ function chromemes(mesbody){
     });
 }
 var getallprices = function (important){
-    $(".featured-item.scanned").each(function (n = 0) {
-        if($(this).children("div").children(".good-deal-discount-pct").html() !== ''){
-            $(this).children("div").prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='"+n+"'></div>");
-            $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").attr("skin-id",n);
+    var  skins = $(".scanned").map(function(){
+        if($(this).children("div").children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof $(this).children("div").children(".skinDBupd").attr("skin-id") === 'undefined') {
             var skinName = $(this).children("div").children(".market-link").html();
             var unavailable = $(this).children("div").children(".item-add");
             if(unavailable.html()){
                 var skinPrice = unavailable.children(".item-amount").html();
+                var skinId = unavailable.children(".item-amount").attr('onclick');
+                skinId = skinId.split("showGraphFromId(");
+                skinId = skinId[1];
+                skinId = skinId.replace(")","");
             }else{
                 var skinPrice = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
+                var skinId = $(this).children("div").children(".item-add-wear").children(".item-amount").attr('onclick');
+                skinId = skinId.split("showGraphFromId(");
+                skinId = skinId[1];
+                skinId = skinId.replace(")", "");
             }
             if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
                 var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
@@ -598,86 +583,82 @@ var getallprices = function (important){
             }
             skinPrice = skinPrice.replace("$","");
             skinPrice = skinPrice.replace(",","");
-            var myData = new FormData();
-            myData.append("data", skinName);
-            myData.append("price", skinPrice);
-            GM_xmlhttpRequest({
-                method:"POST",
-                url:scriptUrl,
-                data: myData,
-                onload:function(result){
-                    var res = jQuery.parseJSON(result.responseText);
-                    var button = $(".label.label-success[skin-id$='"+ n +"']");
-                    var date = $(".skinDBupd[skin-id$='"+ n +"']");
-                    if(important === true){
-                        setTimeout(function () {
-                            button.closest(".scanned").css("border","none");
-                        },500)
-                    }
-                    if ($.cookie("savedDisc")){
-                        savedDiscount = $.cookie("savedDisc");
-                    }else{
-                        savedDiscount = 23;
-                    }
-                    if(res['opsMoney']){
-                        if(button.html() === 'Price' || important === true){
-                            button.html(res['opsMoney']+"%");
-                            date.html(res['dateupd']);
-                            var dif = savedDiscount - res['opsMoney'];
-                            if(res['opsMoney'] > savedDiscount){
-                                if(res['datestatus'] === 'fine'){
-                                    setTimeout(function () {
-                                        button.closest(".scanned").css("border","10px solid green");
-                                    },500)
-                                }else{
-                                    setTimeout(function () {
-                                        button.closest(".scanned").css("border","10px solid orange");
-                                    },500)
-                                }
-                            }else if(dif < 0.2 && dif > 0){
-                                if(res['datestatus'] === 'fine'){
-                                    setTimeout(function () {
-                                        button.closest(".scanned").css("border","10px solid lighblue");
-                                    },500)
-                                }
-                            }
-                        }
-                    }else if(res['error']){
-                        if(button.html() === 'Price') {
-                            button.html("Not Found");
-                        }
-                    } else{
-                        if(button.html() === 'Price') {
-                            button.html("Error");
-                        }
-                    }
-                },
-                onerror: function(res) {
-                    var msg = "An error occurred."
-                        + "\nresponseText: " + res.responseText
-                        + "\nreadyState: " + res.readyState
-                        + "\nresponseHeaders: " + res.responseHeaders
-                        + "\nstatus: " + res.status
-                        + "\nstatusText: " + res.statusText
-                        + "\nfinalUrl: " + res.finalUrl;
-                    alert(msg);
-                }
-            })
+            row = {};
+            row["skinName"] = skinName;
+            row["skinPrice"] = skinPrice;
+            row["skinId"] = skinId;
+            return  row;
+        }
+    }).get();
+    var jsonString = JSON.stringify(skins);
+    var myData = new FormData();
+    myData.append("skinarray", jsonString);
+    GM_xmlhttpRequest({
+        method:"POST",
+        url:scriptUrl,
+        data: myData,
+        onload:function(result){
+            var res = jQuery.parseJSON(result.responseText);
+           $('.featured-item.scanned').each(function () {
+               if($(this).children("div").children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof $(this).children("div").children(".good-skinDBupd-discount-pct").attr("skin-id") === 'undefined') {
+                   var unavailable = $(this).children("div").children(".item-add");
+                   if (unavailable.html()) {
+                       var skinId = unavailable.children(".item-amount").attr('onclick');
+                       skinId = skinId.split("showGraphFromId(");
+                       skinId = skinId[1];
+                       skinId = skinId.replace(")", "");
+                   } else {
+                       var skinId = $(this).children("div").children(".item-add-wear").children(".item-amount").attr('onclick');
+                       skinId = skinId.split("showGraphFromId(");
+                       skinId = skinId[1];
+                       skinId = skinId.replace(")", "");
+                   }
+                   var loaded = $.grep(res, function (e) {
+                       return e.id == skinId;
+                   });
+                   if (typeof loaded[0] !== 'undefined') {
+                       if ($.cookie("savedDisc")){
+                           savedDiscount = $.cookie("savedDisc");
+                       }else{
+                           savedDiscount = 23;
+                       }
+                       var dif = savedDiscount - loaded[0].opsmo;
+                       if(loaded[0].opsmo > savedDiscount){
+                           if(loaded[0].actual === 'fine'){
+                               setTimeout($(this).css("border","10px solid green"),800);
+                           }else if (loaded[0].actual === 'bad'){
+                               setTimeout($(this).css("border","10px solid orange"),800);
+                           }
+                       }else{
+                           if(dif > 0 && dif <= 0.2 ) {
+                               if(loaded[0].actual === 'fine'){
+                                   setTimeout($(this).css("border","10px solid darkblue"),800);
+                               }
+                           }
+                       }
+                       $(this).children("div").prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + loaded[0].id + "'>" + loaded[0].dataupd + "</div>");
+                       $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html(loaded[0].opsmo);
+                   } else {
+                       $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html("Not Found");
+                   }
+               }
+           })
         }
     })
 }
 function loadallprices(ajaxSeconds) {
     if($.cookie('allprices') !== "true"){
-        getallprices();
         setTimeout(function () {
-            getallprices(true);
+            getallprices();
         },800)
         $.cookie('allprices',true,{expires: 0.0001736111});
     }
     $(document).ajaxComplete(function () {
         ajaxDay = ajaxSeconds / 86400;
         if($.cookie('allpricesAjax') !== "true"){
+        setTimeout(function () {
             getallprices();
+        },600)
             $.cookie('allpricesAjax',true,{expires: ajaxDay})
         }
     });
@@ -696,6 +677,8 @@ function settingsMenu(){
         }
     })
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
+    $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
+
     if ($.cookie("savedDisc")){
         savedDiscount = $.cookie("savedDisc");
     }else{

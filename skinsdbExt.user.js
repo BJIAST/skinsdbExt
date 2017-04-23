@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.157
+// @version      1.158
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -619,12 +619,20 @@ var getallprices = function (important){
                         if ($.cookie("savedDisc")){
                             savedDiscount = $.cookie("savedDisc");
                         }else{
-                            savedDiscount = 23;
+                            savedDiscount = 20;
                         }
                         var dif = savedDiscount - loaded[0].opsmo;
                         if(loaded[0].opsmo > savedDiscount){
                             if(loaded[0].actual === 'fine'){
                                 setTimeout($(this).css("border","10px solid green"),800);
+                                $(this).attr('id',skinId);
+                                skin = [];
+                                skin['skinid'] = skinId;
+                                skin['skinlink'] = "#"+skinId;
+                                skinsLoaded.push(skin);
+                                $("#ThatisDisc").show();
+                                $("#ThatisDisc").html(skinsLoaded.length);
+                                $("#ThatisDisc").attr("href",skinsLoaded[0]['skinlink']);
                             }else if (loaded[0].actual === 'bad'){
                                 setTimeout($(this).css("border","10px solid orange"),800);
                             }
@@ -665,6 +673,18 @@ function loadallprices(ajaxSeconds) {
             $.cookie('allpricesAjax',true,{expires: ajaxDay})
         }
     });
+    $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>"+skinsLoaded.length+"</a>");
+    $("#ThatisDisc").on("click",function () {
+        console.table(skinsLoaded);
+        skinsLoaded.splice(0,1);
+        console.table(skinsLoaded);
+        $(this).html(skinsLoaded.length);
+        if(skinsLoaded.length === 0){
+            $(this).hide();
+        }else{
+            $("#ThatisDisc").attr("href",skinsLoaded[0]['skinlink']);
+        }
+    })
 }
 function settingsMenu(){
     var btnText = "Buy this item immediately without using a shopping cart.";
@@ -685,7 +705,7 @@ function settingsMenu(){
     if ($.cookie("savedDisc")){
         savedDiscount = $.cookie("savedDisc");
     }else{
-        savedDiscount = 23;
+        savedDiscount = 20;
     }
     $(".nav.navbar-nav").append("<li class='menu'><a id='savDisc' to-hide='true' style='cursor: pointer;'>"+savedDiscount+"</a></li>");
     $("body").append('' +

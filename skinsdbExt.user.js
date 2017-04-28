@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.158
+// @version      1.160
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -230,7 +230,12 @@ function parseprice(red_btn) {
         }
         if($(this).parent().parent().children(".item-desc").children(".text-muted").html() != ""){
             var exterior = "("+$(this).parent().parent().children(".item-desc").children(".text-muted").html()+")";
-            skinName = skinName.trim()+" "+exterior;
+            var phase = $(this).parent().parent().children(".item-desc").children(".text-muted").next().html().replace( /[/^\D+/()]/g, '');
+            if(phase !== ""){
+                skinName = skinName.trim()+" Phase "+phase+" "+exterior;
+            }else{
+                skinName = skinName.trim()+" "+exterior;
+            }
         }else{
             skinName = skinName.trim();
         }
@@ -284,6 +289,30 @@ function parseprice(red_btn) {
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
                     $("[data-loading='opsMoney']").removeAttr("data-loading");
                 }
+                $(".divmoneyOps").on("click", function () {
+                    var skinName = $(this).parent().parent().children(".market-link").html();
+                    if($(this).parent().parent().children(".item-desc").children(".text-muted").html() != ""){
+                        var exterior = "("+$(this).parent().parent().children(".item-desc").children(".text-muted").html()+")";
+                        var phase = $(this).parent().parent().children(".item-desc").children(".text-muted").next().html().replace( /[/^\D+/()]/g, '');
+                        if(phase !== ""){
+                            skinName = skinName.trim()+" Phase "+phase+" "+exterior;
+                        }else{
+                            skinName = skinName.trim()+" "+exterior;
+                        }
+                    }else{
+                        skinName = skinName.trim();
+                    }
+                    var myData = new FormData();
+                    myData.append("skindate", skinName);
+                    GM_xmlhttpRequest({
+                        method:"POST",
+                        url:scriptUrl,
+                        data: myData,
+                        onload:function(result){
+                            alert(result.responseText);
+                        }
+                    })
+                })
             },
             onerror: function(res) {
                 var msg = "An error occurred."
@@ -295,26 +324,6 @@ function parseprice(red_btn) {
                     + "\nfinalUrl: " + res.finalUrl;
                 alert(msg);
             }
-        })
-        $(".divmoneyOps").on("click", function () {
-            var skinName = $(this).parent().parent().children(".market-link").html();
-            if($(this).parent().parent().children(".item-desc").children(".text-muted").html() != ""){
-                var exterior = "("+$(this).parent().parent().children(".item-desc").children(".text-muted").html()+")";
-                skinName = skinName.trim()+" "+exterior;
-            }else{
-                skinName = skinName.trim();
-            }
-            var myData = new FormData();
-            myData.append("skindate", skinName);
-            console.log(skinName);
-            GM_xmlhttpRequest({
-                method:"POST",
-                url:scriptUrl,
-                data: myData,
-                onload:function(result){
-                    alert(result.responseText);
-                }
-            })
         })
     })
 }
@@ -576,7 +585,12 @@ var getallprices = function (important){
             }
             if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
                 var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
-                skinName = skinName.trim()+" "+exterior;
+                var phase = $(this).children("div").children(".item-desc").children(".text-muted").next().html().replace( /[/^\D+/()]/g, '');
+                if(phase !== ""){
+                    skinName = skinName.trim()+" Phase "+phase+" "+exterior;
+                }else{
+                    skinName = skinName.trim()+" "+exterior;
+                }
             }else{
                 skinName = skinName.trim();
             }

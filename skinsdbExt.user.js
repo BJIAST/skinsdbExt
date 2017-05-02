@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.163
+// @version      1.164
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -1035,7 +1035,7 @@ function sellsinvChecker(){
    var check = setInterval(function () {
        if(typeof $("#inv-container").html() !== 'undefined'){
            clearInterval(check);
-          setTimeout( salesInfo(),400);
+          setTimeout( salesInfo(),500);
        }
    },800)
 };
@@ -1088,7 +1088,11 @@ function salesInfo(){
                 "<span class='label label-success opsMoney'style='background-color:#dc1010'>"+loaded[0].opsMoney+"%</span></div>");
             $("#sell-list-price").val(loaded[0].price.replace("$","").trim());
             $("#sell-selected-inspect-btn").removeAttr("disabled");
-            $("#skinsDbSales .modal-body").html(loaded[0].sels);
+            if(loaded[0].sels !== ""){
+                $("#skinsDbSales .modal-body").html(loaded[0].sels);
+            }else{
+                $("#skinsDbSales .modal-body").html("Not Loaded!");
+            }
             last20date("sell");
             las20btn("sell");
         }else{

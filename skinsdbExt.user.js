@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.161
+// @version      1.162
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -94,11 +94,11 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=good_deals"+opslink2[1]){
         fullpageparse();
-        loadallprices(5);
+        loadallprices(0);
     }
     if(site == "https://opskins.com/?loc=shop_browse"){
         fullpageparse();
-        loadallprices(5);
+        loadallprices(0);
     }
     if(site == "https://opskins.com/"+opslink3[1]){
         settingsMenu();
@@ -109,7 +109,7 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=shop_checkout"){
         fullpageparse();
-        loadallprices(5);
+        loadallprices(0);
     }
     if(site == "https://opskins.com/?loc=sell"){
         sellsinvChecker();
@@ -1035,7 +1035,7 @@ function sellsinvChecker(){
    var check = setInterval(function () {
        if(typeof $("#inv-container").html() !== 'undefined'){
            clearInterval(check);
-          setTimeout( salesInfo(),800);
+          setTimeout( salesInfo(),400);
        }
    },800)
 };
@@ -1062,7 +1062,7 @@ function salesInfo(){
         "right":"10%"
     });
     showlogs("Загружено!"+mark);
-    $(".sell-item").on("click",function () {
+    $(".sell-item").on("click",function sellitem() {
         $("#sell-selected-inspect-btn").attr("disabled","disabled");
         $("#realLowestPrice").remove();
             var url,
@@ -1070,34 +1070,80 @@ function salesInfo(){
         $("#sell-selected-inspect-btn").attr("href","#");
         $("#sell-selected-inspect-btn").attr("data-toggle","modal");
         $("#sell-selected-inspect-btn").attr("data-target","#skinsDbSales");
-            $("#sell-selected-inspect-btn").css("background","green");
-            $("#sell-selected-inspect-btn").text("Check Solds");
-            $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
-            url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
-            skinname = url.split("&sort");
-            skinname = skinname[0].split("&search_item=");
-            skinname = decodeURI(skinname[1]);
-            $("#modalSkinName").text(skinname);
+        $("#sell-selected-inspect-btn").css("background","green");
+        $("#sell-selected-inspect-btn").text("Check Solds");
+        $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
+        url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
+        skinname = url.split("&sort");
+        skinname = skinname[0].split("&search_item=");
+        skinname = decodeURI(skinname[1]);
+        $("#modalSkinName").text(skinname);
+        var loaded = $.grep(skinsLoaded, function (e) {
+            return e.skinname == skinname;
+        });
+        if (typeof loaded[0] !== 'undefined') {
+            console.table(skinsLoaded);
+            $("#realLowestPrice").css("color","green");
+            $("#realLowestPrice").html("<br>Real Lowest Price: "+loaded[0].price+"<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>"+loaded[0].moneyOps+"%</span>"+
+                "<span class='label label-success opsMoney'style='background-color:#dc1010'>"+loaded[0].opsMoney+"%</span></div>");
+            $("#sell-list-price").val(loaded[0].price.replace("$","").trim());
+            $("#sell-selected-inspect-btn").removeAttr("disabled");
+            $("#skinsDbSales .modal-body").html(loaded[0].sels);
+            last20date("sell");
+            las20btn("sell");
+        }else{
             $.post(url).done(function (e) {
                 var price = $(e).find(".item-amount").html();
                 if(typeof price !== 'undefined'){
                     price = price.replace("$","")+" $";
                     $("#realLowestPrice").css("color","green");
-                    $("#realLowestPrice").html("<br>Real Lowest Price: "+price);
-                    $("#sell-list-price").val(price.replace("$","").trim());
-                    $("#sell-selected-inspect-btn").removeAttr("disabled");
-                    var link = $(e).find(".market-link").attr("href");
-                    var newLink = "https://opskins.com/"+link;
-                    $.post(newLink).done(function(res){
-                        var sels = $(res).find(".widget.clearfix").html();
-                        $("#skinsDbSales .modal-body").html(sels);
-                        last20date("sell");
-                        las20btn("sell");
+                    var myData = new FormData();
+                    myData.append("data", skinname);
+                    myData.append("price", price);
+                    GM_xmlhttpRequest({
+                        method:"POST",
+                        url:scriptUrl,
+                        data: myData,
+                        onload:function(result) {
+                            skin = [];
+                            skin['skinname'] = skinname;
+                            skin['price'] = price;
+                            var res = jQuery.parseJSON(result.responseText);
+                            if(res['opsMoney']){
+                                skin['moneyOps'] = res['moneyOps'];
+                                skin['opsMoney'] = res['opsMoney'];
+                            }else if(res['error']){
+                                skin['opsMoney'] = res['Not Found'];
+                            } else{
+                                skin['opsMoney'] = res['Error'];
+                            }
+                            skin = [];
+                            skin['skinname'] = skinname;
+                            skin['price'] = price;
+                            var res = jQuery.parseJSON(result.responseText);
+                            if(res['opsMoney']){
+                                skin['moneyOps'] = res['moneyOps'];
+                                skin['opsMoney'] = res['opsMoney'];
+                            }else if(res['error']){
+                                skin['opsMoney'] = res['Not Found'];
+                            } else{
+                                skin['opsMoney'] = res['Error'];
+                            }
+                            var link = $(e).find(".market-link").attr("href");
+                            var newLink = "https://opskins.com/"+link;
+                            $.post(newLink).done(function(res){
+                                var sels = $(res).find(".widget.clearfix").html();
+                                skin['sels'] = sels;
+                                sellitem();
+                            })
+                            skinsLoaded.push(skin);
+                        }
                     })
                 }else{
                     $("#realLowestPrice").html("<br>Ошибка!");
                 }
             })
+        }
     })
 }
 

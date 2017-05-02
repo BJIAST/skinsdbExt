@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.162
+// @version      1.163
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -1105,18 +1105,6 @@ function salesInfo(){
                         url:scriptUrl,
                         data: myData,
                         onload:function(result) {
-                            skin = [];
-                            skin['skinname'] = skinname;
-                            skin['price'] = price;
-                            var res = jQuery.parseJSON(result.responseText);
-                            if(res['opsMoney']){
-                                skin['moneyOps'] = res['moneyOps'];
-                                skin['opsMoney'] = res['opsMoney'];
-                            }else if(res['error']){
-                                skin['opsMoney'] = res['Not Found'];
-                            } else{
-                                skin['opsMoney'] = res['Error'];
-                            }
                             skin = [];
                             skin['skinname'] = skinname;
                             skin['price'] = price;

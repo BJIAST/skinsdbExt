@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.160
+// @version      1.161
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -110,6 +110,9 @@ function opsbotload(site){
     if(site == "https://opskins.com/?loc=shop_checkout"){
         fullpageparse();
         loadallprices(5);
+    }
+    if(site == "https://opskins.com/?loc=sell"){
+        sellsinvChecker();
     }
 }
 function include(url) {
@@ -327,35 +330,51 @@ function parseprice(red_btn) {
         })
     })
 }
-function las20btn(){
-
-    var li = $(".last20 .list-group-item");
-    var datespan = $(".last20 .list-group-item .pull-right");
+function las20btn(page = "item"){
+   if(page !== "item"){
+       var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
+       var datespan = $("#skinsDbSales .modal-body .last20 .list-group-item .pull-right");
+   }else{
+       var li = $(".last20 .list-group-item");
+       var datespan = $(".last20 .list-group-item .pull-right");
+   }
     datespan.css({
         "cursor" : "pointer"
     })
-    datespan.hover(function () {
-        $(this).css("color","yellow");
-    }, function () {
-        $(this).css("color","white");
-    })
+    if(page === "item"){
+        datespan.hover(function () {
+            $(this).css("color","yellow");
+        }, function () {
+            $(this).css("color","white");
+        })
+    }else{
+        datespan.hover(function () {
+            $(this).css("color","green");
+        }, function () {
+            $(this).css("color","black");
+        })
+    }
 
     datespan.on("click",function(){
         var clickdate = $(this).html();
-        var skinName = $(".market-link").html();
-        var unavailable = $(".item-add");
-        if($(".item-desc").children(".text-muted").html() != ""){
-            var exterior = "("+$(".item-desc").children(".text-muted").html()+")";
-            skinName = skinName.trim()+" "+exterior;
+        if(page === "item"){
+            var skinName = $(".market-link").html();
+            var unavailable = $(".item-add");
+            if($(".item-desc").children(".text-muted").html() != ""){
+                var exterior = "("+$(".item-desc").children(".text-muted").html()+")";
+                skinName = skinName.trim()+" "+exterior;
+            }else{
+                skinName = skinName.trim();
+            }
         }else{
-            skinName = skinName.trim();
+           var skinName = $("#modalSkinName").text();
         }
         var skinPrice = $(this).parent().children(".text-left").html();
         skinPrice = skinPrice.split("<small");
         skinPrice = skinPrice[0];
         skinPrice = skinPrice.replace("$","");
         skinPrice = skinPrice.replace(",","");
-
+        console.log(skinName+" => "+skinPrice);
         if(!$(this).parent().children(".label-success").html()){
             $(this).parent().append(
 
@@ -404,15 +423,20 @@ function las20btn(){
         })
     })
 }
-function last20date() {
-    var li = $(".last20 .list-group-item");
-    var skinName = $(".market-link").html();
-    var unavailable = $(".item-add");
-    if($(".item-desc").children(".text-muted").html() != ""){
-        var exterior = "("+$(".item-desc").children(".text-muted").html()+")";
-        skinName = skinName.trim()+" "+exterior;
+function last20date(page = 'item') {
+    if(page === 'item'){
+        var li = $(".last20 .list-group-item");
+        var skinName = $(".market-link").html();
+        var unavailable = $(".item-add");
+        if($(".item-desc").children(".text-muted").html() != ""){
+            var exterior = "("+$(".item-desc").children(".text-muted").html()+")";
+            skinName = skinName.trim()+" "+exterior;
+        }else{
+            skinName = skinName.trim();
+        }
     }else{
-        skinName = skinName.trim();
+        var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
+        var skinName = $("#modalSkinName").text();
     }
     var myData = new FormData();
     myData.append("shop_view_skinname", skinName);
@@ -556,14 +580,6 @@ function requestforprice(opsUrl,skinname,chprice,discount = false) {
             }
         }
     })
-}
-function chromemes(mesbody){
-    var currentPermission;
-    Notification.requestPermission( function(result) { currentPermission = result } );
-    mailNotification = new Notification("skinsdbExt", {
-        body : mesbody,
-        icon : "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
-    });
 }
 var getallprices = function (important){
     var  skins = $(".scanned").map(function(){
@@ -733,17 +749,14 @@ function settingsMenu(){
         '<div class="modal-body">'+
         '<div>'+
         '<label for="discValues">Искомый процент: </label>'+
-        '&nbsp;<select name="discValues" id="discValues">'+
-        '<option value="19">19+</option>'+
-        '<option value="20">20+</option>'+
-        '<option value="21">21+</option>'+
-        '<option value="22">22+</option>'+
-        '<option value="23">23+</option>'+
-        '<option value="24">24+</option>'+
-        '</select>'+
+        // '&nbsp;<select name="discValues" id="discValues">'+
+        // '<option value="19">19+</option>'+
+        // '<option value="20">20+</option>'+
+        // '</select>'+
+        '<input type="number" name="discValues" id="discValues" class="form-control" min="1" max="99999" step="1" placeholder="" value="'+$.cookie("savedDisc")+'" style="width: 74px">'+
         '<input type="button" class="btn btn-primary" id="saveDisc" style="float:right; padding: 3px; height: 25px;" value="Сохранить">'+
         '</div>'+
-        '<div style="float: right; font-size: 12px;">Только для селектора!</div>'+
+        '<div style="float: right; font-size: 12px;">Только для дисконта!</div>'+
         '<div>'+
         '<label for="buynow" style="cursor:pointer;">Скрыть Buy Now?'+
         '<input type="checkbox" id="buynow" name="buynow" style="margin-left: 15px;"></label>'+
@@ -765,10 +778,21 @@ function settingsMenu(){
             $(".btn.btn-success[title='"+btnText+"']").show();
         }
     })
+    $("#discValues").keyup(function () {
+        if(event.keyCode==13)
+        {
+            $.cookie("savedDisc",$("#discValues").val());
+            $("#savDisc").html($("#discValues").val());
+            showlogs("Сохранено!");
+            setTimeout(function () {
+                $(".discAlert").remove();
+            },2000)
+        }
+    })
     $("#saveDisc").on("click",function () {
         $.cookie("savedDisc",$("#discValues").val());
         $("#savDisc").html($("#discValues").val());
-        $("#saveDisc").after("<span class='discAlert' style='float: right; margin:2px 6px 0 0;'>Сохранено!</span>");
+       showlogs("Сохранено!");
         setTimeout(function () {
             $(".discAlert").remove();
         },2000)
@@ -969,6 +993,7 @@ function csmomenu() {
         '</div>'+
         '</div>');
 
+
     $("#opsbot").on("change",function(){
         if(this.checked) {
             $.cookie("opsbot","on");
@@ -1006,7 +1031,108 @@ function csmocounters(){
         }
     },300)
 }
+function sellsinvChecker(){
+   var check = setInterval(function () {
+       if(typeof $("#inv-container").html() !== 'undefined'){
+           clearInterval(check);
+          setTimeout( salesInfo(),800);
+       }
+   },800)
+};
+function salesInfo(){
+    $("body").append('' +
+        '<div id="skinsDbSales" class="modal fade" role="dialog">'+
+        '<div class="modal-dialog">'+
+        '<div class="modal-content">'+
+        '<div class="modal-header">'+
+        '<button type="button" class="close" data-dismiss="modal">&times;</button>'+
+        '<h4 class="modal-title">Инфа про скин <span id="modalSkinName"></span>'+mark+'</h4>'+
+        '</div>'+
+        '<div class="modal-body">'+
+        '<span>Hi</span>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</div>');
+    $("#skinsDbSales .modal-content").css({
+        "width":"800px",
+        "right":"10%"
+    });
+    showlogs("Загружено!"+mark);
+    $(".sell-item").on("click",function () {
+        $("#sell-selected-inspect-btn").attr("disabled","disabled");
+        $("#realLowestPrice").remove();
+            var url,
+                skinname;
+        $("#sell-selected-inspect-btn").attr("href","#");
+        $("#sell-selected-inspect-btn").attr("data-toggle","modal");
+        $("#sell-selected-inspect-btn").attr("data-target","#skinsDbSales");
+            $("#sell-selected-inspect-btn").css("background","green");
+            $("#sell-selected-inspect-btn").text("Check Solds");
+            $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
+            url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
+            skinname = url.split("&sort");
+            skinname = skinname[0].split("&search_item=");
+            skinname = decodeURI(skinname[1]);
+            $("#modalSkinName").text(skinname);
+            $.post(url).done(function (e) {
+                var price = $(e).find(".item-amount").html();
+                if(typeof price !== 'undefined'){
+                    price = price.replace("$","")+" $";
+                    $("#realLowestPrice").css("color","green");
+                    $("#realLowestPrice").html("<br>Real Lowest Price: "+price);
+                    $("#sell-list-price").val(price.replace("$","").trim());
+                    $("#sell-selected-inspect-btn").removeAttr("disabled");
+                    var link = $(e).find(".market-link").attr("href");
+                    var newLink = "https://opskins.com/"+link;
+                    $.post(newLink).done(function(res){
+                        var sels = $(res).find(".widget.clearfix").html();
+                        $("#skinsDbSales .modal-body").html(sels);
+                        last20date("sell");
+                        las20btn("sell");
+                    })
+                }else{
+                    $("#realLowestPrice").html("<br>Ошибка!");
+                }
+            })
+    })
+}
 
+// Additional functions
+function chromemes(mesbody){
+    var currentPermission;
+    Notification.requestPermission( function(result) { currentPermission = result } );
+    mailNotification = new Notification("skinsdbExt", {
+        body : mesbody,
+        icon : "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
+    });
+}
+function showlogs(logmes){
+    $(".logmessage").remove();
+    $("body").append("<div class='fa fa-check-circle logmessage'><span>" + " " + logmes + "</span></div>");
+    $(".logmessage").css({
+        "position" : "fixed",
+        "bottom" : "20px",
+        "z-index":"9999999",
+        "right" : "10px",
+        "font-size" : "16px",
+        "padding": "10px 29px 8px 40px",
+        "border": "1px solid #026194",
+        "border-radius": "10px",
+        "-moz-border-radius": "10px",
+        "-webkit-border-radius": "10px",
+        "box-shadow": "2px 2px 3px #bbb",
+        "-moz-box-shadow": "2px 2px 3px #bbb",
+        "-webkit-box-shadow": "2px 2px 3px #bbb",
+        "background": "#fff",
+        "text-align":"justify",
+        "color": "#000"
+    });
+    $(".logmessage").fadeIn(300).delay(4500).fadeToggle(300);
+}
 function sortUsingNestedText(parent, childSelector, keySelector) {
     var items = parent.children(childSelector).sort(function(a, b) {
         var vA = $(keySelector, a).text();

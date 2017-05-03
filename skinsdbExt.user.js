@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.164
+// @version      1.165
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -174,7 +174,12 @@ function autoBuyclick(){
         }
     },1000)
     $("#autoBuyclick").on("click",function(){
+        var faild = "Your cart is empty. Someone may have purchased these items before you.";
         var clickInterval = setInterval(function(){
+            if($(".alert.alert-warning").text() === faild){
+                chromemes("Скинов больше нет!");
+                clearInterval(clickInterval);
+            }
             $("#site_inv_checkout").click();
         },600);
         $("#stopAutoBuyclick").on("click",function(){
@@ -331,13 +336,13 @@ function parseprice(red_btn) {
     })
 }
 function las20btn(page = "item"){
-   if(page !== "item"){
-       var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
-       var datespan = $("#skinsDbSales .modal-body .last20 .list-group-item .pull-right");
-   }else{
-       var li = $(".last20 .list-group-item");
-       var datespan = $(".last20 .list-group-item .pull-right");
-   }
+    if(page !== "item"){
+        var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
+        var datespan = $("#skinsDbSales .modal-body .last20 .list-group-item .pull-right");
+    }else{
+        var li = $(".last20 .list-group-item");
+        var datespan = $(".last20 .list-group-item .pull-right");
+    }
     datespan.css({
         "cursor" : "pointer"
     })
@@ -367,7 +372,7 @@ function las20btn(page = "item"){
                 skinName = skinName.trim();
             }
         }else{
-           var skinName = $("#modalSkinName").text();
+            var skinName = $("#modalSkinName").text();
         }
         var skinPrice = $(this).parent().children(".text-left").html();
         skinPrice = skinPrice.split("<small");
@@ -692,7 +697,7 @@ function loadallprices(ajaxSeconds) {
         setTimeout(function () {
             getallprices();
         },800)
-        $.cookie('allprices',true,{expires: 0.0001736111});
+        // $.cookie('allprices',true,{expires: 0.0001736111});
     }
     $(document).ajaxComplete(function () {
         ajaxDay = ajaxSeconds / 86400;
@@ -700,7 +705,7 @@ function loadallprices(ajaxSeconds) {
             setTimeout(function () {
                 getallprices();
             },600)
-            $.cookie('allpricesAjax',true,{expires: ajaxDay})
+            // $.cookie('allpricesAjax',true,{expires: ajaxDay})
         }
     });
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>"+skinsLoaded.length+"</a>");
@@ -792,7 +797,7 @@ function settingsMenu(){
     $("#saveDisc").on("click",function () {
         $.cookie("savedDisc",$("#discValues").val());
         $("#savDisc").html($("#discValues").val());
-       showlogs("Сохранено!");
+        showlogs("Сохранено!");
         setTimeout(function () {
             $(".discAlert").remove();
         },2000)
@@ -813,9 +818,9 @@ function settingsMenu(){
             $(this).attr("to-hide","true");
             $(this).css("background","transparent");
             $("#scroll").children(".featured-item.scanned").each(function () {
-               if($(this).attr("hidden") === "hidden"){
-                   $(this).show();
-               }
+                if($(this).attr("hidden") === "hidden"){
+                    $(this).show();
+                }
             })
         }
     })
@@ -1032,12 +1037,12 @@ function csmocounters(){
     },300)
 }
 function sellsinvChecker(){
-   var check = setInterval(function () {
-       if(typeof $("#inv-container").html() !== 'undefined'){
-           clearInterval(check);
-          setTimeout( salesInfo(),500);
-       }
-   },800)
+    var check = setInterval(function () {
+        if(typeof $("#inv-container").html() !== 'undefined'){
+            clearInterval(check);
+            setTimeout( salesInfo(),500);
+        }
+    },800)
 };
 function salesInfo(){
     $("body").append('' +
@@ -1065,8 +1070,8 @@ function salesInfo(){
     $(".sell-item").on("click",function sellitem() {
         $("#sell-selected-inspect-btn").attr("disabled","disabled");
         $("#realLowestPrice").remove();
-            var url,
-                skinname;
+        var url,
+            skinname;
         $("#sell-selected-inspect-btn").attr("href","#");
         $("#sell-selected-inspect-btn").attr("data-toggle","modal");
         $("#sell-selected-inspect-btn").attr("data-target","#skinsDbSales");
@@ -1083,21 +1088,30 @@ function salesInfo(){
         });
         if (typeof loaded[0] !== 'undefined') {
             console.table(skinsLoaded);
+            $("#skinsDbSales .modal-body").html("Not Loaded!");
             $("#realLowestPrice").css("color","green");
             $("#realLowestPrice").html("<br>Real Lowest Price: "+loaded[0].price+"<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>"+loaded[0].moneyOps+"%</span>"+
                 "<span class='label label-success opsMoney'style='background-color:#dc1010'>"+loaded[0].opsMoney+"%</span></div>");
-            $("#sell-list-price").val(loaded[0].price.replace("$","").trim());
             $("#sell-selected-inspect-btn").removeAttr("disabled");
-            if(loaded[0].sels !== ""){
+            if(typeof loaded[0].sels !== 'undefined'){
                 $("#skinsDbSales .modal-body").html(loaded[0].sels);
             }else{
-                $("#skinsDbSales .modal-body").html("Not Loaded!");
+                var  index = -1;
+                for(var i = 0, len = skinsLoaded.length; i < len; i++) {
+                    if (skinsLoaded[i].skinnname === skinname) {
+                        index = i;
+                        break;
+                    }
+                }
+                skinsLoaded.splice(index, 1);
+                console.log("Index : " + index);
             }
             last20date("sell");
             las20btn("sell");
         }else{
             $.post(url).done(function (e) {
                 var price = $(e).find(".item-amount").html();
+                var link = $(e).find(".market-link").attr("href");
                 if(typeof price !== 'undefined'){
                     price = price.replace("$","")+" $";
                     $("#realLowestPrice").css("color","green");
@@ -1121,14 +1135,13 @@ function salesInfo(){
                             } else{
                                 skin['opsMoney'] = res['Error'];
                             }
-                            var link = $(e).find(".market-link").attr("href");
                             var newLink = "https://opskins.com/"+link;
                             $.post(newLink).done(function(res){
                                 var sels = $(res).find(".widget.clearfix").html();
                                 skin['sels'] = sels;
-                                sellitem();
+                                skinsLoaded.push(skin);
                             })
-                            skinsLoaded.push(skin);
+                            sellitem();
                         }
                     })
                 }else{

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.165
+// @version      1.166
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -84,7 +84,7 @@ function opsbotload(site){
     var opslink2 = site.split("?loc=good_deals");
     var opslink3 = site.split("https://opskins.com/");
     var opslink4 = site.split("?loc=shop_view_item");
-
+    var opslink5 = site.split("?loc=shop_browse");
 
     if (site == "https://opskins.com/?loc=shop_checkout") {
         autoBuyclick();
@@ -96,9 +96,10 @@ function opsbotload(site){
         fullpageparse();
         loadallprices(0);
     }
-    if(site == "https://opskins.com/?loc=shop_browse"){
+    if(site == "https://opskins.com/?loc=shop_browse"+opslink5[1]){
         fullpageparse();
         loadallprices(0);
+        mysteryInner();
     }
     if(site == "https://opskins.com/"+opslink3[1]){
         settingsMenu();
@@ -586,27 +587,47 @@ function requestforprice(opsUrl,skinname,chprice,discount = false) {
         }
     })
 }
-var getallprices = function (important){
+var getallprices = function (opd){
     var  skins = $(".scanned").map(function(){
-        if($(this).children("div").children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof $(this).children("div").children(".skinDBupd").attr("skin-id") === 'undefined') {
-            var skinName = $(this).children("div").children(".market-link").html();
-            var unavailable = $(this).children("div").children(".item-add");
+        var route;
+        if(opd === "opd"){
+            route = $(this);
+        }else{
+            route = $(this).children("div");
+        }
+        if(route.children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof route.children(".skinDBupd").attr("skin-id") === 'undefined') {
+            var skinName = route.children(".market-link").html();
+            var unavailable = route.children(".item-add");
             if(unavailable.html()){
-                var skinPrice = unavailable.children(".item-amount").html();
-                var skinId = unavailable.children(".item-amount").attr('onclick');
-                skinId = skinId.split("showGraphFromId(");
-                skinId = skinId[1];
-                skinId = skinId.replace(")","");
+                if(opd === "opd"){
+                    var skinPrice = unavailable.children("div").children(".item-amount").html();
+                    var skinId = route.children(".market-link").attr("href");
+                    skinId = skinId.split("&item=");
+                    skinId = skinId[1];
+                }else{
+                    var skinPrice = unavailable.children(".item-amount").html();
+                    var skinId = unavailable.children(".item-amount").attr('onclick');
+                    skinId = skinId.split("showGraphFromId(");
+                    skinId = skinId[1];
+                    skinId = skinId.replace(")","");
+                }
             }else{
-                var skinPrice = $(this).children("div").children(".item-add-wear").children(".item-amount").html();
-                var skinId = $(this).children("div").children(".item-add-wear").children(".item-amount").attr('onclick');
-                skinId = skinId.split("showGraphFromId(");
-                skinId = skinId[1];
-                skinId = skinId.replace(")", "");
+                if(opd === "opd"){
+                    var skinPrice = route.children(".item-add-wear").children("div").children(".item-amount").html();
+                    var skinId = route.children(".market-link").attr("href");
+                    skinId = skinId.split("&item=");
+                    skinId = skinId[1];
+                }else{
+                    var skinPrice = route.children(".item-add-wear").children(".item-amount").html();
+                    var skinId = route.children(".item-add-wear").children(".item-amount").attr('onclick');
+                    skinId = skinId.split("showGraphFromId(");
+                    skinId = skinId[1];
+                    skinId = skinId.replace(")", "");
+                }
             }
-            if($(this).children("div").children(".item-desc").children(".text-muted").html() != ""){
-                var exterior = "("+$(this).children("div").children(".item-desc").children(".text-muted").html()+")";
-                var phase = $(this).children("div").children(".item-desc").children(".text-muted").next().html().replace( /[/^\D+/()]/g, '');
+            if(route.children(".item-desc").children(".text-muted").html() != ""){
+                var exterior = "("+route.children(".item-desc").children(".text-muted").html()+")";
+                var phase = route.children(".item-desc").children(".text-muted").next().html().replace( /[/^\D+/()]/g, '');
                 if(phase !== ""){
                     skinName = skinName.trim()+" Phase "+phase+" "+exterior;
                 }else{
@@ -634,18 +655,36 @@ var getallprices = function (important){
         onload:function(result){
             var res = jQuery.parseJSON(result.responseText);
             $('.featured-item.scanned').each(function () {
-                if($(this).children("div").children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof $(this).children("div").children(".good-skinDBupd-discount-pct").attr("skin-id") === 'undefined') {
-                    var unavailable = $(this).children("div").children(".item-add");
-                    if (unavailable.html()) {
-                        var skinId = unavailable.children(".item-amount").attr('onclick');
-                        skinId = skinId.split("showGraphFromId(");
-                        skinId = skinId[1];
-                        skinId = skinId.replace(")", "");
-                    } else {
-                        var skinId = $(this).children("div").children(".item-add-wear").children(".item-amount").attr('onclick');
-                        skinId = skinId.split("showGraphFromId(");
-                        skinId = skinId[1];
-                        skinId = skinId.replace(")", "");
+                var route;
+                if(opd === "opd"){
+                    route = $(this);
+                }else{
+                    route = $(this).children("div");
+                }
+                if(route.children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof route.children(".good-skinDBupd-discount-pct").attr("skin-id") === 'undefined') {
+                    var unavailable = route.children(".item-add");
+                    if(unavailable.html()){
+                        if(opd === "opd"){
+                            var skinId = route.children(".market-link").attr("href");
+                            skinId = skinId.split("&item=");
+                            skinId = skinId[1];
+                        }else{
+                            var skinId = unavailable.children(".item-amount").attr('onclick');
+                            skinId = skinId.split("showGraphFromId(");
+                            skinId = skinId[1];
+                            skinId = skinId.replace(")","");
+                        }
+                    }else{
+                        if(opd === "opd"){
+                            var skinId = route.children(".market-link").attr("href");
+                            skinId = skinId.split("&item=");
+                            skinId = skinId[1];
+                        }else{
+                            var skinId = route.children(".item-add-wear").children(".item-amount").attr('onclick');
+                            skinId = skinId.split("showGraphFromId(");
+                            skinId = skinId[1];
+                            skinId = skinId.replace(")", "");
+                        }
                     }
                     var loaded = $.grep(res, function (e) {
                         return e.id == skinId;
@@ -678,11 +717,11 @@ var getallprices = function (important){
                                 }
                             }
                         }
-                        $(this).children("div").prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + loaded[0].id + "'>" + loaded[0].dataupd + "</div>");
+                        route.prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + loaded[0].id + "'>" + loaded[0].dataupd + "</div>");
                         if(loaded[0].opsmo !== "Not Found"){
-                            $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>%");
+                            route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>%");
                         }else{
-                            $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>");
+                           route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>");
                         }
                     } else {
                         $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html("Not Found");
@@ -710,9 +749,12 @@ function loadallprices(ajaxSeconds) {
     });
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>"+skinsLoaded.length+"</a>");
     $("#ThatisDisc").on("click",function () {
-        console.table(skinsLoaded);
+        if($(".mystery-item-inner .live-listings i").hasClass("fa-pause-circle")){
+            $(".mystery-item-inner .live-listings i").click();
+        }
+        // console.table(skinsLoaded);
         skinsLoaded.splice(0,1);
-        console.table(skinsLoaded);
+        // console.table(skinsLoaded);
         $(this).html(skinsLoaded.length);
         if(skinsLoaded.length === 0){
             $(this).hide();
@@ -720,6 +762,18 @@ function loadallprices(ajaxSeconds) {
             $("#ThatisDisc").attr("href",skinsLoaded[0]['skinlink']);
         }
     })
+}
+function mysteryInner(){
+    var misteryBox = $(".mystery-item-inner .live-listings");
+    if(misteryBox.children("i").hasClass("fa-pause-circle")){
+        setInterval(function () {
+            fullpageparse();
+            getallprices("opd");
+        },3000);
+        showlogs("Interval Started!");
+    }else{
+        showlogs("Interval NOT Started!");
+    }
 }
 function settingsMenu(){
     var btnText = "Buy this item immediately without using a shopping cart.";

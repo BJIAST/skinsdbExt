@@ -1,16 +1,13 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.166
+// @version      1.167
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://cs.money/*
-// @match       https://csgosell.com/*
-// @match       http://csgotrade.me/*
 // @match       http://trade-skins.com/*
-// @match       http://tradeskinsfast.com/*
 // @match       https://cs.money/*
 // @match       https://opskins.com/*
 // @match       https://steamcommunity.com/trade/*
@@ -188,12 +185,12 @@ function autoBuyclick(){
         });
     });
 }
-function fullpageparse() {
+function fullpageparse(opd = "not") {
     $(".label-success").each(function(){
         if($(this).attr("data-ext") != "autoparse"){
             $(this).html("Price");
             $(this).attr("data-ext","autoparse");
-            parseprice($(this));
+            parseprice($(this),opd);
         }
     })
     $( document ).ajaxComplete(function(){
@@ -201,12 +198,12 @@ function fullpageparse() {
             if($(this).attr("data-ext") != "autoparse"){
                 $(this).html("Price");
                 $(this).attr("data-ext","autoparse");
-                parseprice($(this));
+                parseprice($(this),opd);
             }
         })
     })
 }
-function parseprice(red_btn) {
+function parseprice(red_btn,opd) {
     $(".good-deal-discount-pct").css({
         "top": "4px",
         "right":"40px"
@@ -233,9 +230,17 @@ function parseprice(red_btn) {
         var skinName = $(this).parent().parent().children(".market-link").html();
         var unavailable = $(this).parent().parent().children(".item-add");
         if(unavailable.html()){
-            var skinPrice = unavailable.children(".item-amount").html();
+            if(opd === "not"){
+                var skinPrice = unavailable.children(".item-amount").html();
+            }else{
+                var skinPrice = unavailable.children("div").children(".item-amount").html();
+            }
         }else{
-            var skinPrice = $(this).parent().parent().children(".item-add-wear").children(".item-amount").html();
+            if(opd === "not"){
+                var skinPrice = $(this).parent().parent().children(".item-add-wear").children(".item-amount").html();
+            }else{
+                var skinPrice = $(this).parent().parent().children(".item-add-wear").children("div").children(".item-amount").html();
+            }
         }
         if($(this).parent().parent().children(".item-desc").children(".text-muted").html() != ""){
             var exterior = "("+$(this).parent().parent().children(".item-desc").children(".text-muted").html()+")";
@@ -698,6 +703,39 @@ var getallprices = function (opd){
                         var dif = savedDiscount - loaded[0].opsmo;
                         if(loaded[0].opsmo > savedDiscount){
                             if(loaded[0].actual === 'fine'){
+                                if($.cookie("autobuy") === "true" && opd === "opd"){
+                                    if($(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member" && typeof $(this).children(".item-add-wear").children("div").children(".buyers-club-icon").html() === "undefined" && typeof $(this).children(".item-add").children("div").children(".buyers-club-icon").html() === "undefined"){
+                                        if($(this).children(".item-add").html()){
+                                            var div = this;
+                                            $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
+                                            function autobuy(el) {
+                                                $(el).children(".item-add").children(".item-buttons").children(".btn-success").click();
+                                            }
+                                            setTimeout(function () {
+                                                autobuy(div);
+                                            },220);
+                                            showlogs("<h3>Попытался купить: </h3></h3><br>"+$(div).html());
+                                            soundAccept.play();
+                                            setTimeout(function () {
+                                                $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+                                            },5000);
+                                        }else if($(this).children(".item-add-wear").html()){
+                                            var div = this;
+                                            $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
+                                            function autobuy(el) {
+                                                $(el).children(".item-add-wear").children(".item-buttons").children(".btn-success").click();
+                                            }
+                                            setTimeout(function () {
+                                                autobuy(div);
+                                            },220);
+                                            showlogs("<h3>Попытался купить: </h3></h3><br>"+$(div).html());
+                                            soundAccept.play();
+                                            setTimeout(function () {
+                                                $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+                                            },5000);
+                                        }
+                                    }
+                                }
                                 setTimeout($(this).css("border","10px solid green"),800);
                                 $(this).attr('id',skinId);
                                 skin = [];
@@ -721,7 +759,7 @@ var getallprices = function (opd){
                         if(loaded[0].opsmo !== "Not Found"){
                             route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>%");
                         }else{
-                           route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>");
+                            route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>"+loaded[0].opsmo+"</span>");
                         }
                     } else {
                         $(this).children("div").children(".good-deal-discount-pct").children(".label.label-success").html("Not Found");
@@ -767,9 +805,9 @@ function mysteryInner(){
     var misteryBox = $(".mystery-item-inner .live-listings");
     if(misteryBox.children("i").hasClass("fa-pause-circle")){
         setInterval(function () {
-            fullpageparse();
+            fullpageparse("opd");
             getallprices("opd");
-        },3000);
+        },1800);
         showlogs("Interval Started!");
     }else{
         showlogs("Interval NOT Started!");
@@ -782,6 +820,11 @@ function settingsMenu(){
         setTimeout(function(){
             $("#buynow").prop("checked", true);
         },600)
+    }
+    if($.cookie("autobuy") === "true"){
+        setTimeout(function(){
+            $("#autobuy").prop("checked",true);
+        })
     }
     $(document).ajaxComplete(function () {
         if($.cookie("buynow") === "hide") {
@@ -820,6 +863,10 @@ function settingsMenu(){
         '<label for="buynow" style="cursor:pointer;">Скрыть Buy Now?'+
         '<input type="checkbox" id="buynow" name="buynow" style="margin-left: 15px;"></label>'+
         '</div>'+
+        '<div>'+
+        '<label for="autobuy" style="cursor:pointer;">Авто-Бай'+
+        '<input type="checkbox" id="autobuy" name="autobuy" style="margin-left: 15px;"></label>'+
+        '</div>'+
         '</div>'+
         '<div class="modal-footer">'+
         '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'+
@@ -827,6 +874,14 @@ function settingsMenu(){
         '</div>'+
         '</div>'+
         '</div>');
+
+    $("#autobuy").on("change",function(){
+        if(this.checked) {
+            $.cookie("autobuy","true");
+        }else{
+            $.removeCookie("autobuy");
+        }
+    })
 
     $("#buynow").on("change",function(){
         if(this.checked) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.168
+// @version      1.20
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -732,11 +732,11 @@ var getallprices = function (opd){
                                         if(buyCounter > 5){
                                             setTimeout(function () {
                                                 $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                            },1000*buyCounter);
+                                            },2000*buyCounter);
                                         }else{
                                             setTimeout(function () {
                                                 $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                            },5000);
+                                            },7000);
                                         }
                                     }
                                 }

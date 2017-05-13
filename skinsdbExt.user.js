@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.167
+// @version      1.168
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -47,6 +47,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 }
                 if (JSONdata['success']){
                     opsbotload(site);
+                    $.cookie("role",JSONdata['role']);
                 }
             }
         })
@@ -111,6 +112,9 @@ function opsbotload(site){
     }
     if(site == "https://opskins.com/?loc=sell"){
         sellsinvChecker();
+    }
+    if(site == "https://opskins.com/?loc=store_account#manageSales"){
+       realEarning();
     }
 }
 function include(url) {
@@ -651,6 +655,7 @@ var getallprices = function (opd){
         }
     }).get();
     var jsonString = JSON.stringify(skins);
+    var buyCounter = 0;
     var myData = new FormData();
     myData.append("skinarray", jsonString);
     GM_xmlhttpRequest({
@@ -705,31 +710,30 @@ var getallprices = function (opd){
                             if(loaded[0].actual === 'fine'){
                                 if($.cookie("autobuy") === "true" && opd === "opd"){
                                     if($(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member" && typeof $(this).children(".item-add-wear").children("div").children(".buyers-club-icon").html() === "undefined" && typeof $(this).children(".item-add").children("div").children(".buyers-club-icon").html() === "undefined"){
+                                        buyCounter++;
                                         if($(this).children(".item-add").html()){
                                             var div = this;
                                             $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
                                             function autobuy(el) {
                                                 $(el).children(".item-add").children(".item-buttons").children(".btn-success").click();
                                             }
-                                            setTimeout(function () {
-                                                autobuy(div);
-                                            },220);
-                                            showlogs("<h3>Попытался купить: </h3></h3><br>"+$(div).html());
-                                            soundAccept.play();
-                                            setTimeout(function () {
-                                                $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                            },5000);
                                         }else if($(this).children(".item-add-wear").html()){
                                             var div = this;
                                             $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
                                             function autobuy(el) {
                                                 $(el).children(".item-add-wear").children(".item-buttons").children(".btn-success").click();
                                             }
+                                        }
+                                        setTimeout(function () {
+                                            autobuy(div);
+                                        },220);
+                                        showlogs("<h3>Попытался купить в <span style='color: green;'>"+loaded[0].opsmo+"%</span>: </h3>"+$(div).html());
+                                        soundAccept.play();
+                                        if(buyCounter > 5){
                                             setTimeout(function () {
-                                                autobuy(div);
-                                            },220);
-                                            showlogs("<h3>Попытался купить: </h3></h3><br>"+$(div).html());
-                                            soundAccept.play();
+                                                $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+                                            },1000*buyCounter);
+                                        }else{
                                             setTimeout(function () {
                                                 $(".mystery-item-inner .live-listings i.fa-play-circle").click();
                                             },5000);
@@ -804,10 +808,21 @@ function loadallprices(ajaxSeconds) {
 function mysteryInner(){
     var misteryBox = $(".mystery-item-inner .live-listings");
     if(misteryBox.children("i").hasClass("fa-pause-circle")){
-        setInterval(function () {
-            fullpageparse("opd");
-            getallprices("opd");
-        },1800);
+       if($.cookie("role") === "superuser"){
+           setInterval(function () {
+               fullpageparse("opd");
+           },600);
+           setInterval(function () {
+               getallprices("opd");
+           },1500);
+       }else if ($.cookie("role") === "admin"){
+           setInterval(function () {
+               fullpageparse("opd");
+           },300);
+           setInterval(function () {
+               getallprices("opd");
+           },400);
+       }
         showlogs("Interval Started!");
     }else{
         showlogs("Interval NOT Started!");
@@ -832,7 +847,7 @@ function settingsMenu(){
         }
     })
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки"+mark+"</a></li>");
-    $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
+    // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
 
     if ($.cookie("savedDisc")){
         savedDiscount = $.cookie("savedDisc");
@@ -1257,6 +1272,62 @@ function salesInfo(){
                     $("#realLowestPrice").html("<br>Ошибка!");
                 }
             })
+        }
+    })
+}
+
+function realEarning() {
+    var balance = $("#op-count").text().replace("$","");
+    var op = $("#op-credits-count span i").text().replace("$","").trim();
+    var fullBal = Math.round(parseFloat(balance + op) * 100) / 100;
+    $( document ).ajaxComplete(function ( event, xhr, settings ) {
+        if(settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2'){
+            $(".btn.btn-primary.pull-right:contains('Download History')").before("<a href='http://skinsdb.xyz/?mySales' class='btn btn-primary pull-right' target='_blank'>Мои продажи "+mark+"</a>");
+            $("#iTrans table thead th:contains('Your Cut')").after("<th style='text-align: center'>CS.Money (забрал)</th>");
+            $("#iTrans table thead th:contains('CS.Money (забрал)')").after("<th style='text-align: center'>CS.Money -> Opskins</th>");
+            $("#iTrans table tbody td:contains('On Sale')").before("<td class='skinDBcsmoops'>CSMOOPS (Loading..)</td>");
+            $("#iTrans table tbody td:contains('CSMOOPS (Loading..)')").before("<td class='skinDBcsmprice'>CSMOPRICE (Loading..)</td>");
+
+            var myData = new FormData();
+            var onSold = 0;
+
+            myData.append("usersales", true);
+            GM_xmlhttpRequest({
+                method:"POST",
+                url:scriptUrl,
+                data: myData,
+                onload:function(result) {
+                    var res = jQuery.parseJSON(result.responseText);
+                    res = res[0];
+                    console.log(res);
+                    for (var i = 0; i < res.length; i++){
+                        if(res[i]["actual"] === "0"){
+                            $("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().children("td").children("a").css({"color" : "red", "font-weight" : "bold"});
+                        }
+                        $("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().find(".skinDBcsmprice").text("$"+res[i]["csmoney"]);
+                        $("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().find(".skinDBcsmprice").css("text-align","center");
+                        var opsprice =  parseFloat($("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().find(".editable").text().replace("$","").trim());
+                        var resmo = 100-opsprice*95/res[i]["csmoney"];
+                        var res2 = Math.round(resmo * 100) / 100;;
+                        if(res2 > 0){
+                            res2 = -res2;
+                        }else if(res2 < 0){
+                            res2 = res2 + res2*(-2);
+                        }
+                        $("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().find(".skinDBcsmoops").text(res2+"%");
+                        $("#iTrans table tbody td:contains('"+res[i]['id']+"')").parent().find(".skinDBcsmoops").css("text-align","center");
+                        // console.log(res[i]['id']);
+                    }
+                }
+            })
+
+            $("#iTrans table tbody tr td.editable").each(function(){
+                var price = parseFloat($(this).text().replace("$","").trim());
+                onSold += price;
+            })
+            onSold = Math.round((onSold * 0.95) * 100) / 100;
+            realFullB = fullBal + onSold;
+            $("span[id='sold-items-earned']")[1].innerHTML = "<span style='color:green; font-weight: bold;'>"+onSold+"$</span> + <span style='color:green; font-weight: bold;'>"+fullBal+"$</span> = " + realFullB + "$";
         }
     })
 }

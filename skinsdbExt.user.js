@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.201
+// @version      1.202
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -655,7 +655,6 @@ var getallprices = function (opd){
         }
     }).get();
     var jsonString = JSON.stringify(skins);
-    var buyCounter = 0;
     var myData = new FormData();
     myData.append("skinarray", jsonString);
     GM_xmlhttpRequest({
@@ -663,6 +662,7 @@ var getallprices = function (opd){
         url:scriptUrl,
         data: myData,
         onload:function(result){
+            var buyCounter = 0;
             var res = jQuery.parseJSON(result.responseText);
             $('.featured-item.scanned').each(function () {
                 var route;
@@ -708,9 +708,9 @@ var getallprices = function (opd){
                         var dif = savedDiscount - loaded[0].opsmo;
                         if(loaded[0].opsmo > savedDiscount){
                             if(loaded[0].actual === 'fine'){
+                                buyCounter = buyCounter + 1;
                                 if($.cookie("autobuy") === "true" && opd === "opd"){
                                     if($(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member" && typeof $(this).children(".item-add-wear").children("div").children(".buyers-club-icon").html() === "undefined" && typeof $(this).children(".item-add").children("div").children(".buyers-club-icon").html() === "undefined"){
-                                        buyCounter++;
                                         if($(this).children(".item-add").html()){
                                             var div = this;
                                             $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
@@ -729,14 +729,14 @@ var getallprices = function (opd){
                                         },220);
                                         showlogs("<h3>Попытался купить в <span style='color: green;'>"+loaded[0].opsmo+"%</span>: </h3>"+$(div).html());
                                         soundAccept.play();
-                                        if(buyCounter > 5){
+                                        if(buyCounter > 3){
                                             setTimeout(function () {
                                                 $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                            },2000*buyCounter);
+                                            },4000*buyCounter);
                                         }else{
                                             setTimeout(function () {
                                                 $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                            },7000);
+                                            },4000);
                                         }
                                     }
                                 }
@@ -753,7 +753,7 @@ var getallprices = function (opd){
                                 setTimeout($(this).css("border","10px solid orange"),800);
                             }
                         }else{
-                            if(dif > 0 && dif <= 0.2 ) {
+                            if(dif > 0 && dif <= 1.2 ) {
                                 if(loaded[0].actual === 'fine'){
                                     setTimeout($(this).css("border","10px solid darkblue"),800);
                                 }
@@ -927,26 +927,11 @@ function settingsMenu(){
         },2000)
     })
     $("#savDisc").on("click",function () {
-        if ($(this).attr("to-hide") === "true") {
-            $(this).attr("to-hide","false");
-            $(this).css("background","green")
-            var discValue = $(this).html();
-            $("#scroll").children(".featured-item.scanned").each(function () {
-                var realOpsmo = $(this).children("div").children(".good-deal-discount-pct").children(".label-success").children(".realOpsmo").html();
-                if (Number(realOpsmo) < discValue || typeof realOpsmo === 'undefined' || realOpsmo === "Not Found") {
-                    $(this).hide();
-                    $(this).attr("hidden","true");
-                }
-            })
-        }else{
-            $(this).attr("to-hide","true");
-            $(this).css("background","transparent");
-            $("#scroll").children(".featured-item.scanned").each(function () {
-                if($(this).attr("hidden") === "hidden"){
-                    $(this).show();
-                }
-            })
-        }
+
+        sortUsingNestedText($("#scroll"),"div.scanned", "div .good-deal-discount-pct .label-success .realOpsmo");
+        $("body").animate({
+            scrollTop:0
+        },'fast');
     })
 }
 function csmobot() {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.20
+// @version      1.201
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -1279,7 +1279,7 @@ function salesInfo(){
 function realEarning() {
     var balance = $("#op-count").text().replace("$","");
     var op = $("#op-credits-count span i").text().replace("$","").trim();
-    var fullBal = Math.round(parseFloat(balance + op) * 100) / 100;
+    var fullBal = Math.round((parseFloat(balance + op)) * 100) / 100;
     $( document ).ajaxComplete(function ( event, xhr, settings ) {
         if(settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2'){
             $(".btn.btn-primary.pull-right:contains('Download History')").before("<a href='http://skinsdb.xyz/?mySales' class='btn btn-primary pull-right' target='_blank'>Мои продажи "+mark+"</a>");
@@ -1326,7 +1326,7 @@ function realEarning() {
                 onSold += price;
             })
             onSold = Math.round((onSold * 0.95) * 100) / 100;
-            realFullB = fullBal + onSold;
+            realFullB = Math.round((fullBal + onSold) *100) / 100;
             $("span[id='sold-items-earned']")[1].innerHTML = "<span style='color:green; font-weight: bold;'>"+onSold+"$</span> + <span style='color:green; font-weight: bold;'>"+fullBal+"$</span> = " + realFullB + "$";
         }
     })

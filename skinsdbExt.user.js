@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.212
+// @version      1.220
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -97,10 +97,10 @@ function opsbotload(site) {
         loadallprices(true);
     }
     if (site == "https://opskins.com/?loc=shop_browse" + opslink5[1]) {
+        reloadpage();
         fullpageparse();
         loadallprices();
         mysteryInner();
-
     }
     if (site == "https://opskins.com/" + opslink3[1]) {
         settingsMenu();
@@ -263,7 +263,7 @@ function parseprice(red_btn, opd) {
         if ($.cookie("savedDisc")) {
             savedDiscount = $.cookie("savedDisc");
         } else {
-            savedDiscount = 20;
+            savedDiscount = 25;
         }
         skinPrice = skinPrice.replace("$", "");
         skinPrice = skinPrice.replace(",", "");
@@ -708,43 +708,37 @@ var getallprices = function (opd) {
                             if ($.cookie("savedDisc")) {
                                 savedDiscount = $.cookie("savedDisc");
                             } else {
-                                savedDiscount = 20;
+                                savedDiscount = 25;
                             }
                             var dif = savedDiscount - loaded[0].opsmo;
                             if (loaded[0].opsmo > savedDiscount) {
                                 if (loaded[0].actual === 'fine') {
                                     var type = $(this).find(".text-muted").next().text();
-                                    if ($.cookie("autobuy") === "true" && opd === "opd" && type !== "Base Grade Key") {
-                                        if ($(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member" && typeof $(this).find(".buyers-club-icon").html() === "undefined") {
-                                            ++buyCounter;
-                                            var div = this;
-                                            $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
-                                            showlogs("<h3>Попытался купить в <span style='color: green;'>" + loaded[0].opsmo + "%</span>: </h3>" + $(div).html());
-                                            soundAccept.play();
-                                            setTimeout(function () {
-                                                if ($("#live-listing-pause").hasClass("fa-play-circle")) {
-                                                    autobuy(div);
-                                                    setTimeout(function () {
-                                                        $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                                        buyCounter = 0;
-                                                    }, 4000 * buyCounter)
-                                                }
-                                            }, 220)
-                                            function autobuy(el) {
-                                                $(el).find(".btn.btn-success").click();
-                                            }
+                                    if (opd === "opd") {
+                                        if (typeof $(this).find(".buyers-club-icon").html() === "undefined" && type !== "Base Grade Key") {
+                                            $(this).attr("style", "border:10px solid green;");
+                                            skin = [];
+                                            skin['skinid'] = skinId;
+                                            skin['skindisc'] = loaded[0].opsmo;
+                                            skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).children(".item-desc").find(".text-muted").text() + ")";
+                                            skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                            skinsLoaded.push(skin);
                                         }
-                                    }
-                                    if (type !== "Base Grade Key") {
-                                        $(this).attr("style", "border:10px solid green;");
-                                        $(this).attr('id', skinId);
-                                        skin = [];
-                                        skin['skinid'] = skinId;
-                                        skin['skinlink'] = "#" + skinId;
-                                        skinsLoaded.push(skin);
-                                        $("#ThatisDisc").show();
-                                        $("#ThatisDisc").html(skinsLoaded.length);
-                                        $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                                    } else {
+                                        if (type !== "Base Grade Key") {
+                                            $(this).attr("style", "border:10px solid green;");
+                                            $(this).attr('id', skinId);
+                                            skin = [];
+                                            skin['skinid'] = skinId;
+                                            skin['skinlink'] = "#" + skinId;
+                                            skin['skindisc'] = loaded[0].opsmo;
+                                            skin['skinname'] = $(this).find(".market-link").text()
+                                            skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                            skinsLoaded.push(skin);
+                                            $("#ThatisDisc").show();
+                                            $("#ThatisDisc").html(skinsLoaded.length);
+                                            $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                                        }
                                     }
                                 } else if (loaded[0].actual === 'bad') {
                                     $(this).attr("style", "border:10px solid orange;");
@@ -847,44 +841,40 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     } else {
-                        savedDiscount = 20;
+                        savedDiscount = 25;
                     }
                     var resom = 100 - (skinPrice * 100) / (loaded[0].price * 0.97);
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
                     if (res1 > savedDiscount) {
                         if (loaded[0].actual === 'fine') {
-                            // ++buyCounter;
-                            // if ($.cookie("autobuy") === "true" && opd === "opd") {
-                            //     if ($(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member" && typeof $(this).children(".item-add-wear").children("div").children(".buyers-club-icon").html() === "undefined" && typeof $(this).children(".item-add").children("div").children(".buyers-club-icon").html() === "undefined") {
-                            //         // if ($(this).children(".item-add").html()) {
-                            //         var div = this;
-                            //         $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
-                            //         showlogs("<h3>Попытался купить в <span style='color: green;'>" + res1 + "%</span>: </h3>" + $(div).html());
-                            //         soundAccept.play();
-                            //         setTimeout(function () {
-                            //             if ($("#live-listing-pause").hasClass("fa-play-circle")) {
-                            //                 autobuy(div);
-                            //                 setTimeout(function () {
-                            //                     $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                            //                     buyCounter = 0;
-                            //                 }, 4000 * buyCounter)
-                            //             }
-                            //         }, 220)
-                            //         function autobuy(el) {
-                            //             $(el).find(".btn.btn-success").click();
-                            //         }
-                            //     }
-                            // }
-                            $(this).attr("style", "border:10px solid green;");
-                            $(this).attr('id', skinId);
-                            skin = [];
-                            skin['skinid'] = skinId;
-                            skin['skinlink'] = "#" + skinId;
-                            skinsLoaded.push(skin);
-                            $("#ThatisDisc").show();
-                            $("#ThatisDisc").html(skinsLoaded.length);
-                            $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                            var type = $(this).find(".text-muted").next().text();
+                            if (opd === "opd") {
+                                if (typeof $(this).find(".buyers-club-icon").html() === "undefined" && type !== "Base Grade Key") {
+                                    $(this).attr("style", "border:10px solid green;");
+                                    skin = [];
+                                    skin['skinid'] = skinId;
+                                    skin['skindisc'] = res1;
+                                    skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).children(".item-desc").find(".text-muted").text() + ")";
+                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                    skinsLoaded.push(skin);
+                                }
+                            } else {
+                                if (type !== "Base Grade Key") {
+                                    $(this).attr("style", "border:10px solid green;");
+                                    $(this).attr('id', skinId);
+                                    skin = [];
+                                    skin['skinid'] = skinId;
+                                    skin['skinlink'] = "#" + skinId;
+                                    skin['skindisc'] = res1;
+                                    skin['skinname'] = $(this).find(".market-link").text()
+                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                    skinsLoaded.push(skin);
+                                    $("#ThatisDisc").show();
+                                    $("#ThatisDisc").html(skinsLoaded.length);
+                                    $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                                }
+                            }
                         } else if (loaded[0].actual === 'bad') {
                             $(this).attr("style", "border:10px solid orange;");
                         }
@@ -909,9 +899,10 @@ function newloadallprices(opd) {
 
 function loadallprices(fullprice = false) {
     newgetprices();
-    if (fullprice === true) {
+    if (fullprice === true || $.cookie("cpumode") === "on") {
         setInterval(function () {
             newgetprices();
+            showlogs("Цены обновлены"+mark);
         }, 30000)
     }
     setTimeout(function () {
@@ -940,22 +931,50 @@ function loadallprices(fullprice = false) {
 function mysteryInner() {
     var misteryBox = $(".mystery-item-inner .live-listings");
     if (misteryBox.children("i").hasClass("fa-pause-circle")) {
-        if ($.cookie("role") === "superuser") {
-            setInterval(function () {
-                fullpageparse("opd");
-            }, 600);
-            setInterval(function () {
-                getallprices("opd");
-            }, 1500);
-            showlogs("Interval Started!");
-        } else if ($.cookie("role") === "admin") {
-            setInterval(function () {
-                fullpageparse("opd");
-            }, 300);
-            setInterval(function () {
-                getallprices("opd");
-            }, 400);
-            showlogs("Interval Started!");
+        if (skinsLoaded.length > 0) {
+            delete skinsdbprices;
+            skinsLoaded = [];
+        }
+        if ($.cookie("cpumode") === "on") {
+            if ($.cookie("role") === "superuser") {
+                setInterval(function () {
+                    fullpageparse("opd");
+                }, 50);
+                setInterval(function () {
+                    newloadallprices("opd");
+                }, 300);
+                showlogs("Interval Started!");
+                autobuy();
+            } else if ($.cookie("role") === "admin") {
+                setInterval(function () {
+                    fullpageparse("opd");
+                }, 50);
+                setInterval(function () {
+                    newloadallprices("opd");
+                }, 100);
+                showlogs("Interval Started!");
+                autobuy();
+            }
+        } else {
+            if ($.cookie("role") === "superuser") {
+                setInterval(function () {
+                    fullpageparse("opd");
+                }, 600);
+                setInterval(function () {
+                    getallprices("opd");
+                }, 1500);
+                showlogs("Interval Started!");
+                autobuy();
+            } else if ($.cookie("role") === "admin") {
+                setInterval(function () {
+                    fullpageparse("opd");
+                }, 300);
+                setInterval(function () {
+                    getallprices("opd");
+                }, 400);
+                showlogs("Interval Started!");
+                autobuy();
+            }
         }
     } else {
         showlogs("Interval NOT Started!");
@@ -963,11 +982,9 @@ function mysteryInner() {
 }
 
 function settingsMenu() {
-    var btnText = "Buy this item immediately without using a shopping cart.";
-    if ($.cookie("buynow") === "hide") {
-        $(".btn.btn-success[title='" + btnText + "']").hide();
+    if ($.cookie("silence") === "true") {
         setTimeout(function () {
-            $("#buynow").prop("checked", true);
+            $("#silence").prop("checked", true);
         }, 600)
     }
     if ($.cookie("autobuy") === "true") {
@@ -975,18 +992,18 @@ function settingsMenu() {
             $("#autobuy").prop("checked", true);
         })
     }
-    $(document).ajaxComplete(function () {
-        if ($.cookie("buynow") === "hide") {
-            $(".btn.btn-success[title='" + btnText + "']").hide();
-        }
-    })
+    if ($.cookie("cpumode") === "on") {
+        setTimeout(function () {
+            $("#cpumode").prop("checked", true);
+        })
+    }
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
     // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
 
     if ($.cookie("savedDisc")) {
         savedDiscount = $.cookie("savedDisc");
     } else {
-        savedDiscount = 20;
+        savedDiscount = 25;
     }
     $(".nav.navbar-nav").append("<li class='menu'><a id='savDisc' to-hide='true' style='cursor: pointer;'>" + savedDiscount + "</a></li>");
     $("body").append('' +
@@ -1009,8 +1026,12 @@ function settingsMenu() {
         '</div>' +
         '<div style="float: right; font-size: 12px;">Только для дисконта!</div>' +
         '<div>' +
-        '<label for="buynow" style="cursor:pointer;">Скрыть Buy Now?' +
-        '<input type="checkbox" id="buynow" name="buynow" style="margin-left: 15px;"></label>' +
+        '<label for="silence" style="cursor:pointer;">Тихий режим' +
+        '<input type="checkbox" id="silence" name="silence" style="margin-left: 15px;"></label>' +
+        '</div>' +
+        '<div> ' +
+        '<label for="cpumode" style="cursor:pointer;">CPU режим' +
+        '<input type="checkbox" id="cpumode" name="cpumode" style="margin-left: 15px;"></label>' +
         '</div>' +
         '<div class="atbuy">' +
         '<label for="autobuy" style="cursor:pointer;">Авто-Бай' +
@@ -1022,10 +1043,20 @@ function settingsMenu() {
         '</div>' +
         '</div>' +
         '</div>' +
-        '</div>');
-    if ($.cookie("role") !== 'superuser' || $.cookie("role") !== 'admin') {
-        // $(".atbuy").hide();
+        '</div>'
+    )
+    ;
+    if ($.cookie("role") !== 'superuser' && $.cookie("role") !== 'admin') {
+        $(".atbuy").hide();
     }
+
+    $("#cpumode").on("change", function () {
+        if (this.checked) {
+            $.cookie("cpumode", "on");
+        } else {
+            $.removeCookie("cpumode");
+        }
+    })
 
     $("#autobuy").on("change", function () {
         if (this.checked) {
@@ -1035,13 +1066,11 @@ function settingsMenu() {
         }
     })
 
-    $("#buynow").on("change", function () {
+    $("#silence").on("change", function () {
         if (this.checked) {
-            $.cookie("buynow", "hide");
-            $(".btn.btn-success[title='" + btnText + "']").hide();
+            $.cookie("silence", "true");
         } else {
-            $.removeCookie("buynow");
-            $(".btn.btn-success[title='" + btnText + "']").show();
+            $.removeCookie("silence");
         }
     })
     $("#discValues").keyup(function () {
@@ -1477,6 +1506,53 @@ function realEarning() {
         }
     })
 }
+function autobuy() {
+    setTimeout(function () {
+        if ($.cookie("autobuy") === "true" && $(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member") {
+            var autoBuyInt;
+
+            autoBuyInt = setInterval(autoBuyFunc, 500);
+
+            function autoBuyFunc() {
+                if (skinsLoaded.length > 0) {
+                    // console.table(skinsLoaded);
+                    clearInterval(autoBuyInt);
+                    var i;
+                    for (i = 0; i < skinsLoaded.length; i++) {
+                        oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
+                        skinsLoaded.splice(i, 1);
+                    }
+                    setTimeout(function () {
+                        autoBuyInt = setInterval(autoBuyFunc, 500);
+                    }, 2000)
+                } else {
+                    console.log("Скинов еще нету.");
+                }
+            }
+        }
+    },4000)
+}
+
+function reloadpage() {
+    var timetorealod;
+    if($.cookie("cpumode") === "on"){
+        timetorealod = 6;
+        display = $('#language-picker');
+        startTimer(timetorealod * 60, display);
+        setTimeout(function () {
+            $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+            location.reload();
+        }, timetorealod*60000);
+    }else{
+        timetorealod = 10;
+        display = $('#language-picker');
+        startTimer(timetorealod * 60, display);
+        setTimeout(function () {
+            $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+            location.reload();
+        }, timetorealod*60000);
+    }
+}
 
 // Additional functions
 function chromemes(mesbody) {
@@ -1488,7 +1564,18 @@ function chromemes(mesbody) {
         body: mesbody,
         icon: "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
     });
+    setTimeout(mailNotification.close.bind(mailNotification), 3000);
 }
+
+function sortUsingNestedText(parent, childSelector, keySelector) {
+    var items = parent.children(childSelector).sort(function (a, b) {
+        var vA = $(keySelector, a).text();
+        var vB = $(keySelector, b).text();
+        return ((+vA) > (+vB)) ? -1 : ((+vA) < (+vB)) ? 1 : 0;
+    });
+    parent.append(items);
+}
+
 
 function showlogs(logmes) {
     $(".logmessage").remove();
@@ -1514,11 +1601,67 @@ function showlogs(logmes) {
     $(".logmessage").fadeIn(300).delay(4500).fadeToggle(300);
 }
 
-function sortUsingNestedText(parent, childSelector, keySelector) {
-    var items = parent.children(childSelector).sort(function (a, b) {
-        var vA = $(keySelector, a).text();
-        var vB = $(keySelector, b).text();
-        return ((+vA) > (+vB)) ? -1 : ((+vA) < (+vB)) ? 1 : 0;
+
+// Default OPS Functions
+
+function oneClickBuyScr(saleid, price, skin, skinDisc) {
+    var loc = getURLParameter('loc');
+    if (loc === null) {
+        loc = 'home';
+    }
+    var internal_search = getURLParameter('search_internal');
+    $.post("/ajax/shop_buy_item.php", {
+        "action": "buy",
+        "total": price,
+        "accept_tos": 1,
+        "type": 2,
+        "buy_now_saleid": saleid,
+        "location": loc,
+        "internal_search": internal_search
+    }).done(function (res) {
+        var parsed = $.parseHTML(res);
+        // console.log(parsed);
+        if (parsed.length > 1) {
+            if (parsed[1].innerText === "Your purchase was successful. Your new item is now stored in your OPSkins inventory." && $.cookie("silence") !== "true") {
+                soundAccept.play();
+                chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
+            }else{
+                console.log(parsed[0].innerText)
+            }
+        }
+        updateOsiCount(true);
     });
-    parent.append(items);
 }
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.text("Перезагрузка через " + minutes + ":" + seconds);
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
+
+function updateOsiCount(master) {
+    if (!g_UID) {
+        return;
+    }
+    $.get("/ajax/ui_updates.php", {
+        "type": "osi_count",
+        "master": master ? 1 : 0
+    }, function (count) {
+        $('#top-nav-bar').find('a[href*="loc=inventory"] .badge').text(count)[count == 0 ? 'hide' : 'show']();
+    });
+}
+// Default OPS Functions

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.220
+// @version      1.221
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -40,12 +40,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
             onload: function (result) {
                 JSONdata = JSON.parse(result.responseText);
                 if (JSONdata['error']) {
-                    $(".navbar-nav").after("<div class='csmupd'>" + JSONdata['error'] + "</div>");
-                    $(".csmupd").css({
-                        "position": "absolute",
-                        "right": "420px",
-                        "top": "26px"
-                    })
+                    $(".navbar-nav").append("<li class='menu csmupd'>" + JSONdata['error'] + "</li>");
                 }
                 if (JSONdata['success']) {
                     opsbotload(site);
@@ -86,6 +81,9 @@ function opsbotload(site) {
     var opslink4 = site.split("?loc=shop_view_item");
     var opslink5 = site.split("?loc=shop_browse");
 
+    if (site == "https://opskins.com/" + opslink3[1]) {
+        settingsMenu();
+    }
     if (site == "https://opskins.com/?loc=shop_checkout") {
         autoBuyclick();
     }
@@ -101,9 +99,6 @@ function opsbotload(site) {
         fullpageparse();
         loadallprices();
         mysteryInner();
-    }
-    if (site == "https://opskins.com/" + opslink3[1]) {
-        settingsMenu();
     }
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
         last20date();
@@ -902,7 +897,7 @@ function loadallprices(fullprice = false) {
     if (fullprice === true || $.cookie("cpumode") === "on") {
         setInterval(function () {
             newgetprices();
-            showlogs("Цены обновлены"+mark);
+            showlogs("Цены обновлены" + mark);
         }, 30000)
     }
     setTimeout(function () {
@@ -931,10 +926,6 @@ function loadallprices(fullprice = false) {
 function mysteryInner() {
     var misteryBox = $(".mystery-item-inner .live-listings");
     if (misteryBox.children("i").hasClass("fa-pause-circle")) {
-        if (skinsLoaded.length > 0) {
-            delete skinsdbprices;
-            skinsLoaded = [];
-        }
         if ($.cookie("cpumode") === "on") {
             if ($.cookie("role") === "superuser") {
                 setInterval(function () {
@@ -1507,6 +1498,10 @@ function realEarning() {
     })
 }
 function autobuy() {
+    if (skinsLoaded.length > 0) {
+        delete skinsLoaded;
+        skinsLoaded = [];
+    }
     setTimeout(function () {
         if ($.cookie("autobuy") === "true" && $(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member") {
             var autoBuyInt;
@@ -1530,27 +1525,28 @@ function autobuy() {
                 }
             }
         }
-    },4000)
+    }, 4000)
 }
 
 function reloadpage() {
+    $(".navbar-nav").append("<li class='menu scrtimer'><a></a></li>")
     var timetorealod;
-    if($.cookie("cpumode") === "on"){
+    if ($.cookie("cpumode") === "on") {
         timetorealod = 6;
-        display = $('#language-picker');
+        display = $('.scrtimer a');
         startTimer(timetorealod * 60, display);
         setTimeout(function () {
             $(".mystery-item-inner .live-listings i.fa-play-circle").click();
             location.reload();
-        }, timetorealod*60000);
-    }else{
+        }, timetorealod * 60000);
+    } else {
         timetorealod = 10;
-        display = $('#language-picker');
+        display = $('.scrtimer a');
         startTimer(timetorealod * 60, display);
         setTimeout(function () {
             $(".mystery-item-inner .live-listings i.fa-play-circle").click();
             location.reload();
-        }, timetorealod*60000);
+        }, timetorealod * 60000);
     }
 }
 
@@ -1625,7 +1621,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
             if (parsed[1].innerText === "Your purchase was successful. Your new item is now stored in your OPSkins inventory." && $.cookie("silence") !== "true") {
                 soundAccept.play();
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
-            }else{
+            } else {
                 console.log(parsed[0].innerText)
             }
         }

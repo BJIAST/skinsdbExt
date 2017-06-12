@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.23
+// @version      1.230
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*

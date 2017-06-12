@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.230
+// @version      1.231
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -92,7 +92,7 @@ function opsbotload(site) {
     }
     if (site == "https://opskins.com/?loc=good_deals" + opslink2[1]) {
         fullpageparse();
-        loadallprices();
+        loadallprices(true);
     }
     if (site == "https://opskins.com/?loc=shop_browse" + opslink5[1]) {
         fullpageparse();
@@ -1514,7 +1514,7 @@ function autobuy() {
                     clearInterval(autoBuyInt);
                     var i;
                     for (i = 0; i < skinsLoaded.length; i++) {
-                        setTimeout(getbuyQuery(i),i*400);
+                        setTimeout(getbuyQuery(i),i*600);
                         function getbuyQuery(i){
                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
                             skinsLoaded.splice(i, 1);
@@ -1732,7 +1732,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
                 // console.log("https://opskins.com/?loc=shop_view_item&item="+saleid);
 
                 $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
-                console.log(parsed[0].innerText)
+                // console.log(parsed[0].innerText)
             }
         }
         if($.cookie("nav-updater") !== "on"){

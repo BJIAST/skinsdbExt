@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.231
+// @version      1.232
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -1514,8 +1514,8 @@ function autobuy() {
                     clearInterval(autoBuyInt);
                     var i;
                     for (i = 0; i < skinsLoaded.length; i++) {
-                        setTimeout(getbuyQuery(i),i*600);
-                        function getbuyQuery(i){
+                        setTimeout(getbuyQuery(i), i * 900);
+                        function getbuyQuery(i) {
                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
                             skinsLoaded.splice(i, 1);
                         }
@@ -1536,23 +1536,19 @@ function getautobuy() {
         autobuy();
         var main = $("#scroll");
         setTimeout(function () {
-            if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "36" || $(".AllSkins").html() === ""  || typeof $(".AllSkins").html() === "undefined") {
+            if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "36" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
                 location.reload();
             }
-        }, 30000)
+        }, 10000)
         $(document).ajaxComplete(function (event, xhr, settings) {
             if (settings['url'] === "ajax/browse_scroll.php?page=1&appId=730&contextId=2") {
                 var skinsforcheck = [];
-                main.css({
-                    "height" : "100%",
-                    "overflow-y" : "scroll"
-                })
                 main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th></tr></thead><tbody></tbody></table></div></div>");
                 reloadpage();
-                if($.cookie("role") === "admin"){
-                    setInterval(getFunction, 2300);
-                }else if ($.cookie("role") === "superuser"){
-                    setInterval(getFunction, 2800);
+                if ($.cookie("role") === "admin") {
+                    setInterval(getFunction, 3300);
+                } else if ($.cookie("role") === "superuser") {
+                    setInterval(getFunction, 4000);
                 }
                 function getFunction() {
                     var errors = $(".errorsSkins");
@@ -1716,31 +1712,32 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
         // console.log(parsed);
         if (parsed.length > 1) {
             $(".buyedSkins").html(parseInt($(".buyedSkins").text()) + 1);
+            var now = new Date();
+            if ($.cookie("nav-updater") !== "on") {
+                var date = new Date();
+                date.setTime(date.getTime() + (60 * 1000));
+                updateOsiCount(true);
+                updateBalance(true);
+                $.cookie("nav-updater", "on", {expires: date});
+            }
+            if ($(".buyedSkinsTable").css("display") === "none") {
+                $(".buyedSkinsTable").css("display", "table");
+            }
+            $(".buyedSkinsTable tbody").append("<tr><th>" + skin + "</th><th>" + price / 100 + "$</th><th>" + skinDisc + "%  |  " + + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + "</th></tr>");
             if (parsed[1].innerText === "Your purchase was successful. Your new item is now stored in your OPSkins inventory." && $.cookie("silence") !== "true") {
                 soundAccept.play();
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
             }
-            if($(".buyedSkinsTable").css("display")  === "none"){
-                $(".buyedSkinsTable").css("display","table");
-            }
-            $(".buyedSkinsTable tbody").append("<tr><th>"+skin+"</th><th>"+price/100+"$</th><th>"+skinDisc+"%</th></tr>");
         } else if (parsed.length === 1) {
-            if(parsed[0].innerHTML === "You cannot buy any items until your previous action completes."){
+            if (parsed[0].innerHTML === "You cannot buy any items until your previous action completes.") {
                 oneClickBuyScr(saleid, price, skin, skinDisc);
-            }else{
+            } else {
                 // console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
                 // console.log("https://opskins.com/?loc=shop_view_item&item="+saleid);
 
                 $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
                 // console.log(parsed[0].innerText)
             }
-        }
-        if($.cookie("nav-updater") !== "on"){
-            var date = new Date();
-            date.setTime(date.getTime() + (60 * 1000));
-            updateOsiCount(true);
-            updateBalance(true);
-            $.cookie("nav-updater", "on", {expires: date});
         }
     });
 }

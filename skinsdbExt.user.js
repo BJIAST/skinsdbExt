@@ -1,13 +1,11 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.235
+// @version      1.236
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
 // @match       https://steamcommunity.com/tradeoffer/*
-// @match       https://cs.money/*
-// @match       http://trade-skins.com/*
 // @match       https://cs.money/*
 // @match       https://opskins.com/*
 // @match       https://steamcommunity.com/trade/*
@@ -94,6 +92,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=good_deals" + opslink2[1]) {
         fullpageparse();
         loadallprices(true);
+        csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_browse") {
         fullpageparse();
@@ -103,6 +102,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_browse&sort=n") {
         var getAutoInt;
         getautobuy();
+        csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
         last20date();
@@ -126,22 +126,33 @@ function include(url) {
 }
 
 function csmoparser() {
-    var hash = Date.parse(new Date());
-    var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
-    setInterval(getQuery(), 120000);
+    getQuery();
+    setInterval(function(){
+        getQuery();
+    }, 120000);
     function getQuery() {
+        var hash = Date.parse(new Date());
+        var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: url,
+            onload: function (res) {
+                var skins = JSON.stringify(res.responseText);
+                var myData = new FormData();
+                myData.append("csmoprices", skins);
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: "http://skinsdb.xyz/parsers/money.php",
+                    data: myData,
+                    onload: function (result) {
+                        console.log(result.responseText);
+                    }
+                })
+            }
+        })
         $.get(url).done(function (res) {
-            var skins = JSON.stringify(res);
-            var myData = new FormData();
-            myData.append("csmoprices", skins);
-            GM_xmlhttpRequest({
-                method: "POST",
-                url: "http://skinsdb.xyz/parsers/money.php",
-                data: myData,
-                onload: function (result) {
-                    console.log(result.responseText);
-                }
-            })
+
+
         })
     }
 }

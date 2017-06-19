@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.238
+// @version      1.239
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -78,7 +78,7 @@ function opsbotload(site) {
     var opslink2 = site.split("?loc=good_deals");
     var opslink3 = site.split("https://opskins.com/");
     var opslink4 = site.split("?loc=shop_view_item");
-    // var opslink5 = site.split("?loc=shop_browse");
+    var opslink5 = site.split("?app=730_2");
 
     if (site == "https://opskins.com/" + opslink3[1]) {
         settingsMenu();
@@ -86,7 +86,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_checkout") {
         autoBuyclick();
     }
-    if (site == "https://opskins.com/?loc=shop_search" + opslink[1]) {
+    if (site == "https://opskins.com/?loc=shop_search" + opslink[1] || site == "https://opskins.com/?app=730_2" + opslink5[1]) {
         fullpageparse();
     }
     if (site == "https://opskins.com/?loc=good_deals" + opslink2[1]) {
@@ -161,49 +161,49 @@ function include(url) {
 // }
 
 function csmofunctions() {
-    favskinsmo();
+    // favskinsmo();
     csmomenu();
-    setTimeout(function () {
-        autoreloadcsm();
-    }, 1000)
+    // setTimeout(function () {
+    //     autoreloadcsm();
+    // }, 1000)
 }
-function favskinsmo() {
-    $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
-
-    var myData = new FormData();
-    myData.append("favNames", true);
-    GM_xmlhttpRequest({
-        method: "POST",
-        url: scriptUrl,
-        data: myData,
-        onload: function (result) {
-            if (result.responseText === "null") {
-                $(".favSelectDiv").hide();
-            } else {
-                $("#FavSelector").html(result.responseText);
-            }
-        }
-    })
-    $('#FavSelector').on('change', function () {
-        $("#search_right").val(this.value);
-        $("#search_right").focus();
-    })
-}
-function autoreloadcsm() {
-    $("#startInt").on("click", function () {
-        var startint = setInterval(function () {
-            $("#refresh_bots_inventory").click();
-            setTimeout(function () {
-                $(".bot_sort[type_sort='lowest']").click();
-            }, 1000)
-        }, 10000);
-        $(this).attr("disabled", "disabled");
-        $("#stopInt").on("click", function () {
-            $("#startInt").attr("disabled", false);
-            clearInterval(startint);
-        })
-    })
-}
+// function favskinsmo() {
+//     $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
+//
+//     var myData = new FormData();
+//     myData.append("favNames", true);
+//     GM_xmlhttpRequest({
+//         method: "POST",
+//         url: scriptUrl,
+//         data: myData,
+//         onload: function (result) {
+//             if (result.responseText === "null") {
+//                 $(".favSelectDiv").hide();
+//             } else {
+//                 $("#FavSelector").html(result.responseText);
+//             }
+//         }
+//     })
+//     $('#FavSelector').on('change', function () {
+//         $("#search_right").val(this.value);
+//         $("#search_right").focus();
+//     })
+// }
+// function autoreloadcsm() {
+//     $("#startInt").on("click", function () {
+//         var startint = setInterval(function () {
+//             $("#refresh_bots_inventory").click();
+//             setTimeout(function () {
+//                 $(".bot_sort[type_sort='lowest']").click();
+//             }, 1000)
+//         }, 10000);
+//         $(this).attr("disabled", "disabled");
+//         $("#stopInt").on("click", function () {
+//             $("#startInt").attr("disabled", false);
+//             clearInterval(startint);
+//         })
+//     })
+// }
 
 function autoBuyclick() {
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
@@ -485,7 +485,12 @@ function last20date(page = 'item') {
         var unavailable = $(".item-add");
         if ($(".item-desc").children(".text-muted").html() != "") {
             var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-            skinName = skinName.trim() + " " + exterior;
+            var phase = $(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
+            if (phase !== "") {
+                skinName = skinName.trim() + " Phase " + phase + " " + exterior;
+            } else {
+                skinName = skinName.trim() + " " + exterior;
+            }
         } else {
             skinName = skinName.trim();
         }
@@ -1136,7 +1141,7 @@ function settingsMenu() {
 
 function csmobot() {
     csmocounters();
-    $("#stopInt").after("<button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px;'>Сканнер " + mark + "</button></div>");
+    $(".offer_container_main .col_lg_head .row").prepend("<div style='margin: 10px 0 20px;overflow: hidden;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px;'>Сканнер " + mark + "</button></div>");
     $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;'>Opskins -> CS.Money</button></div>");
     $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;'>CS.Money -> Opskins</button></div>");
     setInterval(function () {
@@ -1281,8 +1286,8 @@ function csmopriceView(special) {
 }
 
 function csmomenu() {
-    $(".favSelectDiv").after("<div style='margin-bottom: 12px;'><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button>");
-    $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 2px;'>Стоп</button>");
+    // $(".favSelectDiv").after("<div style='margin-bottom: 12px;'><button id='startInt' class='btn btn-primary' style='margin-left: 34px;'>Старт</button>");
+    // $("#startInt").after("<button id='stopInt' class='btn btn-warning' style='margin-left: 2px;'>Стоп</button>");
     if ($.cookie("opsbot") === 'on') {
         csmobot();
         setTimeout(function () {
@@ -1324,10 +1329,38 @@ function csmomenu() {
 }
 
 function csmocounters() {
+    $("#refresh_user_inventory").after("<div class='autoPickUp input-group' style='position:absolute;right: 27%;height: 20px !important; width: 123px; z-index: 99;'><input type='number' class='popup_link_form_control balanceClick' placeholder='$..' style='color: #000; width: 80px'><span class='input_group_offer toofferClick'>GO</span></div>");
+   $("#user_offer_sum").before("")
     $(".user_col_lg_head .row").append('<div class="offer_header" style="width: 100%; float: left; margin-left: 20px; font-size: 18px; padding: 0;"><span id="userinv">0.00</span>$</div>');
     $(".make_trade_button").before('<div class="market_text_head" style="margin-top: 0; margin-bottom: 20px"><span id="sum_dif">0.00</span>$</div>');
     var user_offer = $("#user_offer_sum").text().replace("$", "").trim();
     var bot_offer = $("#bots_offer_sum").text().replace("$", "").trim();
+
+    $(".toofferClick").on("click", function () {
+        $("#inventory_user").children().each(function () {
+            var count = $(this).find(".count_in_stack").text();
+            var i;
+            if($(".balanceClick").val() === ""){
+                if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
+                    for (i = 0; i < count; i++) {
+                        $(this).click();
+                    }
+                }
+            }else{
+                var maxCost = $(".balanceClick").val();
+                var cost = parseFloat($("#user_offer_sum").text().replace("$",""));
+                if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
+                    var skinCost = parseFloat($(this).find(".price").text().replace("$",""));
+                    for (i = 0; i < count; i++) {
+                        if ( (skinCost + cost) <= maxCost){
+                            $(this).click();
+                        }
+                    }
+                }
+            }
+        })
+    })
+
     setInterval(function () {
         var counts = 0;
         $("#inventory_user").children().each(function () {
@@ -1575,7 +1608,6 @@ function autobuy() {
 }
 
 function getautobuy() {
-    $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>")
     var main = $("#scroll");
     setTimeout(function () {
         if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
@@ -1585,8 +1617,9 @@ function getautobuy() {
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === "ajax/browse_scroll.php?page=1&appId=730&contextId=2") {
             var skinsforcheck = [];
-            var display = $('.scrtimer span');
             main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
+            $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
+            var display = $('.scrtimer span');
             reloadpage(display, 35);
             if ($.cookie("role") === "admin") {
                 getAutoInt = setInterval(getFunction, randomInteger(4000, 12000));
@@ -1795,7 +1828,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
                 }
-            }else{
+            } else {
                 updateOsiCount(true);
                 updateBalance(true);
             }

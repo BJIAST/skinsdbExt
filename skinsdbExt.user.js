@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.239
+// @version      1.240
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -62,7 +62,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 if (JSONdata['success']) {
                     include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
                     csmofunctions();
-                    // csmoparser();
+                    csmoparser();
                 }
             }
         })
@@ -96,13 +96,13 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_browse") {
         fullpageparse();
         loadallprices();
-        // csmoparser();
+        csmoparser();
         mysteryInner();
     }
     if (site == "https://opskins.com/?loc=shop_browse&sort=n") {
         var getAutoInt;
         getautobuy();
-        // csmoparser();
+        csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
         last20date();
@@ -125,86 +125,45 @@ function include(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-// function csmoparser() {
-//     getQuery();
-//     setInterval(function(){
-//         getQuery();
-//     }, 120000);
-//     function getQuery() {
-//         var hash = Date.parse(new Date());
-//         var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
-//             GM_xmlhttpRequest({
-//             method: "GET",
-//             url: url,
-//             onload: function (res) {
-//                 var skins = JSON.stringify(res.responseText);
-//                 if(skins.length < 500000){
-//                     window.open("https://cs.money/");
-//                 }
-//                 var myData = new FormData();
-//                 myData.append("csmoprices", skins);
-//                 GM_xmlhttpRequest({
-//                     method: "POST",
-//                     url: "http://skinsdb.xyz/parsers/money.php",
-//                     data: myData,
-//                     onload: function (result) {
-//                         console.log(result.responseText);
-//                     }
-//                 })
-//             }
-//         })
-//         $.get(url).done(function (res) {
-//
-//
-//         })
-//     }
-// }
+function csmoparser() {
+    getQuery();
+    setInterval(function(){
+        getQuery();
+    }, 120000);
+    function getQuery() {
+        var hash = Date.parse(new Date());
+        var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
+            GM_xmlhttpRequest({
+            method: "GET",
+            url: url,
+            onload: function (res) {
+                var skins = JSON.stringify(res.responseText);
+                if(skins.length < 500000){
+                    window.open("https://cs.money/");
+                }
+                var myData = new FormData();
+                myData.append("csmoprices", skins);
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: "http://skinsdb.xyz/parsers/money.php",
+                    data: myData,
+                    onload: function (result) {
+                        console.log(result.responseText);
+                    }
+                })
+            }
+        })
+        $.get(url).done(function (res) {
+
+
+        })
+    }
+}
 
 function csmofunctions() {
-    // favskinsmo();
     csmomenu();
-    // setTimeout(function () {
-    //     autoreloadcsm();
-    // }, 1000)
-}
-// function favskinsmo() {
-//     $(".offer_container_main .col_lg_head .row").prepend("<div class='favSelectDiv form-group'><select class='form-control' name='FavSelector' id='FavSelector' style='width:92%; margin:0 auto;'></select></div>");
-//
-//     var myData = new FormData();
-//     myData.append("favNames", true);
-//     GM_xmlhttpRequest({
-//         method: "POST",
-//         url: scriptUrl,
-//         data: myData,
-//         onload: function (result) {
-//             if (result.responseText === "null") {
-//                 $(".favSelectDiv").hide();
-//             } else {
-//                 $("#FavSelector").html(result.responseText);
-//             }
-//         }
-//     })
-//     $('#FavSelector').on('change', function () {
-//         $("#search_right").val(this.value);
-//         $("#search_right").focus();
-//     })
-// }
-// function autoreloadcsm() {
-//     $("#startInt").on("click", function () {
-//         var startint = setInterval(function () {
-//             $("#refresh_bots_inventory").click();
-//             setTimeout(function () {
-//                 $(".bot_sort[type_sort='lowest']").click();
-//             }, 1000)
-//         }, 10000);
-//         $(this).attr("disabled", "disabled");
-//         $("#stopInt").on("click", function () {
-//             $("#startInt").attr("disabled", false);
-//             clearInterval(startint);
-//         })
-//     })
-// }
 
+}
 function autoBuyclick() {
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
     $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width: 99px;position:absolute;left: -185px;top: 13px;border-radius: 3px;'>Автоклик</div>");
@@ -272,19 +231,6 @@ function parseprice(red_btn, opd) {
         var skinName = $(this).parent().parent().children(".market-link").html();
         var unavailable = $(this).parent().parent().children(".item-add");
         var skinPrice = $(this).parent().parent().find(".item-amount").text();
-        // if (unavailable.html()) {
-        //     if (opd === "not") {
-        //         var skinPrice = unavailable.children(".item-amount").html();
-        //     } else {
-        //         var skinPrice = unavailable.children("div").children(".item-amount").html();
-        //     }
-        // } else {
-        //     if (opd === "not") {
-        //         var skinPrice = $(this).parent().parent().children(".item-add-wear").children(".item-amount").html();
-        //     } else {
-        //         var skinPrice = $(this).parent().parent().children(".item-add-wear").children("div").children(".item-amount").html();
-        //     }
-        // }
         if ($(this).parent().parent().children(".item-desc").children(".text-muted").html() != "") {
             var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
             var phase = $(this).parent().parent().children(".item-desc").children(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
@@ -1330,7 +1276,7 @@ function csmomenu() {
 
 function csmocounters() {
     $("#refresh_user_inventory").after("<div class='autoPickUp input-group' style='position:absolute;right: 27%;height: 20px !important; width: 123px; z-index: 99;'><input type='number' class='popup_link_form_control balanceClick' placeholder='$..' style='color: #000; width: 80px'><span class='input_group_offer toofferClick'>GO</span></div>");
-   $("#user_offer_sum").before("")
+    $("#user_offer_sum").before("")
     $(".user_col_lg_head .row").append('<div class="offer_header" style="width: 100%; float: left; margin-left: 20px; font-size: 18px; padding: 0;"><span id="userinv">0.00</span>$</div>');
     $(".make_trade_button").before('<div class="market_text_head" style="margin-top: 0; margin-bottom: 20px"><span id="sum_dif">0.00</span>$</div>');
     var user_offer = $("#user_offer_sum").text().replace("$", "").trim();
@@ -1340,19 +1286,20 @@ function csmocounters() {
         $("#inventory_user").children().each(function () {
             var count = $(this).find(".count_in_stack").text();
             var i;
-            if($(".balanceClick").val() === ""){
+            if ($(".balanceClick").val() === "") {
                 if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
                     for (i = 0; i < count; i++) {
                         $(this).click();
                     }
                 }
-            }else{
+            } else {
                 var maxCost = $(".balanceClick").val();
-                var cost = parseFloat($("#user_offer_sum").text().replace("$",""));
+                var cost = 0;
                 if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
-                    var skinCost = parseFloat($(this).find(".price").text().replace("$",""));
+                    var skinCost = parseFloat($(this).find(".price").text().replace("$", ""));
                     for (i = 0; i < count; i++) {
-                        if ( (skinCost + cost) <= maxCost){
+                        if ((skinCost + cost) <= maxCost) {
+                            cost = cost + skinCost;
                             $(this).click();
                         }
                     }
@@ -1699,11 +1646,12 @@ function getautobuy() {
                     })
                     skinsforcheck = [];
                 }).fail(function (xhr, status, error) {
-                    console.log(xhr);
-                    console.log(status);
-                    console.log(error);
-                    errors.css("color", "red");
-                    errors.html("Скоре всего у тебя бан IP.. Сори!");
+                    if (xhr['status'] === '503') {
+
+                        errors.css("color", "red");
+                        errors.html("Скоре всего у тебя бан IP.. Сори!");
+
+                    }
                 })
             }
         }

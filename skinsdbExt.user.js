@@ -1294,7 +1294,7 @@ function csmocounters() {
                 }
             } else {
                 var maxCost = $(".balanceClick").val();
-                var cost = 0;
+                var cost = parseFloat($("#user_offer_sum").text().replace("$",""));
                 if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
                     var skinCost = parseFloat($(this).find(".price").text().replace("$", ""));
                     for (i = 0; i < count; i++) {

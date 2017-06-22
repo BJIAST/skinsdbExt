@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.240
+// @version      1.241
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -126,19 +126,36 @@ function include(url) {
 }
 
 function csmoparser() {
-    getQuery();
-    setInterval(function(){
-        getQuery();
-    }, 120000);
+    var myData = new FormData();
+    myData.append("checkparse", true);
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: scriptUrl,
+        data: myData,
+        onload: function (result) {
+            res = result.responseText;
+            if (res['success']) {
+                getQuery();
+                setInterval(function () {
+                    getQuery();
+                }, 120000);
+                showlogs("Парсер включен!");
+            }else{
+                showlogs("Парсер выключен");
+            }
+        }
+    })
+
+
     function getQuery() {
         var hash = Date.parse(new Date());
         var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
-            GM_xmlhttpRequest({
+        GM_xmlhttpRequest({
             method: "GET",
             url: url,
             onload: function (res) {
                 var skins = JSON.stringify(res.responseText);
-                if(skins.length < 500000){
+                if (skins.length < 500000) {
                     window.open("https://cs.money/");
                 }
                 var myData = new FormData();
@@ -1293,12 +1310,12 @@ function csmocounters() {
                     }
                 }
             } else {
-                var maxCost = $(".balanceClick").val();
-                var cost = parseFloat($("#user_offer_sum").text().replace("$",""));
+                var maxCost = parseFloat($(".balanceClick").val());
+                var cost = parseFloat($("#user_offer_sum").text().replace("$", ""));
                 if ($(this).hasClass(".offer_container_invertory_inactive") === false) {
                     var skinCost = parseFloat($(this).find(".price").text().replace("$", ""));
                     for (i = 0; i < count; i++) {
-                        if ((skinCost + cost) <= maxCost) {
+                        if ((skinCost + cost) <= maxCost || (skinCost + cost) <= maxCost+0.03) {
                             cost = cost + skinCost;
                             $(this).click();
                         }

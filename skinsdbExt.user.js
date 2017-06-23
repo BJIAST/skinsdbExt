@@ -41,7 +41,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 if (JSONdata['success']) {
                     opsbotload(site);
                     $.cookie("role", JSONdata['role']);
-                    if($.cookie("botison") === "on"){
+                    if ($.cookie("botison") === "on") {
                         $(".navbar-nav").append("<li class='menu csmupd'><a style='font-weight: bold; color: red;'>Запущен бот!!</a></li>");
                     }
                 }
@@ -1534,24 +1534,28 @@ function autobuy() {
                             // console.log("Вызов номер " + i + " выполнен.");
                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
                             showlogs("Пытаюсь купить..");
-                            if(i === skinsLoaded.length - 1){
+                            if (i === skinsLoaded.length - 1) {
                                 // console.log("i = "+ i + " skins = " + (skinsLoaded.length - 1));
-                                delete skinsLoaded;
-                                skinsLoaded = [];
-                                setTimeout(function () {
-                                    $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                                    autoBuyInt = setInterval(autoBuyFunc, 700);
-                                }, 2000)
+
                             }
                         }, random)
                     }
 
-                    for(i=0;i < skinsLoaded.length;i++){
+                    for (i = 0; i < skinsLoaded.length; i++) {
                         randomBuy = randomInteger(2000, 4000);
                         // console.log("Вызов функции в цикле по ид: "+ i +" с рандомом: "+ randomBuy + " + " + beforeOneWaiting);
-                        getbuyQuery(i,beforeOneWaiting + randomBuy);
+                        getbuyQuery(i, beforeOneWaiting + randomBuy);
                         beforeOneWaiting += randomBuy;
                     }
+
+                    setTimeout(function () {
+                        delete skinsLoaded;
+                        skinsLoaded = [];
+                        setTimeout(function () {
+                            $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+                            autoBuyInt = setInterval(autoBuyFunc, 700);
+                        }, 2000)
+                    }, beforeOneWaiting + randomInteger(4000, 6000))
                 } else {
                     // console.log("Скинов еще нету.");
                 }

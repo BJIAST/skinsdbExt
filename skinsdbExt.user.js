@@ -737,7 +737,7 @@ var getallprices = function (opd) {
                                             skin['skinlink'] = "#" + skinId;
                                             skin['skindisc'] = loaded[0].opsmo;
                                             skin['skinname'] = $(this).find(".market-link").text()
-                                            skin['skinprice'] = parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100;
+                                            skin['skinprice'] = $(this).find(".item-amount").text().replace("$", "");
                                             skinsLoaded.push(skin);
                                             $("#ThatisDisc").show();
                                             $("#ThatisDisc").html(skinsLoaded.length);
@@ -1531,13 +1531,9 @@ function autobuy() {
                     function getbuyQuery(i, random) {
                         // console.log("Вызов номер " + i + " через " + random/1000 + "с.");
                         setTimeout(function () {
-                            // console.log("Вызов номер " + i + " выполнен.");
+                            console.log("Вызов номер " + i + " выполнен. Скин: "+skinsLoaded[i]['skinname']+" цена: "+(skinsLoaded[i]['skinprice']/100)+"$");
                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
                             showlogs("Пытаюсь купить..");
-                            if (i === skinsLoaded.length - 1) {
-                                // console.log("i = "+ i + " skins = " + (skinsLoaded.length - 1));
-
-                            }
                         }, random)
                     }
 
@@ -1812,7 +1808,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
                 }
                 // console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
                 // console.log("https://opskins.com/?loc=shop_view_item&item="+saleid);
-                // console.log(parsed[0].innerText)
+                console.log(parsed[0].innerText)
             }
         }
     });

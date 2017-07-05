@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.242
+// @version      1.243
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -98,7 +98,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_browse") {
         fullpageparse();
         loadallprices();
-        mysteryInner();
+        // mysteryInner();
         csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_browse&sort=n") {
@@ -135,13 +135,11 @@ function csmoparser() {
         url: scriptUrl,
         data: myData,
         onload: function (result) {
-            res = result.responseText;
+            res = jQuery.parseJSON(result.responseText);
             if (res['success']) {
                 getQuery();
                 setInterval(getQuery, 120000);
                 showlogs("Парсер включен!");
-            } else {
-                showlogs("Парсер выключен");
             }
         }
     })
@@ -250,12 +248,43 @@ function parseprice(red_btn, opd) {
         var skinPrice = $(this).parent().parent().find(".item-amount").text();
         if ($(this).parent().parent().children(".item-desc").children(".text-muted").html() != "") {
             var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
-            var phase = $(this).parent().parent().children(".item-desc").children(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-            if (phase !== "") {
-                skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-            } else {
-                skinName = skinName.trim() + " " + exterior;
+            var phase = $(this).parent().parent().find(".text-muted").next().html();
+            switch (phase) {
+                case '★ Covert Knife (Ruby)' :
+                    phase = "Ruby";
+                    break;
+                case '★ Covert Knife (Sapphire)' :
+                    phase = "Sapphire";
+                    break;
+                case '★ Covert Knife (Black Pearl)' :
+                    phase = "Black Pearl";
+                    break;
+                case '★ Covert Knife (Emerald)' :
+                    phase = "Emerald";
+                    break;
+                default:
+                    phase = phase.replace(/[/^\D+/()]/g, '');
+                    break;
             }
+            switch (phase) {
+                case '1' :
+                    phase = " Phase 1";
+                    break;
+                case '2' :
+                    phase = " Phase 2";
+                    break;
+                case '3' :
+                    phase = " Phase 3";
+                    break;
+                case '4' :
+                    phase = " Phase 4";
+                    break;
+                case '' :
+                    phase = "";
+                    break;
+            }
+            skinName = skinName.trim() + phase + " " + exterior;
+            console.log(skinName);
         } else {
             skinName = skinName.trim();
         }
@@ -313,12 +342,41 @@ function parseprice(red_btn, opd) {
                     var skinName = $(this).parent().parent().children(".market-link").html();
                     if ($(this).parent().parent().children(".item-desc").children(".text-muted").html() != "") {
                         var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
-                        var phase = $(this).parent().parent().children(".item-desc").children(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-                        if (phase !== "") {
-                            skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-                        } else {
-                            skinName = skinName.trim() + " " + exterior;
+                        var phase = $(this).parent().parent().find(".text-muted").next().html();
+                        switch (phase) {
+                            case '★ Covert Knife (Ruby)' :
+                                phase = " Ruby";
+                                break;
+                            case '★ Covert Knife (Sapphire)' :
+                                phase = " Sapphire";
+                                break;
+                            case '★ Covert Knife (Black Pearl)' :
+                                phase = " Black Pearl";
+                                break;
+                            case '★ Covert Knife (Emerald)' :
+                                phase = " Emerald";
+                                break;
+                            default:
+                                phase = phase.replace(/[/^\D+/()]/g, '');
                         }
+                        switch (phase) {
+                            case 1 :
+                                phase = " Phase 1";
+                                break;
+                            case 2 :
+                                phase = " Phase 2";
+                                break;
+                            case 3 :
+                                phase = " Phase 3";
+                                break;
+                            case 4 :
+                                phase = " Phase 4";
+                                break;
+                            case '' :
+                                phase = "";
+                                break;
+                        }
+                        skinName = skinName.trim() + phase + " " + exterior;
                     } else {
                         skinName = skinName.trim();
                     }
@@ -379,12 +437,41 @@ function las20btn(page = "item") {
             var unavailable = $(".item-add");
             if ($(".item-desc").children(".text-muted").html() != "") {
                 var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-                var phase = $(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-                if (phase !== "") {
-                    skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-                } else {
-                    skinName = skinName.trim() + " " + exterior;
+                var phase = $(".text-muted").next().html();
+                switch (phase) {
+                    case '★ Covert Knife (Ruby)' :
+                        phase = " Ruby";
+                        break;
+                    case '★ Covert Knife (Sapphire)' :
+                        phase = " Sapphire";
+                        break;
+                    case '★ Covert Knife (Black Pearl)' :
+                        phase = " Black Pearl";
+                        break;
+                    case '★ Covert Knife (Emerald)' :
+                        phase = " Emerald";
+                        break;
+                    default:
+                        phase = phase.replace(/[/^\D+/()]/g, '');
                 }
+                switch (phase) {
+                    case '1' :
+                        phase = " Phase 1";
+                        break;
+                    case '2' :
+                        phase = " Phase 2";
+                        break;
+                    case '3' :
+                        phase = " Phase 3";
+                        break;
+                    case '4' :
+                        phase = " Phase 4";
+                        break;
+                    case '' :
+                        phase = "";
+                        break;
+                }
+                skinName = skinName.trim() + phase + " " + exterior;
             } else {
                 skinName = skinName.trim();
             }
@@ -448,12 +535,41 @@ function last20date(page = 'item') {
         var unavailable = $(".item-add");
         if ($(".item-desc").children(".text-muted").html() != "") {
             var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-            var phase = $(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-            if (phase !== "") {
-                skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-            } else {
-                skinName = skinName.trim() + " " + exterior;
+            var phase = $(".text-muted").next().html();
+            switch (phase) {
+                case '★ Covert Knife (Ruby)' :
+                    phase = " Ruby";
+                    break;
+                case '★ Covert Knife (Sapphire)' :
+                    phase = " Sapphire";
+                    break;
+                case '★ Covert Knife (Black Pearl)' :
+                    phase = " Black Pearl";
+                    break;
+                case '★ Covert Knife (Emerald)' :
+                    phase = " Emerald";
+                    break;
+                default:
+                    phase = phase.replace(/[/^\D+/()]/g, '');
             }
+            switch (phase) {
+                case '1' :
+                    phase = " Phase 1";
+                    break;
+                case '2' :
+                    phase = " Phase 2";
+                    break;
+                case '3' :
+                    phase = " Phase 3";
+                    break;
+                case '4' :
+                    phase = " Phase 4";
+                    break;
+                case '' :
+                    phase = "";
+                    break;
+            }
+            skinName = skinName.trim() + phase + " " + exterior;
         } else {
             skinName = skinName.trim();
         }
@@ -522,7 +638,7 @@ function opsdiscforphp() {
         var skins = $(".rounded-list").children().map(function () {
             row = {};
             row['surl'] = $(this).children(".skin-info").attr("title");
-            row['sname'] = $(this).children(".skin-info").html();
+            row['sname'] = $(this).find(".skin-info a").html();
             row['changer_price'] = $(this).children(".changer_price").val();
             return row;
         }).get();
@@ -569,15 +685,17 @@ function requestforprice(opsUrl, skinname, chprice, discount = false) {
                 res = res.replace("$", "");
                 res = res.replace(",", "")
                 if (discount !== false) {
+                    var price = res;
                     res = 100 - (res * 100) / (chprice * 0.97);
                     res = Math.round(res * 100) / 100;
                     var date = new Date();
-                    var log = "<span> Лучшее предложение для <a href='" + opsUrl + "' target='_blank'>" + skinname + "</a>: " + res + "%  -  " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
+                    var log = "<span>Лучшее предложение для <a href='" + opsUrl + "' target='_blank'>" + skinname + "</a>: " + res + "%,  " + price + "$ - " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds() + " Ищем: " + discount + "%+ </span><hr>"
                     var logs = $("#comments");
                     logs.html(logs.html() + log);
                     logs.animate({scrollTop: $(document).height()}, "slow");
                     if (res > discount) {
                         $(".status ul").append("<li data-ops='" + res + "%' data-changer='" + chprice + "'>" + skinname + "</li>");
+                        window.open(opsUrl);
                         soundFound.volume = 1;
                         soundFound.play();
                         chromemes("Найден скин " + skinname + " в " + res + "%");
@@ -645,12 +763,41 @@ var getallprices = function (opd) {
             }
             if (route.children(".item-desc").children(".text-muted").html() != "") {
                 var exterior = "(" + route.children(".item-desc").children(".text-muted").html() + ")";
-                var phase = route.children(".item-desc").children(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-                if (phase !== "") {
-                    skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-                } else {
-                    skinName = skinName.trim() + " " + exterior;
+                var phase = route.children(".item-desc").children(".text-muted").next().html();
+                switch (phase) {
+                    case '★ Covert Knife (Ruby)' :
+                        phase = " Ruby";
+                        break;
+                    case '★ Covert Knife (Sapphire)' :
+                        phase = " Sapphire";
+                        break;
+                    case '★ Covert Knife (Black Pearl)' :
+                        phase = " Black Pearl";
+                        break;
+                    case '★ Covert Knife (Emerald)' :
+                        phase = " Emerald";
+                        break;
+                    default:
+                        phase = phase.replace(/[/^\D+/()]/g, '');
                 }
+                switch (phase) {
+                    case '1' :
+                        phase = " Phase 1";
+                        break;
+                    case '2' :
+                        phase = " Phase 2";
+                        break;
+                    case '3' :
+                        phase = " Phase 3";
+                        break;
+                    case '4' :
+                        phase = " Phase 4";
+                        break;
+                    case '' :
+                        phase = "";
+                        break;
+                }
+                skinName = skinName.trim() + phase + " " + exterior;
             } else {
                 skinName = skinName.trim();
             }
@@ -829,12 +976,42 @@ function newloadallprices(opd) {
                 }
                 if (route.children(".item-desc").children(".text-muted").html() != "") {
                     var exterior = "(" + route.children(".item-desc").children(".text-muted").html() + ")";
-                    var phase = route.children(".item-desc").children(".text-muted").next().html().replace(/[/^\D+/()]/g, '');
-                    if (phase !== "") {
-                        skinName = skinName.trim() + " Phase " + phase + " " + exterior;
-                    } else {
-                        skinName = skinName.trim() + " " + exterior;
+
+                    var phase = route.children(".item-desc").children(".text-muted").next().html();
+                    switch (phase) {
+                        case '★ Covert Knife (Ruby)' :
+                            phase = " Ruby";
+                            break;
+                        case '★ Covert Knife (Sapphire)' :
+                            phase = " Sapphire";
+                            break;
+                        case '★ Covert Knife (Black Pearl)' :
+                            phase = " Black Pearl";
+                            break;
+                        case '★ Covert Knife (Emerald)' :
+                            phase = " Emerald";
+                            break;
+                        default:
+                            phase = phase.replace(/[/^\D+/()]/g, '');
                     }
+                    switch (phase) {
+                        case '1' :
+                            phase = " Phase 1";
+                            break;
+                        case '2' :
+                            phase = " Phase 2";
+                            break;
+                        case '3' :
+                            phase = " Phase 3";
+                            break;
+                        case '4' :
+                            phase = " Phase 4";
+                            break;
+                        case '' :
+                            phase = "";
+                            break;
+                    }
+                    skinName = skinName.trim() + phase + " " + exterior;
                 } else {
                     skinName = skinName.trim();
                 }
@@ -932,44 +1109,44 @@ function loadallprices(fullprice = false) {
     })
 }
 
-function mysteryInner() {
-    $(".navbar-nav").append("<li class='menu scrtimer'><a></a></li>");
-    var display = $('.scrtimer a');
-    var misteryBox = $(".mystery-item-inner .live-listings");
-    if (misteryBox.children("i").hasClass("fa-pause-circle")) {
-        if ($.cookie("autobuy") === "true") {
-            if ($.cookie("role") === "superuser") {
-                setInterval(function () {
-                    fullpageparse("opd");
-                }, 300);
-                setInterval(function () {
-                    getallprices("opd");
-                }, randomInteger(800, 2000));
-                showlogs("Interval Started!");
-                autobuy();
-            } else if ($.cookie("role") === "admin") {
-                setInterval(function () {
-                    fullpageparse("opd");
-                }, 100);
-                setInterval(function () {
-                    getallprices("opd");
-                }, randomInteger(600, 1700));
-                showlogs("Interval Started!");
-                autobuy();
-            }
-            reloadpage(display, 10);
-        } else {
-            setInterval(function () {
-                fullpageparse("opd");
-            }, 10);
-            setInterval(function () {
-                newloadallprices("opd");
-            }, 50);
-        }
-    } else {
-        showlogs("Interval NOT Started!");
-    }
-}
+// function mysteryInner() {
+//     $(".navbar-nav").append("<li class='menu scrtimer'><a></a></li>");
+//     var display = $('.scrtimer a');
+//     var misteryBox = $(".mystery-item-inner .live-listings");
+//     if (misteryBox.children("i").hasClass("fa-pause-circle")) {
+//         if ($.cookie("autobuy") === "true") {
+//             if ($.cookie("role") === "superuser") {
+//                 setInterval(function () {
+//                     fullpageparse("opd");
+//                 }, 300);
+//                 setInterval(function () {
+//                     getallprices("opd");
+//                 }, randomInteger(800, 2000));
+//                 showlogs("Interval Started!");
+//                 autobuy();
+//             } else if ($.cookie("role") === "admin") {
+//                 setInterval(function () {
+//                     fullpageparse("opd");
+//                 }, 100);
+//                 setInterval(function () {
+//                     getallprices("opd");
+//                 }, randomInteger(600, 1700));
+//                 showlogs("Interval Started!");
+//                 autobuy();
+//             }
+//             reloadpage(display, 10);
+//         } else {
+//             setInterval(function () {
+//                 fullpageparse("opd");
+//             }, 10);
+//             setInterval(function () {
+//                 newloadallprices("opd");
+//             }, 50);
+//         }
+//     } else {
+//         showlogs("Interval NOT Started!");
+//     }
+// }
 
 function settingsMenu() {
     if ($.cookie("silence") === "true") {
@@ -1149,7 +1326,7 @@ function csmopriceView(special) {
                 $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;'><span class='moopsval'>" + moops + "</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>" + opsmo + "</span>%</span></div>");
                 $(this).prepend("<span style='position: absolute;top: 33%;left: 0;color: #ff8a37; font-size: 13px;z-index: 999; font-weight: bold;'>" + loaded['skincost'] + "$</span>");
             } else {
-                $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
+                $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='https://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
             }
         }
         if (typeof $(this).children(".skindblink").html() === 'undefined') {
@@ -1168,7 +1345,7 @@ function csmopriceView(special) {
                     $(this).attr("disc-status", 'done');
                     $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;'><span class='moopsval'>" + loaded['moops'] + "</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>" + loaded['opsmo'] + "</span>%</span></div>");
                 } else {
-                    $(this).prepend("<a class='opspricelink' target='_blank' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
+                    $(this).prepend("<a class='opspricelink' target='_blank' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='https://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
                 }
             } else {
                 loaded = _.find(opsapiLoaded, function (item) {
@@ -1188,7 +1365,7 @@ function csmopriceView(special) {
                     $(this).prepend("<div style='position:absolute;left:7%; bottom: 25%;z-index: 999;width: 100%'><span class='moopsValue' style='background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;'><span class='moopsval'>" + moops + "</span>%</span><span class='opsmoValue' style='background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right; margin-right: 6px;'><span class='opsmoval'>" + opsmo + "</span>%</span></div>");
                     $(this).prepend("<span style='position: absolute;top: 33%;left: 0;color: #ff8a37; font-size: 13px;z-index: 999; font-weight: bold;'>" + loaded['skincost'] + "$</span>");
                 } else {
-                    $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='http://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
+                    $(this).prepend("<a class='opspricelink' style='position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;'><img class='opsprice' src='https://skinsdb.xyz/design/images/opskins_logo.png' alt='opsprice' style='width: 100%; height: auto;'></a>");
                 }
             }
         }
@@ -1531,7 +1708,7 @@ function autobuy() {
                     function getbuyQuery(i, random) {
                         // console.log("Вызов номер " + i + " через " + random/1000 + "с.");
                         setTimeout(function () {
-                            console.log("Вызов номер " + i + " выполнен. Скин: "+skinsLoaded[i]['skinname']+" цена: "+(skinsLoaded[i]['skinprice']/100)+"$");
+                            console.log("Вызов номер " + i + " выполнен. Скин: " + skinsLoaded[i]['skinname'] + " цена: " + (skinsLoaded[i]['skinprice'] / 100) + "$");
                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
                             showlogs("Пытаюсь купить..");
                         }, random)
@@ -1573,12 +1750,26 @@ function getautobuy() {
             main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
             $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
             var display = $('.scrtimer span');
-            reloadpage(display, 35);
-            if ($.cookie("role") === "admin") {
-                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-            } else if ($.cookie("role") === "superuser") {
-                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+            if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+                console.log("Низкий баланс. Количество запросов ограничено");
+                showlogs("Низкий баланс. Количество запросов ограничено");
+                reloadpage(display, 10);
+
+                if ($.cookie("role") === "admin") {
+                    getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
+                } else if ($.cookie("role") === "superuser") {
+                    getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
+                }
+            } else {
+                reloadpage(display, 35);
+
+                if ($.cookie("role") === "admin") {
+                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                } else if ($.cookie("role") === "superuser") {
+                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+                }
             }
+
             function getFunction() {
                 var errors = $(".errorsSkins");
                 var allskins = $(".AllSkins");
@@ -1597,14 +1788,43 @@ function getautobuy() {
                         var grade = $(html).find('.text-muted').next().html();
                         var name = $(html).find(".market-name.market-link").html().trim();
                         if (wear !== "") {
-                            var phase = $(html).find('.text-muted').next().html().replace(/[/^\D+/()]/g, '');
-                            if (phase !== "") {
-                                name = name + " Phase " + phase + " (" + wear + ")";
-                            } else {
-                                name = name + " (" + wear + ")";
+                            var phase = $(html).find('.text-muted').next().html();
+                            switch (phase) {
+                                case '★ Covert Knife (Ruby)' :
+                                    phase = " Ruby";
+                                    break;
+                                case '★ Covert Knife (Sapphire)' :
+                                    phase = " Sapphire";
+                                    break;
+                                case '★ Covert Knife (Black Pearl)' :
+                                    phase = " Black Pearl";
+                                    break;
+                                case '★ Covert Knife (Emerald)' :
+                                    phase = " Emerald";
+                                    break;
+                                default:
+                                    phase = phase.replace(/[/^\D+/()]/g, '');
                             }
+                            switch (phase) {
+                                case '1' :
+                                    phase = " Phase 1";
+                                    break;
+                                case '2' :
+                                    phase = " Phase 2";
+                                    break;
+                                case '3' :
+                                    phase = " Phase 3";
+                                    break;
+                                case '4' :
+                                    phase = " Phase 4";
+                                    break;
+                                case '' :
+                                    phase = "";
+                                    break;
+                            }
+                            name = name + phase + " (" + wear + ")";
                         }
-                        var amount = $(html).find(".item-amount").html().replace("$", "");
+                        var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
                         var skinId = $(html).find(".market-link").attr("href");
                         skinId = skinId.split("&item=");
                         skinId = skinId[1];
@@ -1612,7 +1832,7 @@ function getautobuy() {
                         if (buyer === 0 && grade !== "Base Grade Key") {
                             var skin = {};
                             skin['skinName'] = name;
-                            skin['skinPrice'] = amount;
+                            skin['skinPrice'] = parseFloat(amount);
                             skin['skinId'] = skinId;
                             skinsforcheck.push(skin);
                         }
@@ -1640,7 +1860,7 @@ function getautobuy() {
                                 } else {
                                     savedDiscount = 26;
                                 }
-                                function getQuery(n,random) {
+                                function getQuery(n, random) {
                                     setTimeout(function () {
                                         oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo']);
                                     }, random)
@@ -1651,19 +1871,32 @@ function getautobuy() {
                                         random = randomInteger(1200, 2300);
                                         random = beforeW + random;
                                         beforeW = random;
-                                        console.log("Try to buy after " + random/1000 + "c.");
+                                        console.log("Try to buy after " + random / 1000 + "c.");
                                         clearInterval(getAutoInt);
-                                        getQuery(n,random);
+                                        getQuery(n, random);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
                                     }
-                                    if(n === (res.length - 1)){
-                                        setTimeout(function () {
-                                            if ($.cookie("role") === "admin") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                            } else if ($.cookie("role") === "superuser") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                                            }
-                                        }, random + 2000)
+                                    if (n === (res.length - 1)) {
+                                        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+                                            console.log("Низкий баланс. Количество запросов ограничено");
+                                            showlogs("Низкий баланс. Количество запросов ограничено");
+                                            random = randomInteger(50000, 120000)
+                                            setTimeout(function () {
+                                                if ($.cookie("role") === "admin") {
+                                                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                                                } else if ($.cookie("role") === "superuser") {
+                                                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+                                                }
+                                            }, random + 2000)
+                                        } else {
+                                            setTimeout(function () {
+                                                if ($.cookie("role") === "admin") {
+                                                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                                                } else if ($.cookie("role") === "superuser") {
+                                                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+                                                }
+                                            }, random + 2000)
+                                        }
                                     }
                                 }
                             }
@@ -1771,6 +2004,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
     if (loc === null) {
         loc = 'home';
     }
+    price = parseFloat(price);
     var internal_search = getURLParameter('search_internal');
     $.post("/ajax/shop_buy_item.php", {
         "action": "buy",
@@ -1816,9 +2050,9 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
                 if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
                     $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
                 }
-                // console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
-                // console.log("https://opskins.com/?loc=shop_view_item&item="+saleid);
-                // console.log(parsed[0].innerText)
+                console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
+                console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
+                console.log(parsed[0].innerText)
             }
         }
     });

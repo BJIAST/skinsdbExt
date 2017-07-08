@@ -1280,6 +1280,78 @@ function csmobot() {
 function getLink() {
     $(".invertory_container").children().each(function () {
         if (typeof $(this).children(".parse_button").html() === 'undefined') {
+
+            var name, phase, ext, stat;
+            var phase = "";
+            var type = "";
+            stat = (typeof $(this).children(".st").html() !== 'undefined') ? 1 : 0;
+            ext = $(this).find(".invertory_title_container_marka").text();
+
+            var sticker = $(this).attr("market_hash_name").indexOf("Sticker");
+            if (sticker > -1) {
+                name = $(this).attr("market_hash_name").replace("Sticker | ", "");
+            } else {
+                name = $(this).attr("market_hash_name").split("(");
+                var gd = name[0].split("Gamma Doppler ");
+                var d = name[0].split("Doppler ");
+                name = name[0].replace("StatTrak™", "").replace(d[1], "").replace(gd[1], "").trim();
+
+                type = (name.indexOf("|") < 0) ? "&vanilla=1" : "";
+                var checkd = d[1];
+                var checkgd = gd[1];
+                phase = "";
+                if (typeof checkd !== 'undefined') {
+                    var fixd = checkd.trim();
+                    switch (fixd) {
+                        case 'Phase 1' :
+                            phase = '&phase=d1';
+                            break;
+                        case 'Phase 2' :
+                            phase = '&phase=d2';
+                            break;
+                        case 'Phase 3' :
+                            phase = '&phase=d3';
+                            break;
+                        case 'Phase 4' :
+                            phase = '&phase=d4';
+                            break;
+                        case 'Ruby' :
+                            phase = '&phase=dr';
+                            break;
+                        case 'Sapphire' :
+                            phase = '&phase=ds';
+                            break;
+                        case 'Black Pearl' :
+                            phase = '&phase=db';
+                            break;
+                    }
+                }
+                if (typeof checkgd !== 'undefined') {
+                    var fixgd = checkgd.trim();
+                    switch (fixgd) {
+                        case 'Phase 1' :
+                            phase = '&phase=g1';
+                            break;
+                        case 'Phase 2' :
+                            phase = '&phase=g2';
+                            break;
+                        case 'Phase 3' :
+                            phase = '&phase=g3';
+                            break;
+                        case 'Phase 4' :
+                            phase = '&phase=g4';
+                            break;
+                        case 'Emerald' :
+                            phase = '&phase=ge';
+                            break;
+                    }
+                }
+            }
+
+            if (typeof $(this).find(".link_button").html() === 'undefined') {
+                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a>');
+            }
+
             var loaded;
             var skinname = $(this).attr("market_hash_name");
             loaded = _.find(skinsLoaded, function (item) {
@@ -1296,81 +1368,13 @@ function getLink() {
                 } else if (moops < 0) {
                     moops = moops + moops * (-2);
                 }
-                $(this).prepend('<div class="parse_button parse_done" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: transparent; margin-top: 45px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 100%;"></div>');
-                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 50%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
-                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 50%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline; padding: 2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
+                $(this).prepend('<div class="parse_button parse_done" data-ops="'+loaded['opsprice']+'" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: transparent; margin-top: 48px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 100%;"></div>');
+                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 50%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
+                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 50%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
+
             } else {
-                var name, phase, ext, stat;
-                var phase = "";
-                var type = "";
-                stat = (typeof $(this).children(".st").html() !== 'undefined') ? 1 : 0;
-                ext = $(this).find(".invertory_title_container_marka").text();
-
-                var sticker = $(this).attr("market_hash_name").indexOf("Sticker");
-                if (sticker > -1) {
-                    name = $(this).attr("market_hash_name").replace("Sticker | ", "");
-                } else {
-                    name = $(this).attr("market_hash_name").split("(");
-                    var gd = name[0].split("Gamma Doppler ");
-                    var d = name[0].split("Doppler ");
-                    name = name[0].replace("StatTrak™", "").replace(d[1], "").replace(gd[1], "").trim();
-
-                    type = (name.indexOf("|") < 0) ? "&vanilla=1" : "";
-                    var checkd = d[1];
-                    var checkgd = gd[1];
-                    phase = "";
-                    if (typeof checkd !== 'undefined') {
-                        var fixd = checkd.trim();
-                        switch (fixd) {
-                            case 'Phase 1' :
-                                phase = '&phase=d1';
-                                break;
-                            case 'Phase 2' :
-                                phase = '&phase=d2';
-                                break;
-                            case 'Phase 3' :
-                                phase = '&phase=d3';
-                                break;
-                            case 'Phase 4' :
-                                phase = '&phase=d4';
-                                break;
-                            case 'Ruby' :
-                                phase = '&phase=dr';
-                                break;
-                            case 'Sapphire' :
-                                phase = '&phase=ds';
-                                break;
-                            case 'Black Pearl' :
-                                phase = '&phase=db';
-                                break;
-                        }
-                    }
-                    if (typeof checkgd !== 'undefined') {
-                        var fixgd = checkgd.trim();
-                        switch (fixgd) {
-                            case 'Phase 1' :
-                                phase = '&phase=g1';
-                                break;
-                            case 'Phase 2' :
-                                phase = '&phase=g2';
-                                break;
-                            case 'Phase 3' :
-                                phase = '&phase=g3';
-                                break;
-                            case 'Phase 4' :
-                                phase = '&phase=g4';
-                                break;
-                            case 'Emerald' :
-                                phase = '&phase=ge';
-                                break;
-                        }
-                    }
-                }
-
-                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="height: 22px; min-width: 35px; cursor: pointer; position: absolute; color: white; background-color: rgba(52, 136, 52, 0.6); margin-top: 20px; font-size: 16px; margin-left: -50px; padding-left: 2px; padding-right: 2px; z-index: 10;">Link</a>');
-
                 //cfdfsfs
-                $(this).prepend('<div class="parse_button parse_event" style="height: 22px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: rgba(52, 136, 52, 0.6); margin-top: 45px; font-size: 16px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999;">Price</div>');
+                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
             }
         }
         $(this).children(".link_button").unbind().on("click", function () {
@@ -1386,6 +1390,10 @@ function getLink() {
             getPrice(nameToSave, link, allThis);
             return false;
         });
+        $(this).children(".parse_done").unbind().on("click",function () {
+            alert($(this).attr("data-ops")+"$ на Opskins");
+            return false;
+        })
     });
 }
 

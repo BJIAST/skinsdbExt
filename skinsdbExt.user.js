@@ -1246,13 +1246,15 @@ function autoWithdraw(){
                     skinForOut = skinForOut.slice(1);
                     $.post("https://api.opskins.com/IInventory/Withdraw/v1/",{key: $.cookie("apikey"), items: skinForOut}).done(function (res) {
                         $(".autowithdraw").html("Подготовка офферов.."+mark);
-                        chromemes(res['message']);
+                        (res['message'].length > 0) ? chromemes(res['message']);
                         var tradeoffers = res['response']['offers'];
                         $.each(tradeoffers,function (i,lvl) {
                             window.open("https://steamcommunity.com/tradeoffer/"+lvl['tradeoffer_id']+"/");
                         })
                         $(".autowithdraw").html("Готово!"+mark);
                     })
+                }else{
+                    $(".autowithdraw").html("Готово!"+mark);
                 }
             }else{
                 $(".autowithdraw").html("Ошибка!"+mark);
@@ -1921,6 +1923,7 @@ function getautobuy() {
                         data: myData,
                         onload: function (result) {
                             var res = jQuery.parseJSON(result.responseText);
+                            var forBuyCounter = 0;
                             if (res['error']) {
                                 errors.html(parseInt(errors.text()) + res.length);
                             } else {
@@ -1936,19 +1939,27 @@ function getautobuy() {
                                 function getQuery(n, random,last) {
                                     setTimeout(function () {
                                         oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'],last);
+                                        console.log("GetQuery last = " + last);
                                     }, random)
                                 }
-
                                 for (n = 0; n < res.length; n++) {
                                     if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
+                                        forBuyCounter++;
+                                    }
+                                }
+                                for (n = 0; n < res.length; n++) {
+                                    var realBuyCounter = 0;
+                                    if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
+                                        realBuyCounter++;
                                         random = randomInteger(1200, 2300);
                                         random = beforeW + random;
                                         beforeW = random;
                                         console.log("Try to buy after " + random / 1000 + "c.");
                                         clearInterval(getAutoInt);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
-                                        if (n === (res.length - 1)) {
-                                            getQuery(n, random,"update");
+                                        if (realBuyCounter === forBuyCounter) {
+                                            var last = "update";
+                                            getQuery(n, random, last);
                                         }else{
                                             getQuery(n, random);
                                         }

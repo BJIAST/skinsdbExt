@@ -1949,7 +1949,6 @@ function getautobuy() {
                                 function getQuery(n, random, last) {
                                     setTimeout(function () {
                                         oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'], last);
-                                        console.log("GetQuery last = " + last);
                                     }, random)
                                 }
 
@@ -2118,7 +2117,6 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
         // console.log(parsed);
         if (parsed.length > 1) {
             if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
-                console.log(last);
                 $(".buyedSkins").html(parseInt($(".buyedSkins").text()) + 1);
                 var now = new Date();
                 if ($(".buyedSkinsTable").css("display") === "none") {
@@ -2127,10 +2125,6 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 $(".buyedSkinsTable tbody").append("<tr><td>" + skin + "</td><td>" + price / 100 + "$</td><td>" + skinDisc + "%</td><td>" + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds() + "." + now.getMilliseconds() + "</td></tr>");
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
-                }
-                if (last == "update") {
-                    updateOsiCount(true);
-                    updateBalance(true);
                 }
             } else {
                 updateOsiCount(true);
@@ -2151,6 +2145,10 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
                 console.log(parsed[0].innerText)
             }
+        }
+        if (last == "update") {
+            updateOsiCount(true);
+            updateBalance(true);
         }
     });
 }

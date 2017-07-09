@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.250
+// @version      1.251
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -41,6 +41,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 if (JSONdata['success']) {
                     opsbotload(site);
                     $.cookie("role", JSONdata['role']);
+                    $.cookie("apikey", JSONdata['key']);
                     if ($.cookie("botison") === "on") {
                         $(".navbar-nav").append("<li class='menu csmupd'><a style='font-weight: bold; color: red;'>Запущен бот!!</a></li>");
                     }
@@ -116,6 +117,9 @@ function opsbotload(site) {
     }
     if (site == "https://opskins.com/?loc=sell") {
         sellsinvChecker();
+    }
+    if (site == "https://opskins.com/?loc=inventory") {
+        autoWithdraw();
     }
     if (site == "https://opskins.com/?loc=store_account#manageSales") {
         realEarning();
@@ -1218,6 +1222,46 @@ function settingsMenu() {
     })
 }
 
+function autoWithdraw(){
+    $(".btn-primary:contains('Select None')").after("<button class='btn btn-primary autowithdraw' style='margin-left: 10px;'>Авто-вывод"+mark+"</button>");
+
+    $(".autowithdraw").on("click",function () {
+        $(this).html("Сбор информации.."+mark);
+        $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key="+$.cookie("apikey")).done(function (res) {
+            var skinForOut = "";
+            if(res['status'] === 1){
+                $(".autowithdraw").html("Выборка скинов.."+mark);
+                var skins = res['response']['items'];
+                var i,n;
+                for (i = 0; i < skins.length; i++){
+                    if (skins[i]['offer_id'] !== null){
+                        n++;
+                        // window.open("https://steamcommunity.com/tradeoffer/"+skins[i]['offer_id']+"/");
+                    }
+                    if(skins[i]['can_repair'] == null && skins[i]['offer_id'] == null){
+                        skinForOut += ","+skins[i]['id'];
+                    }
+                }
+                if (n !== skins.length - 1){
+                    skinForOut = skinForOut.slice(1);
+                    $.post("https://api.opskins.com/IInventory/Withdraw/v1/",{key: $.cookie("apikey"), items: skinForOut}).done(function (res) {
+                        $(".autowithdraw").html("Подготовка офферов.."+mark);
+                        chromemes(res['message']);
+                        var tradeoffers = res['response']['offers'];
+                        $.each(tradeoffers,function (i,lvl) {
+                            window.open("https://steamcommunity.com/tradeoffer/"+lvl['tradeoffer_id']+"/");
+                        })
+                        $(".autowithdraw").html("Готово!"+mark);
+                    })
+                }
+            }else{
+                $(".autowithdraw").html("Ошибка!"+mark);
+            }
+        })
+    })
+
+}
+
 function csmobot() {
     setInterval(getLink, 2000);
 
@@ -1711,60 +1755,60 @@ function realEarning() {
         }
     })
 }
-function autobuy() {
-    if (skinsLoaded.length > 0) {
-        delete skinsLoaded;
-        skinsLoaded = [];
-    }
-    setTimeout(function () {
-        if ($.cookie("autobuy") === "true" && $(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member") {
-            var autoBuyInt;
-
-            autoBuyInt = setInterval(autoBuyFunc, 700);
-
-            function autoBuyFunc() {
-                if (skinsLoaded.length > 0) {
-                    clearInterval(autoBuyInt);
-                    $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
-                    var date = new Date();
-                    date.setTime(date.getTime() + (30 * 1000));
-                    $.cookie("botison", "on", {expires: date});
-                    // console.table(skinsLoaded);
-                    var i;
-                    var randomBuy;
-                    var beforeOneWaiting = 0;
-
-                    function getbuyQuery(i, random) {
-                        // console.log("Вызов номер " + i + " через " + random/1000 + "с.");
-                        setTimeout(function () {
-                            console.log("Вызов номер " + i + " выполнен. Скин: " + skinsLoaded[i]['skinname'] + " цена: " + (skinsLoaded[i]['skinprice'] / 100) + "$");
-                            oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
-                            showlogs("Пытаюсь купить..");
-                        }, random)
-                    }
-
-                    for (i = 0; i < skinsLoaded.length; i++) {
-                        randomBuy = randomInteger(2000, 4000);
-                        // console.log("Вызов функции в цикле по ид: "+ i +" с рандомом: "+ randomBuy + " + " + beforeOneWaiting);
-                        getbuyQuery(i, beforeOneWaiting + randomBuy);
-                        beforeOneWaiting += randomBuy;
-                    }
-
-                    setTimeout(function () {
-                        delete skinsLoaded;
-                        skinsLoaded = [];
-                        setTimeout(function () {
-                            $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-                            autoBuyInt = setInterval(autoBuyFunc, 700);
-                        }, 2000)
-                    }, beforeOneWaiting + randomInteger(4000, 6000))
-                } else {
-                    // console.log("Скинов еще нету.");
-                }
-            }
-        }
-    }, 4000)
-}
+// function autobuy() {
+//     if (skinsLoaded.length > 0) {
+//         delete skinsLoaded;
+//         skinsLoaded = [];
+//     }
+//     setTimeout(function () {
+//         if ($.cookie("autobuy") === "true" && $(".userSub").text() !== "" && $(".userSub").text() !== "Premium Member") {
+//             var autoBuyInt;
+//
+//             autoBuyInt = setInterval(autoBuyFunc, 700);
+//
+//             function autoBuyFunc() {
+//                 if (skinsLoaded.length > 0) {
+//                     clearInterval(autoBuyInt);
+//                     $(".mystery-item-inner .live-listings i.fa-pause-circle").click();
+//                     var date = new Date();
+//                     date.setTime(date.getTime() + (30 * 1000));
+//                     $.cookie("botison", "on", {expires: date});
+//                     // console.table(skinsLoaded);
+//                     var i;
+//                     var randomBuy;
+//                     var beforeOneWaiting = 0;
+//
+//                     function getbuyQuery(i, random) {
+//                         // console.log("Вызов номер " + i + " через " + random/1000 + "с.");
+//                         setTimeout(function () {
+//                             console.log("Вызов номер " + i + " выполнен. Скин: " + skinsLoaded[i]['skinname'] + " цена: " + (skinsLoaded[i]['skinprice'] / 100) + "$");
+//                             oneClickBuyScr(skinsLoaded[i]['skinid'], skinsLoaded[i]['skinprice'], skinsLoaded[i]['skinname'], skinsLoaded[i]['skindisc']);
+//                             showlogs("Пытаюсь купить..");
+//                         }, random)
+//                     }
+//
+//                     for (i = 0; i < skinsLoaded.length; i++) {
+//                         randomBuy = randomInteger(2000, 4000);
+//                         // console.log("Вызов функции в цикле по ид: "+ i +" с рандомом: "+ randomBuy + " + " + beforeOneWaiting);
+//                         getbuyQuery(i, beforeOneWaiting + randomBuy);
+//                         beforeOneWaiting += randomBuy;
+//                     }
+//
+//                     setTimeout(function () {
+//                         delete skinsLoaded;
+//                         skinsLoaded = [];
+//                         setTimeout(function () {
+//                             $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+//                             autoBuyInt = setInterval(autoBuyFunc, 700);
+//                         }, 2000)
+//                     }, beforeOneWaiting + randomInteger(4000, 6000))
+//                 } else {
+//                     // console.log("Скинов еще нету.");
+//                 }
+//             }
+//         }
+//     }, 4000)
+// }
 
 function getautobuy() {
     var main = $("#scroll");
@@ -1889,9 +1933,9 @@ function getautobuy() {
                                 } else {
                                     savedDiscount = 26;
                                 }
-                                function getQuery(n, random) {
+                                function getQuery(n, random,last) {
                                     setTimeout(function () {
-                                        oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo']);
+                                        oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'],last);
                                     }, random)
                                 }
 
@@ -1902,8 +1946,12 @@ function getautobuy() {
                                         beforeW = random;
                                         console.log("Try to buy after " + random / 1000 + "c.");
                                         clearInterval(getAutoInt);
-                                        getQuery(n, random);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
+                                        if (n === (res.length - 1)) {
+                                            getQuery(n, random,"update");
+                                        }else{
+                                            getQuery(n, random);
+                                        }
                                     }
                                     if (n === (res.length - 1)) {
                                         if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
@@ -2028,7 +2076,7 @@ function randomInteger(min, max) {
 
 // Default OPS Functions
 
-function oneClickBuyScr(saleid, price, skin, skinDisc) {
+function oneClickBuyScr(saleid, price, skin, skinDisc,last = false) {
     var loc = getURLParameter('loc');
     if (loc === null) {
         loc = 'home';
@@ -2048,21 +2096,19 @@ function oneClickBuyScr(saleid, price, skin, skinDisc) {
         // console.log(parsed);
         if (parsed.length > 1) {
             if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
+                console.log(last);
                 $(".buyedSkins").html(parseInt($(".buyedSkins").text()) + 1);
                 var now = new Date();
-                if ($.cookie("nav-updater") !== "on") {
-                    var date = new Date();
-                    date.setTime(date.getTime() + (60 * 1000));
-                    updateOsiCount(true);
-                    updateBalance(true);
-                    $.cookie("nav-updater", "on", {expires: date});
-                }
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
                 }
                 $(".buyedSkinsTable tbody").append("<tr><td>" + skin + "</td><td>" + price / 100 + "$</td><td>" + skinDisc + "%</td><td>" + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds() + "." + now.getMilliseconds() + "</td></tr>");
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
+                }
+                if(last == "update"){
+                    updateOsiCount(true);
+                    updateBalance(true);
                 }
             } else {
                 updateOsiCount(true);

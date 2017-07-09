@@ -1222,42 +1222,51 @@ function settingsMenu() {
     })
 }
 
-function autoWithdraw(){
-    $(".btn-primary:contains('Select None')").after("<button class='btn btn-primary autowithdraw' style='margin-left: 10px;'>Авто-вывод"+mark+"</button>");
+function autoWithdraw() {
+    $(".btn-primary:contains('Select None')").after("<button class='btn btn-primary autowithdraw' style='margin-left: 10px;'>Авто-вывод" + mark + "</button>");
 
-    $(".autowithdraw").on("click",function () {
-        $(this).html("Сбор информации.."+mark);
-        $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key="+$.cookie("apikey")).done(function (res) {
+    $(".autowithdraw").on("click", function () {
+        $(this).html("Сбор информации.." + mark);
+        $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key=" + $.cookie("apikey")).done(function (res) {
             var skinForOut = "";
-            if(res['status'] === 1){
-                $(".autowithdraw").html("Выборка скинов.."+mark);
+            if (res['status'] === 1) {
+                $(".autowithdraw").html("Выборка скинов.." + mark);
                 var skins = res['response']['items'];
-                var i,n;
-                for (i = 0; i < skins.length; i++){
-                    if (skins[i]['offer_id'] !== null){
-                        n++;
-                        // window.open("https://steamcommunity.com/tradeoffer/"+skins[i]['offer_id']+"/");
+                var i, n;
+                if (skins.length === 0) {
+                    $(".autowithdraw").html("Скинов нет!" + mark);
+                } else {
+                    for (i = 0; i < skins.length; i++) {
+                        if (skins[i]['offer_id'] !== null) {
+                            n++;
+                            // window.open("https://steamcommunity.com/tradeoffer/"+skins[i]['offer_id']+"/");
+                        }
+                        if (skins[i]['can_repair'] == null && skins[i]['offer_id'] == null) {
+                            skinForOut += "," + skins[i]['id'];
+                        }
                     }
-                    if(skins[i]['can_repair'] == null && skins[i]['offer_id'] == null){
-                        skinForOut += ","+skins[i]['id'];
-                    }
-                }
-                if (n !== skins.length - 1){
-                    skinForOut = skinForOut.slice(1);
-                    $.post("https://api.opskins.com/IInventory/Withdraw/v1/",{key: $.cookie("apikey"), items: skinForOut}).done(function (res) {
-                        $(".autowithdraw").html("Подготовка офферов.."+mark);
-                        (res['message'].length > 0) ? chromemes(res['message']);
-                        var tradeoffers = res['response']['offers'];
-                        $.each(tradeoffers,function (i,lvl) {
-                            window.open("https://steamcommunity.com/tradeoffer/"+lvl['tradeoffer_id']+"/");
+                    if (n !== skins.length - 1) {
+                        skinForOut = skinForOut.slice(1);
+                        $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
+                            key: $.cookie("apikey"),
+                            items: skinForOut
+                        }).done(function (res) {
+                            $(".autowithdraw").html("Подготовка офферов.." + mark);
+                            if (res['message'].length > 0) {
+                                chromemes(res['message']);
+                            }
+                            var tradeoffers = res['response']['offers'];
+                            $.each(tradeoffers, function (i, lvl) {
+                                window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/");
+                            })
+                            $(".autowithdraw").html("Готово!" + mark);
                         })
-                        $(".autowithdraw").html("Готово!"+mark);
-                    })
-                }else{
-                    $(".autowithdraw").html("Готово!"+mark);
+                    } else {
+                        $(".autowithdraw").html("Готово!" + mark);
+                    }
                 }
-            }else{
-                $(".autowithdraw").html("Ошибка!"+mark);
+            } else {
+                $(".autowithdraw").html("Ошибка!" + mark);
             }
         })
     })
@@ -1414,7 +1423,7 @@ function getLink() {
                 } else if (moops < 0) {
                     moops = moops + moops * (-2);
                 }
-                $(this).prepend('<div class="parse_button parse_done" data-ops="'+loaded['opsprice']+'" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: transparent; margin-top: 48px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 100%;"></div>');
+                $(this).prepend('<div class="parse_button parse_done" data-ops="' + loaded['opsprice'] + '" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: transparent; margin-top: 48px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 100%;"></div>');
                 $(this).children(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 50%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
                 $(this).children(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 50%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
 
@@ -1436,8 +1445,8 @@ function getLink() {
             getPrice(nameToSave, link, allThis);
             return false;
         });
-        $(this).children(".parse_done").unbind().on("click",function () {
-            alert($(this).attr("data-ops")+"$ на Opskins");
+        $(this).children(".parse_done").unbind().on("click", function () {
+            alert($(this).attr("data-ops") + "$ на Opskins");
             return false;
         })
     });
@@ -1936,12 +1945,13 @@ function getautobuy() {
                                 } else {
                                     savedDiscount = 26;
                                 }
-                                function getQuery(n, random,last) {
+                                function getQuery(n, random, last) {
                                     setTimeout(function () {
-                                        oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'],last);
+                                        oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'], last);
                                         console.log("GetQuery last = " + last);
                                     }, random)
                                 }
+
                                 for (n = 0; n < res.length; n++) {
                                     if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
                                         forBuyCounter++;
@@ -1960,7 +1970,7 @@ function getautobuy() {
                                         if (realBuyCounter === forBuyCounter) {
                                             var last = "update";
                                             getQuery(n, random, last);
-                                        }else{
+                                        } else {
                                             getQuery(n, random);
                                         }
                                     }
@@ -2087,7 +2097,7 @@ function randomInteger(min, max) {
 
 // Default OPS Functions
 
-function oneClickBuyScr(saleid, price, skin, skinDisc,last = false) {
+function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
     var loc = getURLParameter('loc');
     if (loc === null) {
         loc = 'home';
@@ -2117,7 +2127,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc,last = false) {
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
                 }
-                if(last == "update"){
+                if (last == "update") {
                     updateOsiCount(true);
                     updateBalance(true);
                 }

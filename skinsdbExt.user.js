@@ -1228,11 +1228,11 @@ function autoWithdraw() {
     $(".autowithdraw").on("click", function () {
         $(this).html("Сбор информации.." + mark);
         $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key=" + $.cookie("apikey")).done(function (res) {
-            var skinForOut = "";
             if (res['status'] === 1) {
                 $(".autowithdraw").html("Выборка скинов.." + mark);
                 var skins = res['response']['items'];
-                var i, n;
+                var skinForOut = "";
+                var i, n, z = 0;
                 if (skins.length === 0) {
                     $(".autowithdraw").html("Скинов нет!" + mark);
                 } else {
@@ -1243,16 +1243,17 @@ function autoWithdraw() {
                         }
                         if (skins[i]['can_repair'] == null && skins[i]['offer_id'] == null) {
                             skinForOut += "," + skins[i]['id'];
+                            z++;
                         }
                     }
-                    if (n !== skins.length - 1) {
+                    if (n !== skins.length - 1 && z !== 0) {
                         skinForOut = skinForOut.slice(1);
                         $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
                             key: $.cookie("apikey"),
                             items: skinForOut
                         }).done(function (res) {
                             $(".autowithdraw").html("Подготовка офферов.." + mark);
-                            if (res['message'].length > 0) {
+                            if (typeof res['message'] !== "undefined") {
                                 chromemes(res['message']);
                             }
                             var tradeoffers = res['response']['offers'];
@@ -1262,7 +1263,7 @@ function autoWithdraw() {
                             $(".autowithdraw").html("Готово!" + mark);
                         })
                     } else {
-                        $(".autowithdraw").html("Готово!" + mark);
+                        $(".autowithdraw").html("Ошибка!" + mark);
                     }
                 }
             } else {

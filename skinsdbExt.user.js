@@ -1933,7 +1933,6 @@ function getautobuy() {
                         data: myData,
                         onload: function (result) {
                             var res = jQuery.parseJSON(result.responseText);
-                            var forBuyCounter = 0;
                             if (res['error']) {
                                 errors.html(parseInt(errors.text()) + res.length);
                             } else {
@@ -1941,6 +1940,10 @@ function getautobuy() {
                                 var n;
                                 var beforeW = 0;
                                 var random;
+
+                                var forBuyCounter = 0;
+                                var realBuyCounter = 0;
+
                                 if ($.cookie("savedDisc")) {
                                     savedDiscount = $.cookie("savedDisc");
                                 } else {
@@ -1957,14 +1960,15 @@ function getautobuy() {
                                         forBuyCounter++;
                                     }
                                 }
+
                                 for (n = 0; n < res.length; n++) {
-                                    var realBuyCounter = 0;
                                     if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
                                         realBuyCounter++;
                                         random = randomInteger(1200, 2300);
                                         random = beforeW + random;
                                         beforeW = random;
                                         console.log("Try to buy after " + random / 1000 + "c.");
+                                        console.log("Counter before if "+realBuyCounter);
                                         clearInterval(getAutoInt);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
                                         if (realBuyCounter === forBuyCounter) {

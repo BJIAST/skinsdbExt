@@ -1527,8 +1527,10 @@ function getLink() {
         if (typeof $(this).children(".add_favourite").html() !== 'undefined') {
             $(this).children(".add_favourite").unbind().on("click", function () {
                 var skinname = $(this).parent().attr("market_hash_name");
+                var skinurl = $(this).parent().children(".link_button").attr("href");
                 var myData = new FormData();
                 myData.append("add_fav", skinname);
+                myData.append("add_fav_url", skinurl);
                 var BtnParent = $(this).parent();
                 GM_xmlhttpRequest({
                     method: "POST",

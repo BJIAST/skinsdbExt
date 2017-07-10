@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.251
+// @version      1.252
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -18,8 +18,9 @@ var soundFound = new Audio('http://skinsdb.xyz/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 var skinsLoaded = [];
-var opsapiLoaded = [];
 var skinsdbprices = [];
+var favSkins = [];
+
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -63,8 +64,9 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 }
                 if (JSONdata['success']) {
                     include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-                    csmofunctions();
+                    csmomenu();
                     csmoparser();
+                    favSkins = JSONdata['favskins'];
                 }
             }
         })
@@ -179,10 +181,6 @@ function csmoparser() {
     }
 }
 
-function csmofunctions() {
-    csmomenu();
-
-}
 function autoBuyclick() {
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
     $("#itemCount").after("<div class='btn btn-danger checkout-btn' id='autoBuyclick' style='width: 99px;position:absolute;left: -185px;top: 13px;border-radius: 3px;'>Автоклик</div>");
@@ -1279,6 +1277,7 @@ function csmobot() {
 
     csmocounters();
     $(".offer_container_main .col_lg_head .row").prepend("<div style='margin: 10px 0 20px;overflow: hidden;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px;'>Сканнер " + mark + "</button></div>");
+    $("#scannerdb").before("<div class='btn btn-warning checkout-btn' id='favSkinView' style='margin-left: 32px;'>Избранные" + mark + "</div>");
     $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;'>Opskins -> CS.Money</button></div>");
     $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;'>CS.Money -> Opskins</button></div>");
     $("#sortbymoops").on("click", function () {
@@ -1292,6 +1291,66 @@ function csmobot() {
         $(".offer_container_inventory_steam").animate({
             scrollTop: 0
         }, 'fast');
+    })
+    $("#favSkinView").on("click", function () {
+        if (favSkins.length > 0) {
+            var favSkinsViewer = [];
+            var hash = Date.parse(new Date());
+            var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
+            $.get(url).done(function (result) {
+                res = jQuery.parseJSON(result);
+                var i;
+                for (i = 0; i < favSkins.length; i++) {
+                    $.each(res, function (bot, skins) {
+                        $.each(skins, function (skinid, skin) {
+                            for (key in skin) {
+                                if (skin[key] === favSkins[i]) {
+                                    favSkinsViewer.push(skin);
+                                }
+                            }
+                        })
+                    })
+                }
+                if (favSkinsViewer.length > 1) {
+                    $("#inventory_bots").children(".offer_container_invertory").remove();
+                    var n;
+                    for (n = 0; n < favSkinsViewer.length; n++) {
+                        $("#inventory_bots").append('<div market_hash_name="' + favSkinsViewer[n]['m'] + '" cost="' + favSkinsViewer[n]['p'] + '" id="' + favSkinsViewer[n]['id'] + '' + favSkinsViewer[n]['b'] + '" class="offer_container_invertory" bot_steamid="' + favSkinsViewer[n]['b'] + '" assetid="' + favSkinsViewer[n]['id'] + '" data-original-title="" title="" style="background-color: rgba(39, 179, 22, 0.35);">' +
+                            '<div class="invertory_container_links">' +
+                            '<a title="view on marketplace" href="https://steamcommunity.com/market/listings/730/' + favSkinsViewer[n]['m'] + '" class="invertory_link_view" target="_blank">VIEW</a>' +
+                            '<a title="inpect in steam" href="steam://rungame/730/' + favSkinsViewer[n]['b'] + '/+csgo_econ_action_preview%20S' + favSkinsViewer[n]['b'] + 'A' + favSkinsViewer[n]['id'] + '' + favSkinsViewer[n]['l'] + '" class="invertory_link">INSPECT</a>' +
+                            '</div>' +
+                            '<div class="offer_container_invertory_inactive"></div>' +
+                            '<div class="invertory_title_container">' +
+                            '<div class="invertory_title_text_quantity"> x <span class="count_in_stack">' + (typeof favSkinsViewer[n]['c'] === 'undefined' ? '1' : favSkinsViewer[n]['c']) + '</span></div>' +
+                            '<div class="invertory_title_container_marka">' + favSkinsViewer[n]['e'] + '</div>' +
+                            '</div>' +
+                            '<img alt="' + favSkinsViewer[n]['m'] + '" src="https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLb' + favSkinsViewer[n]['u'] + '/96x72" class="offer_container_img">' +
+                            '<div class="price_animation"></div>' +
+                            '<div class="price">' + favSkinsViewer[n]['p'] + '$</div>' +
+                            '</div>'
+                        );
+                        if (favSkinsViewer[n]['m'].indexOf("StatTrak™") > -1) {
+                            $(".offer_container_invertory").prepend('<img src="img/st.png" class="st">');
+                        }
+                        $(".offer_container_invenory").each(function () {
+                            if (!$(this).hasClass("favourite-skin")) {
+                                $(this).remove();
+                            }
+                        })
+                        $(".popover.fade.bottom.in").remove();
+                    }
+                } else {
+                    $(this).html("Избранных cейчас нет!" + mark);
+                    showlogs("Избранных cейчас нет!" + mark);
+                }
+            });
+            // <div market_hash_name="★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" cost="5278" id="1090937021476561198315968061" class="offer_container_invertory" bot_steamid="76561198315968061" assetid="10909370214" data-original-title="" title="" style="background-color: rgba(39, 179, 22, 0.35);"><div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 29%;z-index: 999;width: 22px; color: #fff;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div><div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div><a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=%E2%98%85%20%20Karambit%20%7C%20Gamma%20Doppler&amp;sort=lh&amp;exterior=fn&amp;stat=1&amp;phase=ge" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a><img src="img/st.png" class="st"><div class="invertory_container_links"> <a title="view on marketplace" href="https://steamcommunity.com/market/listings/730/★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" class="invertory_link_view" target="_blank">VIEW</a> <a title="inspect in steam" href="steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S76561198315968061A10909370214D4964839033136993975" class="invertory_link">INSPECT</a> </div><div class="offer_container_invertory_inactive"></div><div class="invertory_title_container"> <div class="invertory_title_text_quantity"> x<span class="count_in_stack">1</span> </div> <div class="invertory_title_container_marka">FN</div> </div> <img alt="★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" src="https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJlY20kvrxIbrdklRc6ddzhuzI74nxt1i9rBsofT-ld9LDJgVsY1nX-QLtlejqg5bu7Zydm3Q1uSVzsXmOmUe3ghFKauBxxavJdWR7Gog/96x72" class="offer_container_img"> <div class="price_animation"></div> <div class="price">5278$</div> </div>
+        }
+        else {
+            $(this).html("Добавь хоть один скин!" + mark);
+            showlogs("Добавь хоть один скин!" + mark);
+        }
     })
     $("#scannerdb").on("click", function () {
         $(this).html("Загрузка...");
@@ -1403,13 +1462,27 @@ function getLink() {
                     }
                 }
             }
+            var skinname = $(this).attr("market_hash_name");
 
             if (typeof $(this).find(".link_button").html() === 'undefined') {
                 $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a>');
+
+                if (favSkins.length > 0) {
+                    var favs;
+                    favs = _.find(favSkins, function (item) {
+                        return item == skinname;
+                    })
+                    if (typeof favs !== 'undefined') {
+                        Fav(this);
+                    } else {
+                        NotFav(this);
+                    }
+                } else {
+                    NotFav(this);
+                }
             }
 
             var loaded;
-            var skinname = $(this).attr("market_hash_name");
             loaded = _.find(skinsLoaded, function (item) {
                 return item.fullname === skinname;
             });
@@ -1425,12 +1498,13 @@ function getLink() {
                     moops = moops + moops * (-2);
                 }
                 $(this).prepend('<div class="parse_button parse_done" data-ops="' + loaded['opsprice'] + '" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: white; background-color: transparent; margin-top: 48px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 100%;"></div>');
+                $(this).prepend("<span style='position: absolute;top: 33%;left: 0;color: #fff; font-size: 13px;z-index: 999; font-weight: bold;'>" + loaded['opsprice'] + "$</span>");
                 $(this).children(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 50%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
                 $(this).children(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 50%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
 
             } else {
                 //cfdfsfs
-                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 25%;z-index: 999;width: 22px;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 29%;z-index: 999;width: 22px; color: #fff;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
             }
         }
         $(this).children(".link_button").unbind().on("click", function () {
@@ -1450,7 +1524,84 @@ function getLink() {
             alert($(this).attr("data-ops") + "$ на Opskins");
             return false;
         })
+        if (typeof $(this).children(".add_favourite").html() !== 'undefined') {
+            $(this).children(".add_favourite").unbind().on("click", function () {
+                var skinname = $(this).parent().attr("market_hash_name");
+                var myData = new FormData();
+                myData.append("add_fav", skinname);
+                var BtnParent = $(this).parent();
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: scriptUrl,
+                    data: myData,
+                    onload: function (result) {
+                        var res = jQuery.parseJSON(result.responseText);
+                        console.log(res);
+                        if (res['success']) {
+                            Fav(BtnParent, skinname);
+                        } else {
+                            showlogs("Предмет в избранных!");
+                        }
+                    }
+                });
+                return false;
+            })
+        } else {
+            $(this).children(".rem_favourite").unbind().on("click", function () {
+                var skinname = $(this).parent().attr("market_hash_name");
+                var myData = new FormData();
+                myData.append("rem_fav", skinname);
+                var BtnParent = $(this).parent();
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: scriptUrl,
+                    data: myData,
+                    onload: function (result) {
+                        var res = jQuery.parseJSON(result.responseText);
+                        console.log(res);
+                        if (res['succces']) {
+                            NotFav(BtnParent, skinname);
+                        } else {
+                            showlogs("Ошибка удаления!");
+                        }
+                    }
+                });
+                return false;
+            })
+        }
     });
+
+    function NotFav(elem, pack = "false") {
+        if (pack === "false") {
+            $(elem).find(".favourite").remove();
+            $(elem).removeClass("favourite-skin");
+            $(elem).prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div>');
+            $(elem).css("background-color", "rgba(38,38,38,.35)");
+        } else {
+            $("div[market_hash_name='" + pack + "']").find(".favourite").remove();
+            $("div[market_hash_name='" + pack + "']").removeClass("favourite-skin");
+            $("div[market_hash_name='" + pack + "']").prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div>');
+            $("div[market_hash_name='" + pack + "']").css("background-color", "rgba(38,38,38,.35)");
+            favSkins.splice(favSkins.indexOf(pack), 1);
+        }
+    }
+
+    function Fav(elem, pack = "false") {
+        if (pack === "false") {
+            $(elem).find(".favourite").remove();
+            $(elem).addClass("favourite-skin");
+            $(elem).prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div>');
+            $(elem).css("background-color", "rgba(39, 179, 22, 0.35)")
+        } else {
+            $("div[market_hash_name='" + pack + "']").find(".favourite").remove();
+            $("div[market_hash_name='" + pack + "']").addClass("favourite-skin");
+            $("div[market_hash_name='" + pack + "']").prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div>');
+            $("div[market_hash_name='" + pack + "']").css("background-color", "rgba(39, 179, 22, 0.35)");
+            favSkins.push(pack);
+        }
+    }
+
+
 }
 
 function getPrice(fullName, opsUrl, BtnParent) {
@@ -1480,7 +1631,6 @@ function getPrice(fullName, opsUrl, BtnParent) {
 }
 
 function csmomenu() {
-
     if ($.cookie("opsbot") === 'on') {
         csmobot();
         setTimeout(function () {
@@ -1968,7 +2118,7 @@ function getautobuy() {
                                         random = beforeW + random;
                                         beforeW = random;
                                         console.log("Try to buy after " + random / 1000 + "c.");
-                                        console.log("Counter before if "+realBuyCounter);
+                                        console.log("Counter before if " + realBuyCounter);
                                         clearInterval(getAutoInt);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
                                         if (realBuyCounter === forBuyCounter) {

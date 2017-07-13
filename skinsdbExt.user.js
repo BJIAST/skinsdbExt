@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.253
+// @version      1.254
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-
+var version = 1.254;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -47,6 +47,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                     } else {
                         $.cookie("savedDisc", "Укажи дисконт в настройках!");
                     }
+                    versionChecker(JSONdata['user-version'], JSONdata['current-version']);
                     opsbotload(site);
                 }
             }
@@ -66,6 +67,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                 }
                 if (JSONdata['success']) {
                     include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
+                    versionChecker(JSONdata['user-version'], JSONdata['current-version']);
                     csmomenu();
                     csmoparser();
                     favSkins = JSONdata['favskins'];
@@ -78,6 +80,21 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
     }
     steamAccept();
 }());
+
+function versionChecker(userdbV, current) {
+    if (version > userdbV) {
+        var myData = new FormData();
+        myData.append("version_update", version);
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: scriptUrl,
+            data: myData
+        })
+    }
+    if (parseFloat(current) > version) {
+        chromemes('Вышла новая версия: ' + current);
+    }
+}
 
 function opsbotload(site) {
     var opslink = site.split("?loc=shop_search");
@@ -1230,41 +1247,87 @@ function autoWithdraw() {
         $(this).html("Сбор информации.." + mark);
         $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key=" + $.cookie("apikey")).done(function (res) {
             if (res['status'] === 1) {
-                $(".autowithdraw").html("Выборка скинов.." + mark);
+                $(".autowithdraw").html("Собираю офферы.." + mark);
                 var skins = res['response']['items'];
-                var skinForOut = "";
-                var i, n, z = 0;
+                var skinForOut = [];
+                var partsForOut = [];
+                var i, n, z = 0, h, p;
                 if (skins.length === 0) {
                     $(".autowithdraw").html("Скинов нет!" + mark);
                 } else {
                     for (i = 0; i < skins.length; i++) {
                         if (skins[i]['offer_id'] !== null) {
                             n++;
-                            // window.open("https://steamcommunity.com/tradeoffer/"+skins[i]['offer_id']+"/");
                         }
                         if (skins[i]['can_repair'] == null && skins[i]['offer_id'] == null) {
-                            skinForOut += "," + skins[i]['id'];
+                            skinForOut.push(skins[i]['id']);
                             z++;
                         }
                     }
+                    console.log(skinForOut);
                     if (n !== skins.length - 1 && z !== 0) {
-                        skinForOut = skinForOut.slice(1);
-                        $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
-                            key: $.cookie("apikey"),
-                            items: skinForOut
-                        }).done(function (res) {
-                            $(".autowithdraw").html("Подготовка офферов.." + mark);
-                            if (typeof res['message'] !== "undefined") {
-                                chromemes(res['message']);
+                        var maxPart = 10;
+                        var startMaxPart = maxPart;
+                        var colParts = Math.ceil(skinForOut.length / maxPart);
+                        if (skinForOut.length > maxPart) {
+                            p = 0;
+                            var part = [];
+                            for (h = 0; h < skinForOut.length; h++) {
+                                part.push(skinForOut[h]);
+                                partsForOut[p] = part;
+                                if (h === maxPart - 1) {
+                                    p++;
+                                    maxPart = maxPart + startMaxPart;
+                                    part = [];
+                                }
                             }
-                            var tradeoffers = res['response']['offers'];
-                            $.each(tradeoffers, function (i, lvl) {
-                                window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/");
+                            console.log(partsForOut);
+                            for (i = 0; i < partsForOut.length; i++) {
+                                $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
+                                    key: $.cookie("apikey"),
+                                    items: partsForOut[i].join()
+                                }).done(function (res) {
+                                    $(".autowithdraw").html("Подготовка оффера №" + i + "/" + colParts + mark);
+                                    if (typeof res['message'] !== "undefined") {
+                                        chromemes(res['message']);
+                                    }
+                                    var tradeoffers = res['response']['offers'];
+                                    $.each(tradeoffers, function (i, lvl) {
+                                        if (lvl['tradeoffer_id'] !== null) {
+                                            window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/");
+                                        }
+                                    })
+                                    if (i === colParts) {
+                                        $(".autowithdraw").html("Готово!" + mark);
+                                    }
+                                }).fail(function (res) {
+                                    console.log(res);
+                                    showlogs("Пачка №" + i + " зафейлилась!");
+                                })
+                            }
+                        } else {
+                            $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
+                                key: $.cookie("apikey"),
+                                items: skinForOut.join()
+                            }).done(function (res) {
+                                $(".autowithdraw").html("Подготовка офферов.." + mark);
+                                if (typeof res['message'] !== "undefined") {
+                                    chromemes(res['message']);
+                                }
+                                var tradeoffers = res['response']['offers'];
+                                $.each(tradeoffers, function (i, lvl) {
+                                    if (lvl['tradeoffer_id'] !== null) {
+                                        window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/");
+                                    }
+                                })
+                                $(".autowithdraw").html("Готово!" + mark);
+                            }).fail(function (res) {
+                                $(".autowithdraw").html("Жопа.. иди сам забераЙ!");
+                                console.log(res);
                             })
-                            $(".autowithdraw").html("Готово!" + mark);
-                        })
+                        }
                     } else {
-                        $(".autowithdraw").html("Ошибка!" + mark);
+                        $(".autowithdraw").html("Ошибка!" + mark)
                     }
                 }
             } else {
@@ -1272,8 +1335,8 @@ function autoWithdraw() {
             }
         })
     })
-
 }
+
 
 function csmobot() {
     setInterval(getLink, 2000);
@@ -2135,7 +2198,6 @@ function getautobuy() {
                                         random = beforeW + random;
                                         beforeW = random;
                                         console.log("Try to buy after " + random / 1000 + "c.");
-                                        console.log("Counter before if " + realBuyCounter);
                                         clearInterval(getAutoInt);
                                         // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
                                         if (realBuyCounter === forBuyCounter) {
@@ -2183,6 +2245,19 @@ function getautobuy() {
             }
         }
     })
+}
+
+function botOpsChecker() {
+    opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: opsUrl,
+        onload: function (result) {
+            if ($(result.responseText).find(".error#message").html()) {
+                location.reload();
+            }
+        }
+    });
 }
 
 function reloadpage(display, timetorealod) {
@@ -2306,15 +2381,22 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
             }
         } else if (parsed.length === 1) {
-            if (parsed[0].innerHTML === "You cannot buy any items until your previous action completes.") {
-                setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200))
+            var foundKey = parsed[0].innerHTML.indexOf("item's");
+            if (foundKey > -1) {
+                setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
             } else {
-                if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
-                    $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
+                if (parsed[0].innerHTML === "You cannot buy any items until your previous action completes.") {
+                    setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
+                } else if (parsed[0].innerHTML === "") {
+                    setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
+                } else {
+                    if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
+                        $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
+                    }
+                    console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
+                    console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
+                    console.log(parsed[0].innerText)
                 }
-                console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
-                console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
-                console.log(parsed[0].innerText)
             }
         }
         if (last == "update") {

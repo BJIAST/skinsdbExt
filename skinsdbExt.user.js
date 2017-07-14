@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.254;
+var version = 1.2541;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -2381,22 +2381,15 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
             }
         } else if (parsed.length === 1) {
-            var foundKey = parsed[0].innerHTML.indexOf("item's");
-            if (foundKey > -1) {
+            if (parsed[0].innerHTML === "You cannot buy any items until your previous action completes.") {
                 setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
             } else {
-                if (parsed[0].innerHTML === "You cannot buy any items until your previous action completes.") {
-                    setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
-                } else if (parsed[0].innerHTML === "") {
-                    setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
-                } else {
-                    if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
-                        $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
-                    }
-                    console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
-                    console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
-                    console.log(parsed[0].innerText)
+                if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
+                    $(".notBuyedSkins").html(parseInt($(".notBuyedSkins").text()) + 1);
                 }
+                console.log("Хотел купить " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
+                console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
+                console.log(parsed[0].innerText)
             }
         }
         if (last == "update") {

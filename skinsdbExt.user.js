@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.255;
+var version = 1.2551;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -2057,7 +2057,7 @@ function getautobuy() {
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === "ajax/browse_scroll.php?page=1&appId=730&contextId=2") {
             var skinsforcheck = [];
-            main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
+            main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;display: none;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
             $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
             var display = $('.scrtimer span');
             if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
@@ -2142,7 +2142,7 @@ function getautobuy() {
                         if (buyer === 0 && grade !== "Base Grade Key") {
                             var skin = {};
                             skin['skinName'] = name;
-                            skin['skinPrice'] = parseFloat(amount);
+                            skin['skinPrice'] = parseFloat(amount) * 10 / 10;
                             skin['skinId'] = skinId;
                             skinsforcheck.push(skin);
                         }
@@ -2341,7 +2341,6 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
     if (loc === null) {
         loc = 'home';
     }
-    price = parseFloat(price);
     var internal_search = getURLParameter('search_internal');
     $.post("/ajax/shop_buy_item.php", {
         "action": "buy",
@@ -2354,10 +2353,10 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
     }).done(function (res) {
         var parsed = $.parseHTML(res);
         // console.log(parsed);
+        var now = new Date();
         if (parsed.length > 1) {
             if (site === "https://opskins.com/?loc=shop_browse&sort=n") {
                 $(".buyedSkins").html(parseInt($(".buyedSkins").text()) + 1);
-                var now = new Date();
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
                 }
@@ -2373,11 +2372,19 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
             if (parsed[1].innerText === "Your purchase was successful. Your new item is now stored in your OPSkins inventory." && $.cookie("silence") !== "true") {
                 soundAccept.play();
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
+                
+                if (last == "update") {
+                    updateOsiCount(true);
+                    updateBalance(true);
+                }
             }
         } else if (parsed.length === 1) {
             if (parsed[0].innerText === "You cannot buy any items until your previous action completes.") {
                 setTimeout(oneClickBuyScr(saleid, price, skin, skinDisc), randomInteger(800, 3200));
             } else if (parsed[0].innerText === "This item's price has changed. Please add it to your cart to purchase it.") {
+                if ($(".changed_prices").css("display") === "none") {
+                    $(".changed_prices").css("display", "block");
+                }
                 $(".changed_prices").append("<div><a href='https://opskins.com/?loc=shop_view_item&item=" + saleid + "' target='_blank'>" + skin + "(" + price + "$)</a>" +
                     " в " + skinDisc + " % (" + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds() + "." + now.getMilliseconds() + ")</div>");
             } else {
@@ -2388,10 +2395,6 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 console.log("https://opskins.com/?loc=shop_view_item&item=" + saleid);
                 console.log(parsed[0].innerText)
             }
-        }
-        if (last == "update") {
-            updateOsiCount(true);
-            updateBalance(true);
         }
     });
 }

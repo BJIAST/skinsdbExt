@@ -1,4 +1,4 @@
-    // ==UserScript==
+// ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
 // @version      1.255
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.2552;
+var version = 1.2553;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -2343,7 +2343,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
     if (loc === null) {
         loc = 'home';
     }
-    price = Math.floor(price);
+    price = Math.round(price);
     var internal_search = getURLParameter('search_internal');
     $.post("/ajax/shop_buy_item.php", {
         "action": "buy",
@@ -2388,7 +2388,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 if ($(".changed_prices").css("display") === "none") {
                     $(".changed_prices").css("display", "block");
                 }
-                $(".changed_prices").append("<div><a href='https://opskins.com/?loc=shop_view_item&item=" + saleid + "' target='_blank'>" + skin + "(" + price + "$)</a>" +
+                $(".changed_prices").append("<div><a href='https://opskins.com/?loc=shop_view_item&item=" + saleid + "' target='_blank'>" + skin + "(" + price/100 + "$)</a>" +
                     " в " + skinDisc + " % (" + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds() + "." + now.getMilliseconds() + ")</div>");
             } else {
                 if (site === "https://opskins.com/?loc=shop_browse&sort=n") {

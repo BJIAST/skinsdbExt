@@ -2053,7 +2053,7 @@ function getautobuy() {
             location.reload();
         }
     }, 13000)
-    setInterval(botOpsChecker, 300000);
+    setInterval(botOpsChecker, 120000);
     setTimeout(function () {
         var skinsforcheck = [];
         main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;display: none;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");

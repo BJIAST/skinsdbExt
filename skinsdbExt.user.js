@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.255
+// @version      1.256
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.2554;
+var version = 1.256;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -335,7 +335,7 @@ function parseprice(red_btn, opd) {
                             $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid orange");
                         }
                     } else {
-                        if (dif > 0 && dif < 0.2) {
+                        if (dif > 0 && dif < 1.2) {
                             if (res['datestatus'] === 'fine') {
                                 setTimeout(function () {
                                     $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid darkblue");
@@ -345,7 +345,7 @@ function parseprice(red_btn, opd) {
                     }
 
                     $("[data-loading='moneyOps']").html("<span class='realMoops'>" + res['moneyOps'] + "</span>" + "%");
-                    $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd']);
+                    $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd'] + "<span style='color: #d69909; font-weight: bold;'> ("+res['price']+"$)</span>");
                     $("[data-loading='opsMoney']").html("<span class='realOpsmo'>" + res['opsMoney'] + "</span>" + "%");
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
                     $("[data-loading='opsMoney']").removeAttr("data-loading");
@@ -1053,7 +1053,7 @@ function newloadallprices(opd) {
                             }
                         }
                     }
-                    route.prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "</div>");
+                    route.prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> ("+loaded[0].price+"$)</span></div>");
                     if (isFinite(res1)) {
                         route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>" + res1 + "</span>%");
                     }
@@ -2047,195 +2047,194 @@ function userBestBalance(last_balance) {
 
 function getautobuy() {
     var main = $("#scroll");
+    showlogs("Авто-бай загружается..");
     setTimeout(function () {
         if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
             location.reload();
         }
     }, 13000)
     setInterval(botOpsChecker, 300000);
-    $(document).ajaxComplete(function (event, xhr, settings) {
-        if (settings['url'] === "ajax/browse_scroll.php?page=1&appId=730&contextId=2") {
-            var skinsforcheck = [];
-            main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;display: none;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
-            $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
-            var display = $('.scrtimer span');
-            if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                console.log("Низкий баланс. Количество запросов ограничено");
-                showlogs("Низкий баланс. Количество запросов ограничено");
-                reloadpage(display, 10);
+    setTimeout(function () {
+        var skinsforcheck = [];
+        main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;display: none;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
+        $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
+        var display = $('.scrtimer span');
+        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+            console.log("Низкий баланс. Количество запросов ограничено");
+            showlogs("Низкий баланс. Количество запросов ограничено");
+            reloadpage(display, 10);
 
-                if ($.cookie("role") === "admin") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
-                } else if ($.cookie("role") === "superuser") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
-                }
-            } else {
-                reloadpage(display, 35);
-
-                if ($.cookie("role") === "admin") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                } else if ($.cookie("role") === "superuser") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                }
+            if ($.cookie("role") === "admin") {
+                getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
+            } else if ($.cookie("role") === "superuser") {
+                getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
             }
+        } else {
+            reloadpage(display, 35);
 
-            function getFunction() {
-                var errors = $(".errorsSkins");
-                var allskins = $(".AllSkins");
-                var checkedskins = $(".checkedSkins");
-                var buyedskins = $(".buyedSkins");
-                $.get("https://opskins.com/ajax/browse_scroll.php?page=1&appId=730&contextId=2").done(function (res) {
-
-                    var parsed = $.parseHTML(res);
-                    var i;
-                    allskins.html(parseInt(allskins.text()) + (parsed.length - 2));
-
-                    for (i = 2; i < parsed.length; i++) {
-                        var html = parsed[i].innerHTML;
-                        var buyer = parsed[i].className.indexOf("buyers-club-item-sm") + 1;
-                        var wear = $(html).find('.text-muted').html()
-                        var grade = $(html).find('.text-muted').next().html();
-                        var name = $(html).find(".market-name.market-link").html().trim();
-                        if (wear !== "") {
-                            var phase = $(html).find('.text-muted').next().html();
-                            switch (phase) {
-                                case '★ Covert Knife (Ruby)' :
-                                    phase = " Ruby";
-                                    break;
-                                case '★ Covert Knife (Sapphire)' :
-                                    phase = " Sapphire";
-                                    break;
-                                case '★ Covert Knife (Black Pearl)' :
-                                    phase = " Black Pearl";
-                                    break;
-                                case '★ Covert Knife (Emerald)' :
-                                    phase = " Emerald";
-                                    break;
-                                default:
-                                    phase = phase.replace(/[/^\D+/()]/g, '');
-                            }
-                            switch (phase) {
-                                case '1' :
-                                    phase = " Phase 1";
-                                    break;
-                                case '2' :
-                                    phase = " Phase 2";
-                                    break;
-                                case '3' :
-                                    phase = " Phase 3";
-                                    break;
-                                case '4' :
-                                    phase = " Phase 4";
-                                    break;
-                                case '' :
-                                    phase = "";
-                                    break;
-                            }
-                            name = name + phase + " (" + wear + ")";
-                        }
-                        var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
-                        var skinId = $(html).find(".market-link").attr("href").split("&item=");
-                        skinId = skinId[1];
-
-                        if (buyer === 0 && grade !== "Base Grade Key") {
-                            var skin = {};
-                            skin['skinName'] = name;
-                            skin['skinPrice'] = parseFloat(amount);
-                            skin['skinId'] = skinId;
-                            skinsforcheck.push(skin);
-                        }
-                    }
-
-                    var jsonString = JSON.stringify(skinsforcheck);
-                    var myData = new FormData();
-                    myData.append("skinarray", jsonString);
-                    myData.append("newautobuy", true);
-                    GM_xmlhttpRequest({
-                        method: "POST",
-                        url: scriptUrl,
-                        data: myData,
-                        onload: function (result) {
-                            var res = jQuery.parseJSON(result.responseText);
-                            if (res['error']) {
-                                errors.html(parseInt(errors.text()) + res.length);
-                            } else {
-                                checkedskins.html(parseInt(checkedskins.text()) + res.length);
-                                var n;
-                                var beforeW = 0;
-                                var random;
-
-                                var forBuyCounter = 0;
-                                var realBuyCounter = 0;
-
-                                if ($.cookie("savedDisc")) {
-                                    savedDiscount = $.cookie("savedDisc");
-                                }
-                                function getQuery(n, random, last) {
-                                    setTimeout(function () {
-                                        oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'], last);
-                                    }, random)
-                                }
-
-                                for (n = 0; n < res.length; n++) {
-                                    if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
-                                        forBuyCounter++;
-                                    }
-                                }
-
-                                for (n = 0; n < res.length; n++) {
-                                    if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
-                                        realBuyCounter++;
-                                        random = randomInteger(1200, 2300);
-                                        random = beforeW + random;
-                                        beforeW = random;
-                                        console.log("Try to buy after " + random / 1000 + "c.");
-                                        clearInterval(getAutoInt);
-                                        // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
-                                        if (realBuyCounter === forBuyCounter) {
-                                            var last = "update";
-                                            getQuery(n, random, last);
-                                        } else {
-                                            getQuery(n, random);
-                                        }
-                                    }
-                                    if (n === (res.length - 1)) {
-                                        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                                            console.log("Низкий баланс. Количество запросов ограничено");
-                                            showlogs("Низкий баланс. Количество запросов ограничено");
-                                            random = randomInteger(50000, 120000)
-                                            setTimeout(function () {
-                                                if ($.cookie("role") === "admin") {
-                                                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                                } else if ($.cookie("role") === "superuser") {
-                                                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                                                }
-                                            }, random + 2000)
-                                        } else {
-                                            setTimeout(function () {
-                                                if ($.cookie("role") === "admin") {
-                                                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                                } else if ($.cookie("role") === "superuser") {
-                                                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                                                }
-                                            }, random + 2000)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    })
-                    skinsforcheck = [];
-                }).fail(function (xhr, status, error) {
-                    if (xhr['status'] === '503') {
-
-                        errors.css("color", "red");
-                        errors.html("Скоре всего у тебя бан IP.. Сори!");
-
-                    }
-                })
+            if ($.cookie("role") === "admin") {
+                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+            } else if ($.cookie("role") === "superuser") {
+                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
             }
         }
-    })
+
+        function getFunction() {
+            var errors = $(".errorsSkins");
+            var allskins = $(".AllSkins");
+            var checkedskins = $(".checkedSkins");
+            var buyedskins = $(".buyedSkins");
+            $.get("https://opskins.com/ajax/browse_scroll.php?page=1&appId=730&contextId=2").done(function (res) {
+
+                var parsed = $.parseHTML(res);
+                var i;
+                allskins.html(parseInt(allskins.text()) + (parsed.length - 2));
+
+                for (i = 2; i < parsed.length; i++) {
+                    var html = parsed[i].innerHTML;
+                    var buyer = parsed[i].className.indexOf("buyers-club-item-sm") + 1;
+                    var wear = $(html).find('.text-muted').html()
+                    var grade = $(html).find('.text-muted').next().html();
+                    var name = $(html).find(".market-name.market-link").html().trim();
+                    if (wear !== "") {
+                        var phase = $(html).find('.text-muted').next().html();
+                        switch (phase) {
+                            case '★ Covert Knife (Ruby)' :
+                                phase = " Ruby";
+                                break;
+                            case '★ Covert Knife (Sapphire)' :
+                                phase = " Sapphire";
+                                break;
+                            case '★ Covert Knife (Black Pearl)' :
+                                phase = " Black Pearl";
+                                break;
+                            case '★ Covert Knife (Emerald)' :
+                                phase = " Emerald";
+                                break;
+                            default:
+                                phase = phase.replace(/[/^\D+/()]/g, '');
+                        }
+                        switch (phase) {
+                            case '1' :
+                                phase = " Phase 1";
+                                break;
+                            case '2' :
+                                phase = " Phase 2";
+                                break;
+                            case '3' :
+                                phase = " Phase 3";
+                                break;
+                            case '4' :
+                                phase = " Phase 4";
+                                break;
+                            case '' :
+                                phase = "";
+                                break;
+                        }
+                        name = name + phase + " (" + wear + ")";
+                    }
+                    var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
+                    var skinId = $(html).find(".market-link").attr("href").split("&item=");
+                    skinId = skinId[1];
+
+                    if (buyer === 0 && grade !== "Base Grade Key") {
+                        var skin = {};
+                        skin['skinName'] = name;
+                        skin['skinPrice'] = parseFloat(amount);
+                        skin['skinId'] = skinId;
+                        skinsforcheck.push(skin);
+                    }
+                }
+
+                var jsonString = JSON.stringify(skinsforcheck);
+                var myData = new FormData();
+                myData.append("skinarray", jsonString);
+                myData.append("newautobuy", true);
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: scriptUrl,
+                    data: myData,
+                    onload: function (result) {
+                        var res = jQuery.parseJSON(result.responseText);
+                        if (res['error']) {
+                            errors.html(parseInt(errors.text()) + res.length);
+                        } else {
+                            checkedskins.html(parseInt(checkedskins.text()) + res.length);
+                            var n;
+                            var beforeW = 0;
+                            var random;
+
+                            var forBuyCounter = 0;
+                            var realBuyCounter = 0;
+
+                            if ($.cookie("savedDisc")) {
+                                savedDiscount = $.cookie("savedDisc");
+                            }
+                            function getQuery(n, random, last) {
+                                setTimeout(function () {
+                                    oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'], last);
+                                }, random)
+                            }
+
+                            for (n = 0; n < res.length; n++) {
+                                if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
+                                    forBuyCounter++;
+                                }
+                            }
+
+                            for (n = 0; n < res.length; n++) {
+                                if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
+                                    realBuyCounter++;
+                                    random = randomInteger(1200, 2300);
+                                    random = beforeW + random;
+                                    beforeW = random;
+                                    console.log("Try to buy after " + random / 1000 + "c.");
+                                    clearInterval(getAutoInt);
+                                    // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
+                                    if (realBuyCounter === forBuyCounter) {
+                                        var last = "update";
+                                        getQuery(n, random, last);
+                                    } else {
+                                        getQuery(n, random);
+                                    }
+                                }
+                                if (n === (res.length - 1)) {
+                                    if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+                                        console.log("Низкий баланс. Количество запросов ограничено");
+                                        showlogs("Низкий баланс. Количество запросов ограничено");
+                                        random = randomInteger(50000, 120000)
+                                        setTimeout(function () {
+                                            if ($.cookie("role") === "admin") {
+                                                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                                            } else if ($.cookie("role") === "superuser") {
+                                                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+                                            }
+                                        }, random + 2000)
+                                    } else {
+                                        setTimeout(function () {
+                                            if ($.cookie("role") === "admin") {
+                                                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                                            } else if ($.cookie("role") === "superuser") {
+                                                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
+                                            }
+                                        }, random + 2000)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                skinsforcheck = [];
+            }).fail(function (xhr, status, error) {
+                if (xhr['status'] === '503') {
+
+                    errors.css("color", "red");
+                    errors.html("Скоре всего у тебя бан IP.. Сори!");
+
+                }
+            })
+        }
+    }, 1100)
 }
 
 function botOpsChecker() {

@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.2551;
+var version = 1.2552;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -48,6 +48,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
                         $.cookie("savedDisc", "Укажи дисконт в настройках!");
                     }
                     versionChecker(JSONdata['user-version'], JSONdata['current-version']);
+                    userBestBalance(JSONdata['last-best-balance']);
                     opsbotload(site);
                 }
             }
@@ -144,7 +145,6 @@ function opsbotload(site) {
     }
     if (site == "https://opskins.com/?loc=store_account#manageSales") {
         realEarning();
-        userBestBalance();
     }
 }
 function include(url) {
@@ -1979,17 +1979,19 @@ function realEarning() {
     })
 }
 
-function userBestBalance() {
+function userBestBalance(last_balance) {
     var balance = parseFloat($("#op-count").text().replace("$", ""));
     var op = parseFloat($("#op-credits-count span").text().replace("$", "").trim());
     var fullBal = Math.round((balance + op) * 100) / 100;
-    var myData = new FormData();
-    myData.append("user_balance", fullBal);
-    GM_xmlhttpRequest({
-        method: "POST",
-        url: scriptUrl,
-        data: myData
-    })
+    if (fullBal > last_balance) {
+        var myData = new FormData();
+        myData.append("user_balance", fullBal);
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: scriptUrl,
+            data: myData
+        })
+    }
 }
 
 // function autobuy() {
@@ -2054,6 +2056,7 @@ function getautobuy() {
             location.reload();
         }
     }, 13000)
+    setInterval(botOpsChecker, 300000);
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === "ajax/browse_scroll.php?page=1&appId=730&contextId=2") {
             var skinsforcheck = [];
@@ -2135,14 +2138,13 @@ function getautobuy() {
                             name = name + phase + " (" + wear + ")";
                         }
                         var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
-                        var skinId = $(html).find(".market-link").attr("href");
-                        skinId = skinId.split("&item=");
+                        var skinId = $(html).find(".market-link").attr("href").split("&item=");
                         skinId = skinId[1];
 
                         if (buyer === 0 && grade !== "Base Grade Key") {
                             var skin = {};
                             skin['skinName'] = name;
-                            skin['skinPrice'] = parseFloat(amount) * 10 / 10;
+                            skin['skinPrice'] = parseFloat(amount);
                             skin['skinId'] = skinId;
                             skinsforcheck.push(skin);
                         }
@@ -2248,6 +2250,8 @@ function botOpsChecker() {
         onload: function (result) {
             if ($(result.responseText).find(".error#message").html()) {
                 location.reload();
+            }else{
+                showlogs("Бото-проверка прошла успешно!");
             }
         }
     });
@@ -2341,6 +2345,7 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
     if (loc === null) {
         loc = 'home';
     }
+    price = Math.floor(price);
     var internal_search = getURLParameter('search_internal');
     $.post("/ajax/shop_buy_item.php", {
         "action": "buy",
@@ -2365,6 +2370,11 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
                 if ($(".buyedSkinsTable").css("display") === "none") {
                     $(".buyedSkinsTable").css("display", "table");
                 }
+                if (last == "update") {
+                    updateOsiCount(true);
+                    updateBalance(true);
+                }
+                $("#loading").remove();
             } else {
                 updateOsiCount(true);
                 updateBalance(true);
@@ -2372,11 +2382,6 @@ function oneClickBuyScr(saleid, price, skin, skinDisc, last = false) {
             if (parsed[1].innerText === "Your purchase was successful. Your new item is now stored in your OPSkins inventory." && $.cookie("silence") !== "true") {
                 soundAccept.play();
                 chromemes("Купил " + skin + " за " + price / 100 + "$ в " + skinDisc + "%");
-                
-                if (last == "update") {
-                    updateOsiCount(true);
-                    updateBalance(true);
-                }
             }
         } else if (parsed.length === 1) {
             if (parsed[0].innerText === "You cannot buy any items until your previous action completes.") {

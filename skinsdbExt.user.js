@@ -1,4 +1,4 @@
-// ==UserScript==
+    // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
 // @version      1.255
@@ -1268,7 +1268,7 @@ function autoWithdraw() {
                             var tradeoffers = res['response']['offers'];
                             $.each(tradeoffers, function (i, lvl) {
                                 if (lvl['tradeoffer_id'] !== null) {
-                                    window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/");
+                                    window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
                                 }
                             })
                             if (i === colParts) {
@@ -1276,7 +1276,7 @@ function autoWithdraw() {
                             }
                         }).fail(function (res) {
                             console.log(res);
-                            $(element).html("Я обкакался, дальше сам");
+                            $(element).html("Я обкакался, заберай сам(");
                             showlogs("Пачка " + i + " зафейлилась!");
                         })
                     }
@@ -1292,7 +1292,7 @@ function autoWithdraw() {
                     }
                     console.log(skinForOut);
                     if (n !== skins.length - 1 && z !== 0) {
-                        var maxPart = 20;
+                        var maxPart = 15;
                         var startMaxPart = maxPart;
                         var colParts = Math.ceil(skinForOut.length / maxPart);
                         if (skinForOut.length > maxPart) {
@@ -1317,7 +1317,7 @@ function autoWithdraw() {
                                 openoffers($(this).attr("items"), this, $(this).attr("id"));
                             });
                         } else {
-                            openoffers(skinForOut.join(), this);
+                            openoffers(skinForOut.join(), ".autowithdraw");
                         }
                     } else {
                         $(".autowithdraw").html("Ошибка!" + mark)
@@ -1791,9 +1791,9 @@ function sellsinvChecker() {
     var check = setInterval(function () {
         if (typeof $("#inv-container").html() !== 'undefined') {
             clearInterval(check);
-            setTimeout(salesInfo(), 500);
+            setTimeout(salesInfo, 500);
         }
-    }, 800)
+    }, 100)
 };
 function salesInfo() {
     $("body").append('' +
@@ -1838,7 +1838,6 @@ function salesInfo() {
             return e.skinname == skinname;
         });
         if (typeof loaded[0] !== 'undefined') {
-            console.table(skinsLoaded);
             $("#skinsDbSales .modal-body").html("Not Loaded!");
             $("#realLowestPrice").css("color", "green");
             $("#realLowestPrice").html("<br>Real Lowest Price: " + loaded[0].price + "<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>" + loaded[0].moneyOps + "%</span>" +
@@ -1855,7 +1854,6 @@ function salesInfo() {
                     }
                 }
                 skinsLoaded.splice(index, 1);
-                console.log("Index : " + index);
             }
             last20date("sell");
             las20btn("sell");
@@ -2250,7 +2248,7 @@ function botOpsChecker() {
         onload: function (result) {
             if ($(result.responseText).find(".error#message").html()) {
                 location.reload();
-            }else{
+            } else {
                 showlogs("Бото-проверка прошла успешно!");
             }
         }

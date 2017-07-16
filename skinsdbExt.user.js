@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.256
+// @version      1.257
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.256;
+var version = 1.257;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -224,32 +224,41 @@ function autoBuyclick() {
     });
 }
 function fullpageparse(opd = "not") {
-    $(".label-success").each(function () {
-        if ($(this).attr("data-ext") != "autoparse") {
-            $(this).html("Price");
-            $(this).attr("data-ext", "autoparse");
-            parseprice($(this), opd);
+    $(".scanned").each(function () {
+        if ($(this).find(".priceBtn").length === 0) {
+            $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;'><span class='label label-success priceBtn'>Price</span></div>");
+            $(this).find(".priceBtn").attr("data-ext", "autoparse");
+            parseprice($(this).find(".priceBtn"), opd);
+
+            sugestedDiscount(this);
         }
     })
     $(document).ajaxComplete(function () {
-        $(".label-success").each(function () {
-            if ($(this).attr("data-ext") != "autoparse") {
-                $(this).html("Price");
-                $(this).attr("data-ext", "autoparse");
-                parseprice($(this), opd);
+        $(".scanned").each(function () {
+            if ($(this).find(".priceBtn").length === 0) {
+                $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;'><span class='label label-success priceBtn'>Price</span></div>");
+                $(this).find(".priceBtn").attr("data-ext", "autoparse");
+                parseprice($(this).find(".priceBtn"), opd);
+
+                sugestedDiscount(this);
             }
         })
     })
 }
-function parseprice(red_btn, opd) {
-    $(".good-deal-discount-pct").css({
-        "top": "4px",
-        "right": "40px"
 
-    });
-    $(".label-success").css({
+function sugestedDiscount(element) {
+    var disc = 100 - 100 * parseFloat($(element).find(".item-amount").text().replace("$", "").replace(",", "")) / parseFloat($(element).find(".suggested-price").text().replace("$", "").replace(",", ""));
+    $(element).prepend('<span class="market-name" style="font-size: 18px;"><span class="glyphicon glyphicon-thumbs-up"></span>-' + Math.round(disc, 2) + '%</span><br>');
+    $(element).find(".good-deal-discount-pct").remove();
+};
+
+
+function parseprice(red_btn, opd) {
+    $(".priceBtn").css({
         "cursor": "pointer",
         "background-color": "#d21d25",
+        "font-size": "90%",
+        "z-index": 999
     });
     $(red_btn).on("click", function () {
         $(this).html("Loading..");
@@ -262,14 +271,17 @@ function parseprice(red_btn, opd) {
         $(this).before("<span class='label divmoneyOps'></span>");
         $(".divmoneyOps").css({
             "background-color": "#2D792D",
-            "cursor": "pointer"
+            "cursor": "pointer",
+            "font-size": "90%",
+            "z-index": 999
+
         });
         $(this).parent().children(".divmoneyOps").attr("data-loading", "moneyOps");
-        var skinName = $(this).parent().parent().children(".market-link").html();
-        var unavailable = $(this).parent().parent().children(".item-add");
+        var skinName = $(this).parent().parent().find(".market-link").html();
+        var unavailable = $(this).parent().parent().find(".item-add");
         var skinPrice = $(this).parent().parent().find(".item-amount").text();
-        if ($(this).parent().parent().children(".item-desc").children(".text-muted").html() != "") {
-            var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
+        if ($(this).parent().parent().find(".text-muted").html() != "") {
+            var exterior = "(" + $(this).parent().parent().find(".text-muted").html() + ")";
             var phase = $(this).parent().parent().find(".text-muted").next().html();
             switch (phase) {
                 case '★ Covert Knife (Ruby)' :
@@ -345,7 +357,7 @@ function parseprice(red_btn, opd) {
                     }
 
                     $("[data-loading='moneyOps']").html("<span class='realMoops'>" + res['moneyOps'] + "</span>" + "%");
-                    $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd'] + "<span style='color: #d69909; font-weight: bold;'> ("+res['price']+"$)</span>");
+                    $(".skinDBupd[data-loading='moneyOps']").html(res['dateupd'] + "<span style='color: #d69909; font-weight: bold;'> (" + res['price'] + "$)</span>");
                     $("[data-loading='opsMoney']").html("<span class='realOpsmo'>" + res['opsMoney'] + "</span>" + "%");
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
                     $("[data-loading='opsMoney']").removeAttr("data-loading");
@@ -930,19 +942,14 @@ function newgetprices() {
 function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
         $('.featured-item.scanned').each(function () {
-            var route;
-            if (opd === "opd") {
-                route = $(this);
-            } else {
-                route = $(this).children("div");
-            }
-            if (route.children(".good-deal-discount-pct").children(".label-success").html() === 'Price' && typeof route.children(".good-skinDBupd-discount-pct").attr("skin-id") === 'undefined') {
-                var skinName = route.children(".market-link").html();
+            var route = $(this);
+            if (route.find(".priceBtn").html() === 'Price') {
+                var skinName = route.find(".market-link").html();
                 var skinPrice = route.find(".item-amount").html().replace("$", "");
-                var unavailable = route.children(".item-add");
+                var unavailable = route.find(".item-add");
                 if (unavailable.html()) {
                     if (opd === "opd") {
-                        var skinId = route.children(".market-link").attr("href");
+                        var skinId = route.find(".market-link").attr("href");
                         skinId = skinId.split("&item=");
                         skinId = skinId[1];
                     } else {
@@ -957,16 +964,16 @@ function newloadallprices(opd) {
                         skinId = skinId.split("&item=");
                         skinId = skinId[1];
                     } else {
-                        var skinId = route.children(".item-add-wear").children(".item-amount").attr('onclick');
+                        var skinId = route.find(".item-amount").attr('onclick');
                         skinId = skinId.split("showGraphFromId(");
                         skinId = skinId[1];
                         skinId = skinId.replace(")", "");
                     }
                 }
-                if (route.children(".item-desc").children(".text-muted").html() != "") {
-                    var exterior = "(" + route.children(".item-desc").children(".text-muted").html() + ")";
+                if (route.find(".text-muted").html() != "") {
+                    var exterior = "(" + route.find(".text-muted").html() + ")";
 
-                    var phase = route.children(".item-desc").children(".text-muted").next().html();
+                    var phase = route.find(".text-muted").next().html();
                     switch (phase) {
                         case '★ Covert Knife (Ruby)' :
                             phase = " Ruby";
@@ -1023,7 +1030,7 @@ function newloadallprices(opd) {
                                     skin = [];
                                     skin['skinid'] = skinId;
                                     skin['skindisc'] = res1;
-                                    skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).children(".item-desc").find(".text-muted").text() + ")";
+                                    skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).find(".text-muted").text() + ")";
                                     skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
                                     skinsLoaded.push(skin);
                                 }
@@ -1053,12 +1060,12 @@ function newloadallprices(opd) {
                             }
                         }
                     }
-                    route.prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> ("+loaded[0].price+"$)</span></div>");
+                    route.prepend("<div class='skinDBupd' style='position: absolute;top: 21%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)</span></div>");
                     if (isFinite(res1)) {
-                        route.children(".good-deal-discount-pct").children(".label.label-success").html("<span class='realOpsmo'>" + res1 + "</span>%");
+                        route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
                     }
                 } else {
-                    route.children(".good-deal-discount-pct").children(".label.label-success").html("Not Found");
+                    route.find(".priceBtn").html("Not Found");
                 }
             }
         })

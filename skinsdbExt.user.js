@@ -21,7 +21,6 @@ var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
 var version = 1.2571;
-
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
 (function () {
@@ -83,6 +82,8 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
 }());
 
 function versionChecker(userdbV, current) {
+    var description = "Добавил десрипшн обновы, пофиксил сортировку на опсе";
+
     if (version > userdbV) {
         var myData = new FormData();
         myData.append("version_update", version);
@@ -93,7 +94,7 @@ function versionChecker(userdbV, current) {
         })
     }
     if (parseFloat(current) > version) {
-        chromemes('Вышла новая версия: ' + current);
+        versionUpdate(description, current);
     }
 }
 
@@ -2279,6 +2280,19 @@ function chromemes(mesbody) {
     });
     setTimeout(mailNotification.close.bind(mailNotification), 3000);
 }
+
+function versionUpdate(mesbody, version) {
+    var currentPermission;
+    Notification.requestPermission(function (result) {
+        currentPermission = result
+    });
+    mailNotification = new Notification("Вышла новая версия: " + version, {
+        body: mesbody,
+        icon: "https://pp.vk.me/c7004/v7004148/23616/XwoiYEex0CQ.jpg"
+    });
+    setTimeout(mailNotification.close.bind(mailNotification), 7000);
+}
+
 
 function sortUsingNestedText(parent, childSelector, keySelector) {
     var items = parent.children(childSelector).sort(function (a, b) {

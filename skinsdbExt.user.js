@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.257;
+var version = 1.2571;
 
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
@@ -1222,7 +1222,7 @@ function settingsMenu() {
     })
     $("#savDisc").on("click", function () {
 
-        sortUsingNestedText($("#scroll"), "div.scanned", "div .good-deal-discount-pct .label-success .realOpsmo");
+        sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
         $("body").animate({
             scrollTop: 0
         }, 'fast');

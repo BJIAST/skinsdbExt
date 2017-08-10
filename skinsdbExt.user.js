@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.257
+// @version      1.258
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
 // @match       https://steamcommunity.com/tradeoffer/*
-// @match       https://cs.money/*
+// @match       https://old.cs.money/*
 // @match       https://opskins.com/*
 // @match       https://steamcommunity.com/trade/*
 // @grant        GM_xmlhttpRequest
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.2571;
+var version = 1.258;
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
 (function () {
@@ -53,7 +53,7 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
             }
         })
     }
-    if (site == "https://cs.money/" || site == "https://cs.money/#") {
+    if (site == "https://old.cs.money/" || site == "https://old.cs.money/#") {
         var myData = new FormData();
         myData.append("checkpay", true);
         GM_xmlhttpRequest({
@@ -82,7 +82,6 @@ include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cooki
 }());
 
 function versionChecker(userdbV, current) {
-    var description = "Добавил десрипшн обновы, пофиксил сортировку на опсе";
 
     if (version > userdbV) {
         var myData = new FormData();
@@ -92,9 +91,6 @@ function versionChecker(userdbV, current) {
             url: scriptUrl,
             data: myData
         })
-    }
-    if (parseFloat(current) > version) {
-        versionUpdate(description, current);
     }
 }
 
@@ -127,7 +123,6 @@ function opsbotload(site) {
     }
     if (site == "https://opskins.com/?loc=shop_browse&sort=n") {
         var getAutoInt;
-        getautobuy();
         csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
@@ -174,14 +169,14 @@ function csmoparser() {
 
     function getQuery() {
         var hash = Date.parse(new Date());
-        var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
+        var url = "https://old.cs.money/load_all_bots_inventory?hash=" + hash;
         GM_xmlhttpRequest({
             method: "GET",
             url: url,
             onload: function (res) {
                 var skins = JSON.stringify(res.responseText);
                 if (skins.length < 500000) {
-                    window.open("https://cs.money/");
+                    window.open("https://old.cs.money/");
                 }
                 var myData = new FormData();
                 myData.append("csmoprices", skins);
@@ -286,16 +281,16 @@ function parseprice(red_btn, opd) {
             var phase = $(this).parent().parent().find(".text-muted").next().html();
             switch (phase) {
                 case '★ Covert Knife (Ruby)' :
-                    phase = "Ruby";
+                    phase = " Ruby";
                     break;
                 case '★ Covert Knife (Sapphire)' :
-                    phase = "Sapphire";
+                    phase = " Sapphire";
                     break;
                 case '★ Covert Knife (Black Pearl)' :
-                    phase = "Black Pearl";
+                    phase = " Black Pearl";
                     break;
                 case '★ Covert Knife (Emerald)' :
-                    phase = "Emerald";
+                    phase = " Emerald";
                     break;
                 default:
                     phase = phase.replace(/[/^\D+/()]/g, '');
@@ -1154,7 +1149,6 @@ function settingsMenu() {
             $("#autobuy").prop("checked", true);
         })
     }
-    $(".nav.navbar-nav").append("<li class='menu'><a href='/?loc=shop_browse&sort=n'>Авто-бай</a></li>");
 
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
     // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
@@ -1361,7 +1355,7 @@ function csmobot() {
         if (favSkins.length > 0) {
             var favSkinsViewer = [];
             var hash = Date.parse(new Date());
-            var url = "https://cs.money/load_all_bots_inventory?hash=" + hash;
+            var url = "https://old.cs.money/load_all_bots_inventory?hash=" + hash;
             $.get(url).done(function (result) {
                 res = jQuery.parseJSON(result);
                 var i;
@@ -2053,197 +2047,6 @@ function userBestBalance(last_balance) {
 //     }, 4000)
 // }
 
-function getautobuy() {
-    var main = $("#scroll");
-    showlogs("Авто-бай загружается..");
-    setTimeout(function () {
-        if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
-            location.reload();
-        }
-    }, 13000)
-    setInterval(botOpsChecker, 120000);
-    setTimeout(function () {
-        var skinsforcheck = [];
-        main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div>Куплено: <span class='buyedSkins'>0</span></div><div>Не куплено: <span class='notBuyedSkins'>0</span></div><div>Ошибок: <span class='errorsSkins'>0</span></div><div class='changed_prices' style='float: right;display: none;'><div>Возможно сможешь забрать сам:</div></div><div><table class='table table-bordered op-tx-table buyedSkinsTable' style='margin-top: 100px; display: none;'><thead><tr><th>Скин: </th><th>Цена: </th><th>Дисконт: </th><th>Время: </th></tr></thead><tbody></tbody></table></div></div>");
-        $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
-        var display = $('.scrtimer span');
-        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-            console.log("Низкий баланс. Количество запросов ограничено");
-            showlogs("Низкий баланс. Количество запросов ограничено");
-            reloadpage(display, 10);
-
-            if ($.cookie("role") === "admin") {
-                getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
-            } else if ($.cookie("role") === "superuser") {
-                getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
-            }
-        } else {
-            reloadpage(display, 35);
-
-            if ($.cookie("role") === "admin") {
-                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-            } else if ($.cookie("role") === "superuser") {
-                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-            }
-        }
-
-        function getFunction() {
-            var errors = $(".errorsSkins");
-            var allskins = $(".AllSkins");
-            var checkedskins = $(".checkedSkins");
-            var buyedskins = $(".buyedSkins");
-            $.get("https://opskins.com/ajax/browse_scroll.php?page=1&appId=730&contextId=2").done(function (res) {
-
-                var parsed = $.parseHTML(res);
-                var i;
-                allskins.html(parseInt(allskins.text()) + (parsed.length - 2));
-
-                for (i = 2; i < parsed.length; i++) {
-                    var html = parsed[i].innerHTML;
-                    var buyer = parsed[i].className.indexOf("buyers-club-item-sm") + 1;
-                    var wear = $(html).find('.text-muted').html()
-                    var grade = $(html).find('.text-muted').next().html();
-                    var name = $(html).find(".market-name.market-link").html().trim();
-                    if (wear !== "") {
-                        var phase = $(html).find('.text-muted').next().html();
-                        switch (phase) {
-                            case '★ Covert Knife (Ruby)' :
-                                phase = " Ruby";
-                                break;
-                            case '★ Covert Knife (Sapphire)' :
-                                phase = " Sapphire";
-                                break;
-                            case '★ Covert Knife (Black Pearl)' :
-                                phase = " Black Pearl";
-                                break;
-                            case '★ Covert Knife (Emerald)' :
-                                phase = " Emerald";
-                                break;
-                            default:
-                                phase = phase.replace(/[/^\D+/()]/g, '');
-                        }
-                        switch (phase) {
-                            case '1' :
-                                phase = " Phase 1";
-                                break;
-                            case '2' :
-                                phase = " Phase 2";
-                                break;
-                            case '3' :
-                                phase = " Phase 3";
-                                break;
-                            case '4' :
-                                phase = " Phase 4";
-                                break;
-                            case '' :
-                                phase = "";
-                                break;
-                        }
-                        name = name + phase + " (" + wear + ")";
-                    }
-                    var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
-                    var skinId = $(html).find(".market-link").attr("href").split("&item=");
-                    skinId = skinId[1];
-
-                    if (buyer === 0 && grade !== "Base Grade Key") {
-                        var skin = {};
-                        skin['skinName'] = name;
-                        skin['skinPrice'] = parseFloat(amount);
-                        skin['skinId'] = skinId;
-                        skinsforcheck.push(skin);
-                    }
-                }
-
-                var jsonString = JSON.stringify(skinsforcheck);
-                var myData = new FormData();
-                myData.append("skinarray", jsonString);
-                myData.append("newautobuy", true);
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: scriptUrl,
-                    data: myData,
-                    onload: function (result) {
-                        var res = jQuery.parseJSON(result.responseText);
-                        if (res['error']) {
-                            errors.html(parseInt(errors.text()) + res.length);
-                        } else {
-                            checkedskins.html(parseInt(checkedskins.text()) + res.length);
-                            var n;
-                            var beforeW = 0;
-                            var random;
-
-                            var forBuyCounter = 0;
-                            var realBuyCounter = 0;
-
-                            if ($.cookie("savedDisc")) {
-                                savedDiscount = $.cookie("savedDisc");
-                            }
-                            function getQuery(n, random, last) {
-                                setTimeout(function () {
-                                    oneClickBuyScr(res[n]["id"], res[n]['opsprice'] * 100, res[n]['skinname'], res[n]['opsmo'], last);
-                                }, random)
-                            }
-
-                            for (n = 0; n < res.length; n++) {
-                                if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
-                                    forBuyCounter++;
-                                }
-                            }
-
-                            for (n = 0; n < res.length; n++) {
-                                if (res[n]['actual'] === "fine" && res[n]['opsmo'] > savedDiscount) {
-                                    realBuyCounter++;
-                                    random = randomInteger(1200, 2300);
-                                    random = beforeW + random;
-                                    beforeW = random;
-                                    console.log("Try to buy after " + random / 1000 + "c.");
-                                    clearInterval(getAutoInt);
-                                    // console.log("Я бы купил: " + res[n]['skinname'] + " в " + res[n]['opsmo'] + " % за" + res[n]['opsprice'] + " $");
-                                    if (realBuyCounter === forBuyCounter) {
-                                        var last = "update";
-                                        getQuery(n, random, last);
-                                    } else {
-                                        getQuery(n, random);
-                                    }
-                                }
-                                if (n === (res.length - 1)) {
-                                    if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                                        console.log("Низкий баланс. Количество запросов ограничено");
-                                        showlogs("Низкий баланс. Количество запросов ограничено");
-                                        random = randomInteger(50000, 120000)
-                                        setTimeout(function () {
-                                            if ($.cookie("role") === "admin") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                            } else if ($.cookie("role") === "superuser") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                                            }
-                                        }, random + 2000)
-                                    } else {
-                                        setTimeout(function () {
-                                            if ($.cookie("role") === "admin") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                            } else if ($.cookie("role") === "superuser") {
-                                                getAutoInt = setTimeout(getFunction, randomInteger(5000, 10000));
-                                            }
-                                        }, random + 2000)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-                skinsforcheck = [];
-            }).fail(function (xhr, status, error) {
-                if (xhr['status'] === '503') {
-
-                    errors.css("color", "red");
-                    errors.html("Скоре всего у тебя бан IP.. Сори!");
-
-                }
-            })
-        }
-    }, 1100)
-}
 
 function botOpsChecker() {
     opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";

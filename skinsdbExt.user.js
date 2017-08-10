@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      1.258
+// @version      1.259
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -20,7 +20,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 1.258;
+var version = 1.259;
 include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
 (function () {
@@ -143,6 +143,7 @@ function opsbotload(site) {
         realEarning();
     }
 }
+
 function include(url) {
     var script = document.createElement('script');
     script.src = url;
@@ -168,31 +169,50 @@ function csmoparser() {
 
 
     function getQuery() {
-        var hash = Date.parse(new Date());
-        var url = "https://old.cs.money/load_all_bots_inventory?hash=" + hash;
+        var url = "https://old.cs.money/load_all_bots_inventory";
+
         GM_xmlhttpRequest({
             method: "GET",
             url: url,
             onload: function (res) {
-                var skins = JSON.stringify(res.responseText);
-                if (skins.length < 500000) {
+
+                if (res.responseText[0] === "<") {
                     window.open("https://old.cs.money/");
+                } else {
+                    json = JSON.parse(res.responseText) ;
+
+                    var skins = [];
+                    $.each(json, function (key, bot_items) {
+                        $.each(bot_items, function (key, skin) {
+                            var target = skin['m'];
+                            var result = $.grep(skins, function (e) {
+                                return e.skinname == target;
+                            });
+                            if (typeof result[0] == 'undefined') {
+                                var thisskin = {};
+                                thisskin['skinname'] = skin['m'];
+                                thisskin['csmprice'] = skin['p'];
+                                thisskin['counter'] = 1;
+                                skins.push(thisskin);
+                            } else {
+                                objIndex = skins.findIndex((obj => obj.skinname == skin['m']));
+                                skins[objIndex].counter = skins[objIndex].counter + 1;
+                            }
+                        })
+                    });
+                    jsonReady = JSON.stringify(skins);
+                    var myData = new FormData();
+                    myData.append("csmoprices", jsonReady);
+                    GM_xmlhttpRequest({
+                        method: "POST",
+                        url: "http://skinsdb.xyz/parsers/money.php",
+                        data: myData,
+                        onload: function (result) {
+                            console.log(result.responseText);
+                        }
+                    })
                 }
-                var myData = new FormData();
-                myData.append("csmoprices", skins);
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: "http://skinsdb.xyz/parsers/money.php",
-                    data: myData,
-                    onload: function (result) {
-                        console.log(result.responseText);
-                    }
-                })
             }
-        })
-        $.get(url).done(function (res) {
-
-
         })
     }
 }
@@ -219,6 +239,7 @@ function autoBuyclick() {
         });
     });
 }
+
 function fullpageparse(opd = "not") {
     $(".scanned").each(function () {
         if ($(this).find(".priceBtn").length === 0) {
@@ -433,6 +454,7 @@ function parseprice(red_btn, opd) {
         })
     })
 }
+
 function las20btn(page = "item") {
     if (page !== "item") {
         var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
@@ -556,6 +578,7 @@ function las20btn(page = "item") {
         })
     })
 }
+
 function last20date(page = 'item') {
     if (page === 'item') {
         var li = $(".last20 .list-group-item");
@@ -616,6 +639,7 @@ function last20date(page = 'item') {
         }
     })
 }
+
 function steamAccept() {
     var web = location.href,
         fromWeb = document.referrer,
@@ -644,6 +668,7 @@ function steamAccept() {
         chromemes("Скин забрал!");
     }
 }
+
 function offerAccept() {
     setInterval(function () {
         if (jQuery('.newmodal_content>div').html() == "Для завершения обмена подтвердите его на странице подтверждений в мобильном приложении Steam.") {
@@ -659,6 +684,7 @@ function offerAccept() {
         }
     }, 3000);
 }
+
 function opsdiscforphp() {
     $("#startSearch").on("click", function () {
         $(".loader").html("<img src='/design/images/ajax-loader.gif'>");
@@ -686,11 +712,13 @@ function opsdiscforphp() {
         }, 8000 + skins.length * 1200)
     })
 }
+
 function doSetTimeout(i, array, dicount) {
     setTimeout(function () {
         requestforprice(array[i]['surl'], array[i]['sname'], array[i]['changer_price'], dicount, true);
     }, 3000);
 }
+
 function requestforprice(opsUrl, skinname, chprice, discount = false) {
     GM_xmlhttpRequest({
         method: "POST",
@@ -935,6 +963,7 @@ function newgetprices() {
         }
     })
 }
+
 function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
         $('.featured-item.scanned').each(function () {
@@ -1795,6 +1824,7 @@ function sellsinvChecker() {
         }
     }, 100)
 };
+
 function salesInfo() {
     $("body").append('' +
         '<div id="skinsDbSales" class="modal fade" role="dialog">' +
@@ -2239,4 +2269,5 @@ function updateOsiCount(master) {
         $('#top-nav-bar').find('a[href*="loc=inventory"] .badge').text(count)[count == 0 ? 'hide' : 'show']();
     });
 }
+
 // Default OPS Functions

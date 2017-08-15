@@ -1790,8 +1790,8 @@ function salesInfo() {
 }
 
 function realEarning() {
-    var balance = parseFloat($("#op-count").text().replace("$", ""));
-    var op = parseFloat($("#op-credits-count span").text().replace("$", "").trim());
+    var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
+    var op = parseFloat($("#op-credits-count span").text().replace("$", "").replace(",", "").trim());
     var fullBal = Math.round((balance + op) * 100) / 100;
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2') {

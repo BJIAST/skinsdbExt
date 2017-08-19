@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2
+// @version      2.01
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
@@ -22,7 +22,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2;
+var version = 2.01;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -85,9 +85,6 @@ var version = 2;
                 }
             })
         }, 300)
-    }
-    if (site == "http://skinsdb.xyz/?opsSearch") {
-
     }
     if (site == "http://skinsdb.xyz/?doppler_search" || site == "http://skinsdb.xyz/?favsearch") {
         dopplerChecker();
@@ -723,6 +720,19 @@ function dopplerChecker() {
         $(".loaderDoplers").html("Готов к работе");
         init_PNotify('Парсинг цен', 'Парсер остановлен!', 'info');
     })
+    var statusChecker = (Cookies.get("cycle") ? "checked" : "");
+
+    $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+    var elem = document.querySelector('.js-switch');
+    var switchery = new Switchery(elem);
+
+    elem.onchange = function() {
+        if(elem.checked === true){
+            Cookies.set("cycle",true);
+        }else{
+            Cookies.remove("cycle");
+        };
+    };
     $(".doppler_check").on("click", function () {
         status = true;
         $(".doppler_check").removeAttr("disabled");
@@ -771,19 +781,24 @@ function dopplerChecker() {
                     if ($(result.responseText).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
                         $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
                     if (counter < length - 1 && status === true) {
-                        if (counter % 10 === 0) {
-                            var timeer = randomInteger(600, 1600);
-                        } else {
-                            var timeer = 0;
-                        }
+                        var timeer = randomInteger(600, 1600);
+
                         counter++;
                         $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                         checks = setTimeout(function () {
                             dopplerPrice(counter, btn);
                         }, timeer)
                     } else {
-                        $(".doppler_check").removeAttr("disabled");
-                        $(".loaderDoplers").html("Готов к работе");
+                       if(typeof Cookies.get("cycle") === "undefined"){
+                           $(".doppler_check").removeAttr("disabled");
+                           $(".loaderDoplers").html("Готов к работе");
+                       }else{
+                           counter = 0;
+                           $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                           checks = setTimeout(function () {
+                               dopplerPrice(counter, btn);
+                           }, timeer)
+                       }
                     }
                 } else if ($(result.responseText).find(".error#message").html()) {
                     var newWindow = window.open(opsUrl);
@@ -814,19 +829,24 @@ function dopplerChecker() {
                         });
                     }
                     if (counter < length - 1 && status === true) {
-                        if (counter % 10 === 0) {
-                            var timeer = randomInteger(600, 1600);
-                        } else {
-                            var timeer = 0;
-                        }
+                        var timeer = randomInteger(600, 1600);
+
                         counter++;
                         $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                         checks = setTimeout(function () {
                             dopplerPrice(counter, btn);
                         }, timeer)
                     } else {
-                        $(".doppler_check").removeAttr("disabled");
-                        $(".loaderDoplers").html("Готов к работе");
+                        if(typeof Cookies.get("cycle") === "undefined"){
+                            $(".doppler_check").removeAttr("disabled");
+                            $(".loaderDoplers").html("Готов к работе");
+                        }else{
+                            counter = 0;
+                            $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                            checks = setTimeout(function () {
+                                dopplerPrice(counter, btn);
+                            }, timeer)
+                        }
                     }
                 }
             }

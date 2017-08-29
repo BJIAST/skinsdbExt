@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.01
+// @version      2.02
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.xyz/*
+// @match       http://skinsdb.online/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://cs.money/*
 // @match       http://cs.money/*
@@ -14,7 +15,7 @@
 // ==/UserScript==
 
 
-var scriptUrl = "http://skinsdb.xyz/scripts/opsinc.php";
+var scriptUrl = "http://skinsdb.online/scripts/opsinc.php";
 var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
 var soundFound = new Audio('http://skinsdb.xyz/assets/ready.mp3');
 var site = location.href;
@@ -22,7 +23,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.01;
+var version = 2.02;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -86,7 +87,7 @@ var version = 2.01;
             })
         }, 300)
     }
-    if (site == "http://skinsdb.xyz/?doppler_search" || site == "http://skinsdb.xyz/?favsearch") {
+    if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
         dopplerChecker();
     }
     steamAccept();
@@ -721,8 +722,12 @@ function dopplerChecker() {
         init_PNotify('Парсинг цен', 'Парсер остановлен!', 'info');
     })
     var statusChecker = (Cookies.get("cycle") ? "checked" : "");
+    if(site === "http://skinsdb.online/?doppler_search"){
+        $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+    }else{
+        $(".check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
 
-    $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+    }
     var elem = document.querySelector('.js-switch');
     var switchery = new Switchery(elem);
 
@@ -803,9 +808,16 @@ function dopplerChecker() {
                 } else if ($(result.responseText).find(".error#message").html()) {
                     var newWindow = window.open(opsUrl);
                     $(".doppler_check").removeAttr("disabled");
-                } else {
+                } else if($(result.responseText).find("title").html() == "opskins.com | 504: Gateway time-out"){
+                    newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                }else if($(result.responseText).find("title").html() == "502 Bad Gateway"){
+                    newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                }
+                else {
+                    // console.log(result);
+                    // console.log(result.responseText);
                     res = res.replace("$", "");
-                    res = res.replace(",", "")
+                    res = res.replace(",", "");
                     var price = res;
                     res = 100 - (res * 100) / (chprice * 0.97);
                     res = Math.round(res * 100) / 100;

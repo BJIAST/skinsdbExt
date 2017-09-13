@@ -11,6 +11,7 @@
 // @match       https://loot.farm/*
 // @match       https://csgotrade.me/*
 // @match       https://csoffer.me/*
+// @match       https://trade-skins.com/*
 // @match       https://opskins.com/*
 // @match      https://csgo.steamanalyst.com/*
 // @match       https://steamcommunity.com/trade/*
@@ -86,6 +87,15 @@ var version = 2.04;
         setTimeout(function () {
             setInterval(function () {
                 allAnotherGetLink("TradeMe");
+            }, 2000);
+        },400);
+    }
+    if(site === "https://trade-skins.com/"){
+        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
+
+        setTimeout(function () {
+            setInterval(function () {
+                allAnotherGetLink("TradeSkins");
             }, 2000);
         },400);
     }
@@ -1696,6 +1706,16 @@ function allAnotherGetLink(changer) {
             priceArg = "cost";
             items = $("#bot_inventory").children();
             zindex = "";
+
+            break;
+        case 'TradeSkins' :
+            statArg = ".st";
+            extArg = ".invertory_title_container_marka";
+            nameArg = "market_hash_name";
+            currentItem = ".offer_container_invertory";
+            priceArg = "cost";
+            items = $(".invertory_container").children();
+            zindex = "z-index: 10000;";
 
             break;
     }

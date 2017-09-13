@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.03
+// @version      2.04
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -12,6 +12,7 @@
 // @match       https://csgotrade.me/*
 // @match       https://csoffer.me/*
 // @match       https://opskins.com/*
+// @match      https://csgo.steamanalyst.com/*
 // @match       https://steamcommunity.com/trade/*
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -25,7 +26,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.03;
+var version = 2.04;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -87,6 +88,9 @@ var version = 2.03;
                 allAnotherGetLink("TradeMe");
             }, 2000);
         },400);
+    }
+    if(site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/"){
+        loadanalystprices();
     }
     if (site == "https://cs.money/" || site == "https://cs.money/#" || site == "https://cs.money/ru" || site == "https://cs.money/ru/#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
@@ -152,6 +156,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_search" + opslink[1] || site == "https://opskins.com/?app=730_2" + opslink5[1]) {
         fullpageparse();
         loadallprices();
+        friendssells();
     }
     if (site == "https://opskins.com/?loc=good_deals" + opslink2[1]) {
         fullpageparse();
@@ -916,6 +921,45 @@ function newgetprices() {
     })
 }
 
+function loadanalystprices() {
+    newgetprices();
+    setInterval(function () {
+        newgetprices();
+        showlogs("Цены обновлены" + mark);
+    }, 30000)
+    setTimeout(function () {
+        analystgetprices();
+    }, 800)
+    $(document).ajaxComplete(function () {
+        analystgetprices();
+    });
+}
+
+function analystgetprices(){
+
+    if(skinsdbprices.length > 0){
+        $(".grid-item").each(function () {
+            if(typeof $(this).find(".changerprice").html() === 'undefined'){
+                var skinName = $(this).find(".card-header a").text();
+                var opsprice = $(this).find(".tag-primary.tag-deals").text().replace("$","");
+                var loaded = $.grep(skinsdbprices, function (e) {
+                    return e.skinname == skinName;
+                });
+                $(this).find(".btn.btn-sm.btn-success").attr("href","https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+encodeURI(skinName)+"&search_internal=1");
+                if(typeof loaded[0] !== 'undefined'){
+                    var resom = 100 - (opsprice * 100) / (loaded[0].price * 0.97);
+                    var res1 = Math.round(resom * 100) / 100;
+                    $(this).find(".tag-primary.tag-deals").after("<a class='tag tag-success tag-deals changerprice' title='Цена выбраного обменника!'>$"+loaded[0].price+"</a>");
+                    $(this).find(".changerprice").after("<a class='tag tag-danger tag-deals changerdiscount' title='Дисконт выбраного обменника!'>"+res1+"%</a>");
+                    $(this).find(".card-footer").before("<div style='width: 100; text-align: center; "+(loaded[0].actual === "fine" ? "color: #2bab2b;" : "color: #fff;")+" font-weight: 600;'>"+loaded[0].dataupd+"</div>");
+                }else{
+                    $(this).remove();
+                }
+            }
+        })
+    }
+}
+
 function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
         $('.featured-item.scanned').each(function () {
@@ -1075,16 +1119,6 @@ function loadallprices() {
 }
 
 function settingsMenu() {
-    if ($.cookie("silence") === "true") {
-        setTimeout(function () {
-            $("#silence").prop("checked", true);
-        }, 600)
-    }
-    if ($.cookie("autobuy") === "true") {
-        setTimeout(function () {
-            $("#autobuy").prop("checked", true);
-        })
-    }
     $(".nav.navbar-nav").append("<li class='menu'><a href='/?loc=shop_browse&sort=n'>Авто-пикер</a></li>");
 
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
@@ -2086,6 +2120,40 @@ function addFilterBtn() {
     $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
 }
 
+function friendssells() {
+
+    var myData = new FormData();
+    myData.append("friendssolds", true);
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: scriptUrl,
+        data: myData,
+        onload: function (result) {
+            res = JSON.parse(result.responseText);
+            console.log(res);
+            check(res);
+            $(document).ajaxComplete(function () {
+                check(res);
+            });
+        }
+    })
+
+    function check(array){
+            console.log("working");
+            $("#scroll").children(".scanned").each(function () {
+                if(typeof $(this).find(".friendsicon").html() === 'undefined') {
+                    var skinId = Number($(this).find(".market-name.market-link").attr("href").replace("?loc=shop_view_item&item=", ""));
+                    var loaded = $.grep(array, function (e) {
+                        return e.skinid == skinId;
+                    });
+                    if (typeof loaded[0] !== 'undefined') {
+                        $(this).find(".item-amount").before("<div class='buyers-club-icon friendsicon'><span><img src='" + loaded[0].sellerimg + "' alt='" + loaded[0].skinid + "' style='border-radius: 60px; border:3px solid green;width: 45px;' title='"+loaded[0].sellername+"'></span></div>")
+                    }
+                }
+            })
+
+    }
+}
 
 function getautopick() {
     var main = $("#scroll");
@@ -2343,7 +2411,7 @@ function chromemes(mesbody) {
 
 
 function sortUsingNestedText(parent, childSelector, keySelector) {
-    var items = parent.children(childSelector).sort(function (a, b) {
+    var items = parent.find(childSelector).sort(function (a, b) {
         var vA = $(keySelector, a).text();
         var vB = $(keySelector, b).text();
         return ((+vA) > (+vB)) ? -1 : ((+vA) < (+vB)) ? 1 : 0;

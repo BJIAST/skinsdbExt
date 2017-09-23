@@ -1734,7 +1734,7 @@
                 currentItem = ".images.tooltip";
                 priceArg = "cost";
                 items = $("#bot_inventory").children();
-                zindex = "";
+                zindex = "z-index: 10000;";
 
                 break;
             case 'TradeSkins' :
@@ -1880,7 +1880,7 @@
                 $("#opsbot").prop("checked", true);
             }, 600)
         }
-        $(".profile__menu ul").prepend("<li><div><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg><a href='#' class='skinsdbset '>Настройки SkinsDb</a></div></li>");
+        $(".profile__menu ul").prepend("<li><a href='#' class='skinsdbset '><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg> <div>Настройки SkinsDb</div></a></div></li>");
         $(".overlay.hidden .overlay-wrapper").append('' +
             '<div id="skinsDb" class="modal hidden">' +
             '<a class="modal__close skindbClose" href="#">' +

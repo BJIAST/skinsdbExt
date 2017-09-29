@@ -1,7 +1,7 @@
     // ==UserScript==
     // @name         skinsdbExt
     // @namespace   http://skinsdb.xyz/
-    // @version      2.05
+    // @version      2.06
     // @description  try to hard!
     // @author       BJIAST
     // @match       http://skinsdb.online/*
@@ -9,6 +9,7 @@
     // @match       https://cs.money/*
     // @match       http://cs.money/*
     // @match       https://loot.farm/*
+    // @match       https://cstrade.gg/*
     // @match       https://csgotrade.me/*
     // @match       https://csoffer.me/*
     // @match       https://trade-skins.com/*
@@ -27,7 +28,7 @@
     var skinsLoaded = [];
     var skinsdbprices = [];
     var favSkins = [];
-    var version = 2.05;
+    var version = 2.06;
 
     (function () {
         var opslink3 = site.split("https://opskins.com/");
@@ -97,6 +98,15 @@
             setTimeout(function () {
                 setInterval(function () {
                     allAnotherGetLink("TradeSkins");
+                }, 2000);
+            },400);
+        }
+        if(site === "https://cstrade.gg/"){
+            include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
+
+            setTimeout(function () {
+                setInterval(function () {
+                    allAnotherGetLink("CSTrade");
                 }, 2000);
             },400);
         }
@@ -191,6 +201,7 @@
             last20date();
             las20btn();
             oneItemDiscount();
+            buyerChecker();
         }
         if (site == "https://opskins.com/?loc=shop_checkout") {
             fullpageparse();
@@ -246,23 +257,23 @@
                             var skinname = "";
                             switch (item['e']) {
                                 case 'FN' :
-                                    skinname = item['m'] + " (Factory New)";
-                                    break;
+                                skinname = item['m'] + " (Factory New)";
+                                break;
                                 case 'MW' :
-                                    skinname = item['m'] + " (Minimal Wear)";
-                                    break;
+                                skinname = item['m'] + " (Minimal Wear)";
+                                break;
                                 case 'FT' :
-                                    skinname = item['m'] + " (Field-Tested)";
-                                    break;
+                                skinname = item['m'] + " (Field-Tested)";
+                                break;
                                 case 'WW' :
-                                    skinname = item['m'] + " (Well-Worn)";
-                                    break;
+                                skinname = item['m'] + " (Well-Worn)";
+                                break;
                                 case 'BS' :
-                                    skinname = item['m'] + " (Battle-Scarred)";
-                                    break;
+                                skinname = item['m'] + " (Battle-Scarred)";
+                                break;
                                 default :
-                                    skinname = item['m'];
-                                    break;
+                                skinname = item['m'];
+                                break;
                             }
                             var target = skinname;
                             var result = $.grep(skins, function (e) {
@@ -396,38 +407,38 @@
                 var exterior = "(" + $(this).parent().parent().find(".text-muted").html() + ")";
                 var phase = $(this).parent().parent().find(".text-muted").next().html();
                 switch (phase) {
-                    case '★ Covert Knife (Ruby)' :
-                        phase = " Ruby";
-                        break;
-                    case '★ Covert Knife (Sapphire)' :
-                        phase = " Sapphire";
-                        break;
-                    case '★ Covert Knife (Black Pearl)' :
-                        phase = " Black Pearl";
-                        break;
-                    case '★ Covert Knife (Emerald)' :
-                        phase = " Emerald";
-                        break;
+                    case ' Covert Knife (Ruby)' :
+                    phase = " Ruby";
+                    break;
+                    case ' Covert Knife (Sapphire)' :
+                    phase = " Sapphire";
+                    break;
+                    case ' Covert Knife (Black Pearl)' :
+                    phase = " Black Pearl";
+                    break;
+                    case ' Covert Knife (Emerald)' :
+                    phase = " Emerald";
+                    break;
                     default:
-                        phase = phase.replace(/[/^\D+/()]/g, '');
-                        break;
+                    phase = phase.replace(/[/^\D+/()]/g, '');
+                    break;
                 }
                 switch (phase) {
                     case '1' :
-                        phase = " Phase 1";
-                        break;
+                    phase = " Phase 1";
+                    break;
                     case '2' :
-                        phase = " Phase 2";
-                        break;
+                    phase = " Phase 2";
+                    break;
                     case '3' :
-                        phase = " Phase 3";
-                        break;
+                    phase = " Phase 3";
+                    break;
                     case '4' :
-                        phase = " Phase 4";
-                        break;
+                    phase = " Phase 4";
+                    break;
                     case '' :
-                        phase = "";
-                        break;
+                    phase = "";
+                    break;
                 }
                 if($.cookie('changer') === "LOOT.Farm"){
                     phase = "";
@@ -490,37 +501,37 @@
                             var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
                             var phase = $(this).parent().parent().find(".text-muted").next().html();
                             switch (phase) {
-                                case '★ Covert Knife (Ruby)' :
-                                    phase = " Ruby";
-                                    break;
-                                case '★ Covert Knife (Sapphire)' :
-                                    phase = " Sapphire";
-                                    break;
-                                case '★ Covert Knife (Black Pearl)' :
-                                    phase = " Black Pearl";
-                                    break;
-                                case '★ Covert Knife (Emerald)' :
-                                    phase = " Emerald";
-                                    break;
+                                case ' Covert Knife (Ruby)' :
+                                phase = " Ruby";
+                                break;
+                                case ' Covert Knife (Sapphire)' :
+                                phase = " Sapphire";
+                                break;
+                                case ' Covert Knife (Black Pearl)' :
+                                phase = " Black Pearl";
+                                break;
+                                case ' Covert Knife (Emerald)' :
+                                phase = " Emerald";
+                                break;
                                 default:
-                                    phase = phase.replace(/[/^\D+/()]/g, '');
+                                phase = phase.replace(/[/^\D+/()]/g, '');
                             }
                             switch (phase) {
                                 case 1 :
-                                    phase = " Phase 1";
-                                    break;
+                                phase = " Phase 1";
+                                break;
                                 case 2 :
-                                    phase = " Phase 2";
-                                    break;
+                                phase = " Phase 2";
+                                break;
                                 case 3 :
-                                    phase = " Phase 3";
-                                    break;
+                                phase = " Phase 3";
+                                break;
                                 case 4 :
-                                    phase = " Phase 4";
-                                    break;
+                                phase = " Phase 4";
+                                break;
                                 case '' :
-                                    phase = "";
-                                    break;
+                                phase = "";
+                                break;
                             }
                             skinName = skinName.trim() + phase + " " + exterior;
                         } else {
@@ -540,350 +551,350 @@
                 },
                 onerror: function (res) {
                     var msg = "An error occurred."
-                        + "\nresponseText: " + res.responseText
-                        + "\nreadyState: " + res.readyState
-                        + "\nresponseHeaders: " + res.responseHeaders
-                        + "\nstatus: " + res.status
-                        + "\nstatusText: " + res.statusText
-                        + "\nfinalUrl: " + res.finalUrl;
+                    + "\nresponseText: " + res.responseText
+                    + "\nreadyState: " + res.readyState
+                    + "\nresponseHeaders: " + res.responseHeaders
+                    + "\nstatus: " + res.status
+                    + "\nstatusText: " + res.statusText
+                    + "\nfinalUrl: " + res.finalUrl;
                     alert(msg);
                 }
             })
+})
+}
+
+function las20btn(page = "item") {
+    if (page !== "item") {
+        var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
+        var datespan = $("#skinsDbSales .modal-body .last20 .list-group-item .pull-right");
+    } else {
+        var li = $(".last20 .list-group-item");
+        var datespan = $(".last20 .list-group-item .pull-right");
+    }
+    datespan.css({
+        "cursor": "pointer"
+    })
+    if (page === "item") {
+        datespan.hover(function () {
+            $(this).css("color", "yellow");
+        }, function () {
+            $(this).css("color", "white");
+        })
+    } else {
+        datespan.hover(function () {
+            $(this).css("color", "green");
+        }, function () {
+            $(this).css("color", "black");
         })
     }
 
-    function las20btn(page = "item") {
-        if (page !== "item") {
-            var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
-            var datespan = $("#skinsDbSales .modal-body .last20 .list-group-item .pull-right");
-        } else {
-            var li = $(".last20 .list-group-item");
-            var datespan = $(".last20 .list-group-item .pull-right");
-        }
-        datespan.css({
-            "cursor": "pointer"
-        })
+    datespan.on("click", function () {
+        var clickdate = $(this).html();
         if (page === "item") {
-            datespan.hover(function () {
-                $(this).css("color", "yellow");
-            }, function () {
-                $(this).css("color", "white");
-            })
-        } else {
-            datespan.hover(function () {
-                $(this).css("color", "green");
-            }, function () {
-                $(this).css("color", "black");
-            })
-        }
-
-        datespan.on("click", function () {
-            var clickdate = $(this).html();
-            if (page === "item") {
-                var skinName = $(".market-link").html();
-                var unavailable = $(".item-add");
-                if ($(".item-desc").children(".text-muted").html() != "") {
-                    var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-                    var phase = $(".text-muted").next().html();
-                    switch (phase) {
-                        case '★ Covert Knife (Ruby)' :
-                            phase = " Ruby";
-                            break;
-                        case '★ Covert Knife (Sapphire)' :
-                            phase = " Sapphire";
-                            break;
-                        case '★ Covert Knife (Black Pearl)' :
-                            phase = " Black Pearl";
-                            break;
-                        case '★ Covert Knife (Emerald)' :
-                            phase = " Emerald";
-                            break;
-                        default:
-                            phase = phase.replace(/[/^\D+/()]/g, '');
-                    }
-                    switch (phase) {
-                        case '1' :
-                            phase = " Phase 1";
-                            break;
-                        case '2' :
-                            phase = " Phase 2";
-                            break;
-                        case '3' :
-                            phase = " Phase 3";
-                            break;
-                        case '4' :
-                            phase = " Phase 4";
-                            break;
-                        case '' :
-                            phase = "";
-                            break;
-                    }
-                    skinName = skinName.trim() + phase + " " + exterior;
-                } else {
-                    skinName = skinName.trim();
-                }
-            } else {
-                var skinName = $("#modalSkinName").text();
-            }
-            var skinPrice = $(this).parent().children(".text-left").html();
-            skinPrice = skinPrice.split("<small");
-            skinPrice = skinPrice[0];
-            skinPrice = skinPrice.replace("$", "");
-            skinPrice = skinPrice.replace(",", "");
-            console.log(skinName + " => " + skinPrice);
-            if (!$(this).parent().children(".label-success").html()) {
-                $(this).parent().append(
-                    "<span class='label label-success moneyOps' data-loading='moneyOps'>load</span>"
-                    + "<span class='label label-success opsMoney'style='background-color:#dc1010' data-loading='opsMoney'>ing...</span>"
-                )
-            }
-            var myData = new FormData();
-            myData.append("data", skinName);
-            myData.append("price", skinPrice);
-            myData.append("shop_view", true);
-
-            GM_xmlhttpRequest({
-                method: "POST",
-                url: scriptUrl,
-                data: myData,
-                onload: function (result) {
-
-                    var res = jQuery.parseJSON(result.responseText);
-                    console.log(result.responseText);
-                    if (res['opsMoney']) {
-                        $("[data-loading='opsMoney']").html(res['opsMoney'] + "%");
-                        $("[data-loading='moneyOps']").html(res['moneyOps'] + "%");
-                        $("[data-loading]").removeAttr("data-loading");
-
-                    } else if (res['error']) {
-                        $("[data-loading='opsMoney']").html("Not Found");
-
-                    } else {
-                        $("[data-loading='opsMoney']").html("Error");
-                    }
-                },
-                onerror: function (res) {
-                    var msg = "An error occurred."
-                        + "\nresponseText: " + res.responseText
-                        + "\nreadyState: " + res.readyState
-                        + "\nresponseHeaders: " + res.responseHeaders
-                        + "\nstatus: " + res.status
-                        + "\nstatusText: " + res.statusText
-                        + "\nfinalUrl: " + res.finalUrl;
-                    alert(msg);
-                }
-            })
-        })
-    }
-
-    function last20date(page = 'item') {
-        if (page === 'item') {
-            var li = $(".last20 .list-group-item");
             var skinName = $(".market-link").html();
             var unavailable = $(".item-add");
             if ($(".item-desc").children(".text-muted").html() != "") {
                 var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
                 var phase = $(".text-muted").next().html();
                 switch (phase) {
-                    case '★ Covert Knife (Ruby)' :
-                        phase = " Ruby";
-                        break;
-                    case '★ Covert Knife (Sapphire)' :
-                        phase = " Sapphire";
-                        break;
-                    case '★ Covert Knife (Black Pearl)' :
-                        phase = " Black Pearl";
-                        break;
-                    case '★ Covert Knife (Emerald)' :
-                        phase = " Emerald";
-                        break;
+                    case ' Covert Knife (Ruby)' :
+                    phase = " Ruby";
+                    break;
+                    case ' Covert Knife (Sapphire)' :
+                    phase = " Sapphire";
+                    break;
+                    case ' Covert Knife (Black Pearl)' :
+                    phase = " Black Pearl";
+                    break;
+                    case ' Covert Knife (Emerald)' :
+                    phase = " Emerald";
+                    break;
                     default:
-                        phase = phase.replace(/[/^\D+/()]/g, '');
+                    phase = phase.replace(/[/^\D+/()]/g, '');
                 }
                 switch (phase) {
                     case '1' :
-                        phase = " Phase 1";
-                        break;
+                    phase = " Phase 1";
+                    break;
                     case '2' :
-                        phase = " Phase 2";
-                        break;
+                    phase = " Phase 2";
+                    break;
                     case '3' :
-                        phase = " Phase 3";
-                        break;
+                    phase = " Phase 3";
+                    break;
                     case '4' :
-                        phase = " Phase 4";
-                        break;
+                    phase = " Phase 4";
+                    break;
                     case '' :
-                        phase = "";
-                        break;
+                    phase = "";
+                    break;
                 }
                 skinName = skinName.trim() + phase + " " + exterior;
             } else {
                 skinName = skinName.trim();
             }
         } else {
-            var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
             var skinName = $("#modalSkinName").text();
         }
+        var skinPrice = $(this).parent().children(".text-left").html();
+        skinPrice = skinPrice.split("<small");
+        skinPrice = skinPrice[0];
+        skinPrice = skinPrice.replace("$", "");
+        skinPrice = skinPrice.replace(",", "");
+        console.log(skinName + " => " + skinPrice);
+        if (!$(this).parent().children(".label-success").html()) {
+            $(this).parent().append(
+                "<span class='label label-success moneyOps' data-loading='moneyOps'>load</span>"
+                + "<span class='label label-success opsMoney'style='background-color:#dc1010' data-loading='opsMoney'>ing...</span>"
+                )
+        }
         var myData = new FormData();
-        myData.append("shop_view_skinname", skinName);
+        myData.append("data", skinName);
+        myData.append("price", skinPrice);
+        myData.append("shop_view", true);
+
         GM_xmlhttpRequest({
             method: "POST",
             url: scriptUrl,
             data: myData,
             onload: function (result) {
-                li.parent().parent().parent().prepend("<div class='col-md-12 text-center'>" + result.responseText + "</div>");
+
+                var res = jQuery.parseJSON(result.responseText);
+                console.log(result.responseText);
+                if (res['opsMoney']) {
+                    $("[data-loading='opsMoney']").html(res['opsMoney'] + "%");
+                    $("[data-loading='moneyOps']").html(res['moneyOps'] + "%");
+                    $("[data-loading]").removeAttr("data-loading");
+
+                } else if (res['error']) {
+                    $("[data-loading='opsMoney']").html("Not Found");
+
+                } else {
+                    $("[data-loading='opsMoney']").html("Error");
+                }
+            },
+            onerror: function (res) {
+                var msg = "An error occurred."
+                + "\nresponseText: " + res.responseText
+                + "\nreadyState: " + res.readyState
+                + "\nresponseHeaders: " + res.responseHeaders
+                + "\nstatus: " + res.status
+                + "\nstatusText: " + res.statusText
+                + "\nfinalUrl: " + res.finalUrl;
+                alert(msg);
             }
         })
-    }
+    })
+}
 
-    function steamAccept() {
-        var web = location.href,
-            fromWeb = document.referrer,
-            steamsite = location.href.split("/receipt"),
-            sendoffer = location.href.split("/new/"),
-            tradeoffer = location.href.split("tradeoffer/"),
-            FromCut = document.referrer.split("tradeoffer/");
-
-        if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && web != sendoffer[0] + "/new/" + sendoffer[1] && !jQuery("#your_slot_0 .slot_inner").html()) {
-            offerAccept();
-
-        } else if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "https://opskins.com/?loc=sell" || web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "http://cs.money/") {
-            if (jQuery('.error_page_content h3').html() == "О не-е-е-е-е-е-е-т!") {
-                setTimeout(function () {
-                    window.close();
-                }, 300);
-                chromemes("Оффер не действителен!");
-            } else if (fromWeb == "https://opskins.com/?loc=sell") {
-                offerAccept();
+function last20date(page = 'item') {
+    if (page === 'item') {
+        var li = $(".last20 .list-group-item");
+        var skinName = $(".market-link").html();
+        var unavailable = $(".item-add");
+        if ($(".item-desc").children(".text-muted").html() != "") {
+            var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
+            var phase = $(".text-muted").next().html();
+            switch (phase) {
+                case ' Covert Knife (Ruby)' :
+                phase = " Ruby";
+                break;
+                case ' Covert Knife (Sapphire)' :
+                phase = " Sapphire";
+                break;
+                case ' Covert Knife (Black Pearl)' :
+                phase = " Black Pearl";
+                break;
+                case ' Covert Knife (Emerald)' :
+                phase = " Emerald";
+                break;
+                default:
+                phase = phase.replace(/[/^\D+/()]/g, '');
             }
-        } else if (web == steamsite[0] + "/receipt" && fromWeb == FromCut[0] + "tradeoffer/" + FromCut[1]) {
-            soundAccept.play();
+            switch (phase) {
+                case '1' :
+                phase = " Phase 1";
+                break;
+                case '2' :
+                phase = " Phase 2";
+                break;
+                case '3' :
+                phase = " Phase 3";
+                break;
+                case '4' :
+                phase = " Phase 4";
+                break;
+                case '' :
+                phase = "";
+                break;
+            }
+            skinName = skinName.trim() + phase + " " + exterior;
+        } else {
+            skinName = skinName.trim();
+        }
+    } else {
+        var li = $("#skinsDbSales .modal-body .last20 .list-group-item");
+        var skinName = $("#modalSkinName").text();
+    }
+    var myData = new FormData();
+    myData.append("shop_view_skinname", skinName);
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: scriptUrl,
+        data: myData,
+        onload: function (result) {
+            li.parent().parent().parent().prepend("<div class='col-md-12 text-center'>" + result.responseText + "</div>");
+        }
+    })
+}
+
+function steamAccept() {
+    var web = location.href,
+    fromWeb = document.referrer,
+    steamsite = location.href.split("/receipt"),
+    sendoffer = location.href.split("/new/"),
+    tradeoffer = location.href.split("tradeoffer/"),
+    FromCut = document.referrer.split("tradeoffer/");
+
+    if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && web != sendoffer[0] + "/new/" + sendoffer[1] && !jQuery("#your_slot_0 .slot_inner").html()) {
+        offerAccept();
+
+    } else if (web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "https://opskins.com/?loc=sell" || web == tradeoffer[0] + "tradeoffer/" + tradeoffer[1] && fromWeb == "http://cs.money/") {
+        if (jQuery('.error_page_content h3').html() == "О не-е-е-е-е-е-е-т!") {
             setTimeout(function () {
                 window.close();
-            }, 3000);
-            chromemes("Скин забрал!");
+            }, 300);
+            chromemes("Оффер не действителен!");
+        } else if (fromWeb == "https://opskins.com/?loc=sell") {
+            offerAccept();
         }
-    }
-
-    function offerAccept() {
-        setInterval(function () {
-            if (jQuery('.newmodal_content>div').html() == "Для завершения обмена подтвердите его на странице подтверждений в мобильном приложении Steam.") {
-                soundAccept.play();
-                window.close();
-            } else {
-                jQuery(".newmodal").remove();
-                ToggleReady(true);
-                if (jQuery(".newmodal_buttons .btn_green_white_innerfade span")) {
-                    jQuery(".newmodal_buttons .btn_green_white_innerfade span").click();
-                }
-                ConfirmTradeOffer();
-            }
+    } else if (web == steamsite[0] + "/receipt" && fromWeb == FromCut[0] + "tradeoffer/" + FromCut[1]) {
+        soundAccept.play();
+        setTimeout(function () {
+            window.close();
         }, 3000);
+        chromemes("Скин забрал!");
+    }
+}
+
+function offerAccept() {
+    setInterval(function () {
+        if (jQuery('.newmodal_content>div').html() == "Для завершения обмена подтвердите его на странице подтверждений в мобильном приложении Steam.") {
+            soundAccept.play();
+            window.close();
+        } else {
+            jQuery(".newmodal").remove();
+            ToggleReady(true);
+            if (jQuery(".newmodal_buttons .btn_green_white_innerfade span")) {
+                jQuery(".newmodal_buttons .btn_green_white_innerfade span").click();
+            }
+            ConfirmTradeOffer();
+        }
+    }, 3000);
+}
+
+function dopplerChecker() {
+    var dopplers_knife = [], checks, status = false;
+    $(".check_stop").on("click", function () {
+        status = false;
+        $(".doppler_check").removeAttr("disabled");
+        clearTimeout(checks);
+        $(".loaderDoplers").html("Готов к работе");
+        init_PNotify('Парсинг цен', 'Парсер остановлен!', 'info');
+    })
+    var statusChecker = (Cookies.get("cycle") ? "checked" : "");
+    if(site === "http://skinsdb.online/?doppler_search"){
+        $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+    }else{
+        $(".check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+
+    }
+    var elem = document.querySelector('.js-switch');
+    var switchery = new Switchery(elem);
+
+    elem.onchange = function() {
+        if(elem.checked === true){
+            Cookies.set("cycle",true);
+        }else{
+            Cookies.remove("cycle");
+        };
+    };
+    $(".doppler_check").on("click", function () {
+        status = true;
+        $(".doppler_check").removeAttr("disabled");
+        $(this).attr("disabled", "disabled");
+        clearTimeout(checks);
+        dopplers_knife = [];
+        var full = 0;
+        $(this).parent().find(".table tbody tr").each(function () {
+            if ($(this).find(".discount").html() !== "") {
+                full++;
+            }
+        })
+        if (full === $(this).parent().find(".table tbody tr .discount").length) {
+            $(this).parent().find(".table tbody tr .discount").html("");
+        }
+        $(this).parent().find(".table tbody tr").each(function () {
+            if ($(this).find(".discount").html() === "") {
+                var skin = {};
+                skin['id'] = $(this).find(".id-counter").text();
+                skin['skinname'] = $(this).find(".skinname a").text();
+                skin['skinlink'] = $(this).find(".skinname a").attr("href");
+                skin['changer_price'] = $(this).find(".changer_price").text();
+                dopplers_knife.push(skin);
+            }
+        })
+        dopplerPrice(0, this, 0);
+    })
+
+    function dopplerPrice(n, btn, i) {
+        var discount = $("#discount-value").val();
+        if (n === dopplers_knife.length - 1) {
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount);
+        } else if (n < dopplers_knife.length) {
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount);
+        }
     }
 
-    function dopplerChecker() {
-        var dopplers_knife = [], checks, status = false;
-        $(".check_stop").on("click", function () {
-            status = false;
-            $(".doppler_check").removeAttr("disabled");
-            clearTimeout(checks);
-            $(".loaderDoplers").html("Готов к работе");
-            init_PNotify('Парсинг цен', 'Парсер остановлен!', 'info');
-        })
-        var statusChecker = (Cookies.get("cycle") ? "checked" : "");
-        if(site === "http://skinsdb.online/?doppler_search"){
-            $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
-        }else{
-            $(".check_stop").after('<label><input type="checkbox" class="js-switch" '+ statusChecker +'> Цикл</label>');
+    function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount) {
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: opsUrl,
+            onload: function (result) {
+                var res = $(result.responseText).find(".item-amount").html();
+                if ($(result.responseText).find(".alert-danger").html()) {
+                    console.log($(result.responseText).find(".alert-danger").html());
+                    if ($(result.responseText).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
+                        $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
+                    if (counter < length - 1 && status === true) {
+                        var timeer = randomInteger(600, 1600);
 
-        }
-        var elem = document.querySelector('.js-switch');
-        var switchery = new Switchery(elem);
-
-        elem.onchange = function() {
-            if(elem.checked === true){
-                Cookies.set("cycle",true);
-            }else{
-                Cookies.remove("cycle");
-            };
-        };
-        $(".doppler_check").on("click", function () {
-            status = true;
-            $(".doppler_check").removeAttr("disabled");
-            $(this).attr("disabled", "disabled");
-            clearTimeout(checks);
-            dopplers_knife = [];
-            var full = 0;
-            $(this).parent().find(".table tbody tr").each(function () {
-                if ($(this).find(".discount").html() !== "") {
-                    full++;
-                }
-            })
-            if (full === $(this).parent().find(".table tbody tr .discount").length) {
-                $(this).parent().find(".table tbody tr .discount").html("");
-            }
-            $(this).parent().find(".table tbody tr").each(function () {
-                if ($(this).find(".discount").html() === "") {
-                    var skin = {};
-                    skin['id'] = $(this).find(".id-counter").text();
-                    skin['skinname'] = $(this).find(".skinname a").text();
-                    skin['skinlink'] = $(this).find(".skinname a").attr("href");
-                    skin['changer_price'] = $(this).find(".changer_price").text();
-                    dopplers_knife.push(skin);
-                }
-            })
-            dopplerPrice(0, this, 0);
-        })
-
-        function dopplerPrice(n, btn, i) {
-            var discount = $("#discount-value").val();
-            if (n === dopplers_knife.length - 1) {
-                newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount);
-            } else if (n < dopplers_knife.length) {
-                newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount);
-            }
-        }
-
-        function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount) {
-            GM_xmlhttpRequest({
-                method: "POST",
-                url: opsUrl,
-                onload: function (result) {
-                    var res = $(result.responseText).find(".item-amount").html();
-                    if ($(result.responseText).find(".alert-danger").html()) {
-                        console.log($(result.responseText).find(".alert-danger").html());
-                        if ($(result.responseText).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
-                            $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
-                        if (counter < length - 1 && status === true) {
-                            var timeer = randomInteger(600, 1600);
-
-                            counter++;
+                        counter++;
+                        $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                        checks = setTimeout(function () {
+                            dopplerPrice(counter, btn);
+                        }, timeer)
+                    } else {
+                        if(typeof Cookies.get("cycle") === "undefined"){
+                            $(".doppler_check").removeAttr("disabled");
+                            $(".loaderDoplers").html("Готов к работе");
+                        }else{
+                            counter = 0;
                             $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                             checks = setTimeout(function () {
                                 dopplerPrice(counter, btn);
                             }, timeer)
-                        } else {
-                            if(typeof Cookies.get("cycle") === "undefined"){
-                                $(".doppler_check").removeAttr("disabled");
-                                $(".loaderDoplers").html("Готов к работе");
-                            }else{
-                                counter = 0;
-                                $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                                checks = setTimeout(function () {
-                                    dopplerPrice(counter, btn);
-                                }, timeer)
-                            }
                         }
-                    } else if ($(result.responseText).find(".error#message").html()) {
-                        var newWindow = window.open(opsUrl);
-                        $(".doppler_check").removeAttr("disabled");
-                    } else if($(result.responseText).find("title").html() == "opskins.com | 504: Gateway time-out"){
-                        newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
-                    }else if($(result.responseText).find("title").html() == "502 Bad Gateway"){
-                        newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                     }
-                    else {
+                } else if ($(result.responseText).find(".error#message").html()) {
+                    var newWindow = window.open(opsUrl);
+                    $(".doppler_check").removeAttr("disabled");
+                } else if($(result.responseText).find("title").html() == "opskins.com | 504: Gateway time-out"){
+                    newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                }else if($(result.responseText).find("title").html() == "502 Bad Gateway"){
+                    newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                }
+                else {
                         // console.log(result);
                         // console.log(result.responseText);
                         res = res.replace("$", "");
@@ -933,220 +944,220 @@
                     }
                 }
             })
-        }
-    }
+}
+}
 
-    function newgetprices() {
-        if (skinsdbprices.length > 0) {
-            delete skinsdbprices;
-            skinsdbprices = [];
+function newgetprices() {
+    if (skinsdbprices.length > 0) {
+        delete skinsdbprices;
+        skinsdbprices = [];
+    }
+    var myData = new FormData();
+    myData.append("newgetprices", true);
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: scriptUrl,
+        data: myData,
+        onload: function (result) {
+            var res = jQuery.parseJSON(result.responseText);
+            res = res[0];
+            skinsdbprices.push(res);
+            skinsdbprices = skinsdbprices[0];
         }
-        var myData = new FormData();
-        myData.append("newgetprices", true);
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: scriptUrl,
-            data: myData,
-            onload: function (result) {
-                var res = jQuery.parseJSON(result.responseText);
-                res = res[0];
-                skinsdbprices.push(res);
-                skinsdbprices = skinsdbprices[0];
+    })
+}
+
+function loadanalystprices() {
+    newgetprices();
+    setInterval(function () {
+        newgetprices();
+        showlogs("Цены обновлены" + mark);
+    }, 30000)
+    setTimeout(function () {
+        analystgetprices();
+    }, 800)
+    $(document).ajaxComplete(function () {
+        analystgetprices();
+    });
+}
+
+function analystgetprices(){
+
+    if(skinsdbprices.length > 0){
+        $(".grid-item").each(function () {
+            if(typeof $(this).find(".changerprice").html() === 'undefined'){
+                var skinName = $(this).find(".card-header a").text();
+                var opsprice = $(this).find(".tag-primary.tag-deals").text().replace("$","");
+                var loaded = $.grep(skinsdbprices, function (e) {
+                    return e.skinname == skinName;
+                });
+                $(this).find(".btn.btn-sm.btn-success").attr("href","https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+encodeURI(skinName)+"&search_internal=1");
+                if(typeof loaded[0] !== 'undefined'){
+                    var resom = 100 - (opsprice * 100) / (loaded[0].price * 0.97);
+                    var res1 = Math.round(resom * 100) / 100;
+                    $(this).find(".tag-primary.tag-deals").after("<a class='tag tag-success tag-deals changerprice' title='Цена выбраного обменника!'>$"+loaded[0].price+"</a>");
+                    $(this).find(".changerprice").after("<a class='tag tag-danger tag-deals changerdiscount' title='Дисконт выбраного обменника!'>"+res1+"%</a>");
+                    $(this).find(".card-footer").before("<div style='width: 100; text-align: center; "+(loaded[0].actual === "fine" ? "color: #2bab2b;" : "color: #fff;")+" font-weight: 600;'>"+loaded[0].dataupd+"</div>");
+                }else{
+                    $(this).remove();
+                }
             }
         })
     }
+}
 
-    function loadanalystprices() {
-        newgetprices();
-        setInterval(function () {
-            newgetprices();
-            showlogs("Цены обновлены" + mark);
-        }, 30000)
-        setTimeout(function () {
-            analystgetprices();
-        }, 800)
-        $(document).ajaxComplete(function () {
-            analystgetprices();
-        });
-    }
-
-    function analystgetprices(){
-
-        if(skinsdbprices.length > 0){
-            $(".grid-item").each(function () {
-                if(typeof $(this).find(".changerprice").html() === 'undefined'){
-                    var skinName = $(this).find(".card-header a").text();
-                    var opsprice = $(this).find(".tag-primary.tag-deals").text().replace("$","");
-                    var loaded = $.grep(skinsdbprices, function (e) {
-                        return e.skinname == skinName;
-                    });
-                    $(this).find(".btn.btn-sm.btn-success").attr("href","https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item="+encodeURI(skinName)+"&search_internal=1");
-                    if(typeof loaded[0] !== 'undefined'){
-                        var resom = 100 - (opsprice * 100) / (loaded[0].price * 0.97);
-                        var res1 = Math.round(resom * 100) / 100;
-                        $(this).find(".tag-primary.tag-deals").after("<a class='tag tag-success tag-deals changerprice' title='Цена выбраного обменника!'>$"+loaded[0].price+"</a>");
-                        $(this).find(".changerprice").after("<a class='tag tag-danger tag-deals changerdiscount' title='Дисконт выбраного обменника!'>"+res1+"%</a>");
-                        $(this).find(".card-footer").before("<div style='width: 100; text-align: center; "+(loaded[0].actual === "fine" ? "color: #2bab2b;" : "color: #fff;")+" font-weight: 600;'>"+loaded[0].dataupd+"</div>");
-                    }else{
-                        $(this).remove();
+function newloadallprices(opd) {
+    if (skinsdbprices.length > 0) {
+        $('.featured-item.scanned').each(function () {
+            var route = $(this);
+            if (route.find(".priceBtn").html() === 'Price') {
+                var skinName = route.find(".market-link").html();
+                var skinPrice = route.find(".item-amount").html().replace("$", "");
+                var unavailable = route.find(".item-add");
+                if (unavailable.html()) {
+                    if (opd === "opd") {
+                        var skinId = route.find(".market-link").attr("href");
+                        skinId = skinId.split("&item=");
+                        skinId = skinId[1];
+                    } else {
+                        var skinId = unavailable.children(".item-amount").attr('onclick');
+                        skinId = skinId.split("showGraphFromId(");
+                        skinId = skinId[1];
+                        skinId = skinId.replace(")", "");
+                    }
+                } else {
+                    if (opd === "opd") {
+                        var skinId = route.children(".market-link").attr("href");
+                        skinId = skinId.split("&item=");
+                        skinId = skinId[1];
+                    } else {
+                        var skinId = route.find(".item-amount").attr('onclick');
+                        skinId = skinId.split("showGraphFromId(");
+                        skinId = skinId[1];
+                        skinId = skinId.replace(")", "");
                     }
                 }
-            })
-        }
-    }
+                if (route.find(".text-muted").html() != "") {
+                    var exterior = "(" + route.find(".text-muted").html() + ")";
 
-    function newloadallprices(opd) {
-        if (skinsdbprices.length > 0) {
-            $('.featured-item.scanned').each(function () {
-                var route = $(this);
-                if (route.find(".priceBtn").html() === 'Price') {
-                    var skinName = route.find(".market-link").html();
-                    var skinPrice = route.find(".item-amount").html().replace("$", "");
-                    var unavailable = route.find(".item-add");
-                    if (unavailable.html()) {
-                        if (opd === "opd") {
-                            var skinId = route.find(".market-link").attr("href");
-                            skinId = skinId.split("&item=");
-                            skinId = skinId[1];
-                        } else {
-                            var skinId = unavailable.children(".item-amount").attr('onclick');
-                            skinId = skinId.split("showGraphFromId(");
-                            skinId = skinId[1];
-                            skinId = skinId.replace(")", "");
+                    var phase = route.find(".text-muted").next().html();
+                    switch (phase) {
+                        case ' Covert Knife (Ruby)' :
+                        phase = " Ruby";
+                        break;
+                        case ' Covert Knife (Sapphire)' :
+                        phase = " Sapphire";
+                        break;
+                        case ' Covert Knife (Black Pearl)' :
+                        phase = " Black Pearl";
+                        break;
+                        case ' Covert Knife (Emerald)' :
+                        phase = " Emerald";
+                        break;
+                        default:
+                        phase = phase.replace(/[/^\D+/()]/g, '');
+                    }
+                    switch (phase) {
+                        case '1' :
+                        phase = " Phase 1";
+                        break;
+                        case '2' :
+                        phase = " Phase 2";
+                        break;
+                        case '3' :
+                        phase = " Phase 3";
+                        break;
+                        case '4' :
+                        phase = " Phase 4";
+                        break;
+                        case '' :
+                        phase = "";
+                        break;
+                    }
+                    if($.cookie('changer') === "LOOT.Farm"){
+                        phase = "";
+                    }
+                    skinName = skinName.trim() + phase + " " + exterior;
+                } else {
+                    skinName = skinName.trim();
+                }
+                console.log(skinName);
+                var loaded = $.grep(skinsdbprices, function (e) {
+                    return e.skinname == skinName;
+                });
+                if (typeof loaded[0] !== 'undefined') {
+                    if ($.cookie("savedDisc")) {
+                        savedDiscount = $.cookie("savedDisc");
+                    }
+                    var resom = 100 - (skinPrice * 100) / (loaded[0].price * 0.97);
+                    var res1 = Math.round(resom * 100) / 100;
+                    var dif = savedDiscount - res1;
+                    if (res1 > savedDiscount) {
+                        if (loaded[0].actual === 'fine') {
+                            var type = $(this).find(".text-muted").next().text();
+                            if (opd === "opd") {
+                                if (typeof $(this).find(".buyers-club-icon").html() === "undefined" && type !== "Base Grade Key") {
+                                    $(this).attr("style", "border:10px solid green;");
+                                    skin = [];
+                                    skin['skinid'] = skinId;
+                                    skin['skindisc'] = res1;
+                                    skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).find(".text-muted").text() + ")";
+                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                    skinsLoaded.push(skin);
+                                }
+                            } else {
+                                if (type !== "Base Grade Key") {
+                                    $(this).attr("style", "border:10px solid green;");
+                                    $(this).attr('id', skinId);
+                                    skin = [];
+                                    skin['skinid'] = skinId;
+                                    skin['skinlink'] = "#" + skinId;
+                                    skin['skindisc'] = res1;
+                                    skin['skinname'] = $(this).find(".market-link").text()
+                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                                    skinsLoaded.push(skin);
+                                    $("#ThatisDisc").show();
+                                    $("#ThatisDisc").html(skinsLoaded.length);
+                                    $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                                }
+                            }
+                        } else if (loaded[0].actual === 'bad') {
+                            $(this).attr("style", "border:10px solid orange;");
                         }
                     } else {
-                        if (opd === "opd") {
-                            var skinId = route.children(".market-link").attr("href");
-                            skinId = skinId.split("&item=");
-                            skinId = skinId[1];
-                        } else {
-                            var skinId = route.find(".item-amount").attr('onclick');
-                            skinId = skinId.split("showGraphFromId(");
-                            skinId = skinId[1];
-                            skinId = skinId.replace(")", "");
-                        }
-                    }
-                    if (route.find(".text-muted").html() != "") {
-                        var exterior = "(" + route.find(".text-muted").html() + ")";
-
-                        var phase = route.find(".text-muted").next().html();
-                        switch (phase) {
-                            case '★ Covert Knife (Ruby)' :
-                                phase = " Ruby";
-                                break;
-                            case '★ Covert Knife (Sapphire)' :
-                                phase = " Sapphire";
-                                break;
-                            case '★ Covert Knife (Black Pearl)' :
-                                phase = " Black Pearl";
-                                break;
-                            case '★ Covert Knife (Emerald)' :
-                                phase = " Emerald";
-                                break;
-                            default:
-                                phase = phase.replace(/[/^\D+/()]/g, '');
-                        }
-                        switch (phase) {
-                            case '1' :
-                                phase = " Phase 1";
-                                break;
-                            case '2' :
-                                phase = " Phase 2";
-                                break;
-                            case '3' :
-                                phase = " Phase 3";
-                                break;
-                            case '4' :
-                                phase = " Phase 4";
-                                break;
-                            case '' :
-                                phase = "";
-                                break;
-                        }
-                        if($.cookie('changer') === "LOOT.Farm"){
-                            phase = "";
-                        }
-                        skinName = skinName.trim() + phase + " " + exterior;
-                    } else {
-                        skinName = skinName.trim();
-                    }
-                    console.log(skinName);
-                    var loaded = $.grep(skinsdbprices, function (e) {
-                        return e.skinname == skinName;
-                    });
-                    if (typeof loaded[0] !== 'undefined') {
-                        if ($.cookie("savedDisc")) {
-                            savedDiscount = $.cookie("savedDisc");
-                        }
-                        var resom = 100 - (skinPrice * 100) / (loaded[0].price * 0.97);
-                        var res1 = Math.round(resom * 100) / 100;
-                        var dif = savedDiscount - res1;
-                        if (res1 > savedDiscount) {
+                        if (dif > 0 && dif <= 1.2) {
                             if (loaded[0].actual === 'fine') {
-                                var type = $(this).find(".text-muted").next().text();
-                                if (opd === "opd") {
-                                    if (typeof $(this).find(".buyers-club-icon").html() === "undefined" && type !== "Base Grade Key") {
-                                        $(this).attr("style", "border:10px solid green;");
-                                        skin = [];
-                                        skin['skinid'] = skinId;
-                                        skin['skindisc'] = res1;
-                                        skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).find(".text-muted").text() + ")";
-                                        skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
-                                        skinsLoaded.push(skin);
-                                    }
-                                } else {
-                                    if (type !== "Base Grade Key") {
-                                        $(this).attr("style", "border:10px solid green;");
-                                        $(this).attr('id', skinId);
-                                        skin = [];
-                                        skin['skinid'] = skinId;
-                                        skin['skinlink'] = "#" + skinId;
-                                        skin['skindisc'] = res1;
-                                        skin['skinname'] = $(this).find(".market-link").text()
-                                        skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
-                                        skinsLoaded.push(skin);
-                                        $("#ThatisDisc").show();
-                                        $("#ThatisDisc").html(skinsLoaded.length);
-                                        $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
-                                    }
-                                }
-                            } else if (loaded[0].actual === 'bad') {
-                                $(this).attr("style", "border:10px solid orange;");
-                            }
-                        } else {
-                            if (dif > 0 && dif <= 1.2) {
-                                if (loaded[0].actual === 'fine') {
-                                    $(this).attr("style", "border:10px solid darkblue;");
-                                }
+                                $(this).attr("style", "border:10px solid darkblue;");
                             }
                         }
-                        route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
-                        if (isFinite(res1)) {
-                            route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
-                        }
-                    } else {
-                        route.find(".priceBtn").html("Not Found");
                     }
+                    route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
+                    if (isFinite(res1)) {
+                        route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
+                    }
+                } else {
+                    route.find(".priceBtn").html("Not Found");
                 }
-            })
-        }
-    }
+            }
+        })
+}
+}
 
-    function loadallprices() {
+function loadallprices() {
+    newgetprices();
+    setInterval(function () {
         newgetprices();
-        setInterval(function () {
-            newgetprices();
-            showlogs("Цены обновлены" + mark);
-        }, 30000)
-        setTimeout(function () {
-            newloadallprices();
-        }, 800)
-        $(document).ajaxComplete(function () {
-            newloadallprices();
-        });
-        $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
-        $("#ThatisDisc").on("click", function () {
-            skinsLoaded.splice(0, 1);
+        showlogs("Цены обновлены" + mark);
+    }, 30000)
+    setTimeout(function () {
+        newloadallprices();
+    }, 800)
+    $(document).ajaxComplete(function () {
+        newloadallprices();
+    });
+    $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
+    $("#ThatisDisc").on("click", function () {
+        skinsLoaded.splice(0, 1);
             // console.table(skinsLoaded);
             $(this).html(skinsLoaded.length);
             if (skinsLoaded.length === 0) {
@@ -1155,12 +1166,12 @@
                 $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
             }
         })
-    }
+}
 
-    function settingsMenu() {
-        $(".nav.navbar-nav").append("<li class='menu'><a href='/?loc=shop_browse&sort=n'>Авто-пикер</a></li>");
+function settingsMenu() {
+    $(".nav.navbar-nav").append("<li class='menu'><a href='/?loc=shop_browse&sort=n'>Авто-пикер</a></li>");
 
-        $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
+    $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
         // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
 
         if ($.cookie("savedDisc")) {
@@ -1189,7 +1200,7 @@
             '</div>' +
             '</div>' +
             '</div>'
-        )
+            )
         ;
         if ($.cookie("role") !== 'superuser' && $.cookie("role") !== 'admin') {
             $(".atbuy").hide();
@@ -1321,15 +1332,15 @@
                     $(".autowithdraw").html("Ошибка!" + mark);
                 }
             })
-        })
-    }
+})
+}
 
 
-    function csmobot() {
-        setInterval(getLink, 2000);
+function csmobot() {
+    setInterval(getLink, 2000);
 
-        csmocounters();
-        $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div style='margin: 10px 0 20px;overflow: hidden;width: 100%;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканнер " + mark + "</button></div>");
+    csmocounters();
+    $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div style='margin: 10px 0 20px;overflow: hidden;width: 100%;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканнер " + mark + "</button></div>");
         // $("#scannerdb").before("<div class='btn btn-warning checkout-btn' id='favSkinView' style='margin-left: 32px; padding: 8px 4px;'>Избранные" + mark + "</div>");
         $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;padding: 8px 4px;'>Opskins -> CS.Money</button></div>");
         $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;padding: 8px 4px;'>CS.Money -> Opskins</button></div>");
@@ -1413,7 +1424,7 @@
         //                 showlogs("Избранных cейчас нет!" + mark);
         //             }
         //         });
-        //         // <div market_hash_name="★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" cost="5278" id="1090937021476561198315968061" class="offer_container_invertory" bot_steamid="76561198315968061" assetid="10909370214" data-original-title="" title="" style="background-color: rgba(39, 179, 22, 0.35);"><div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 29%;z-index: 999;width: 22px; color: #fff;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div><div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div><a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=%E2%98%85%20%20Karambit%20%7C%20Gamma%20Doppler&amp;sort=lh&amp;exterior=fn&amp;stat=1&amp;phase=ge" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a><img src="img/st.png" class="st"><div class="invertory_container_links"> <a title="view on marketplace" href="https://steamcommunity.com/market/listings/730/★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" class="invertory_link_view" target="_blank">VIEW</a> <a title="inspect in steam" href="steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S76561198315968061A10909370214D4964839033136993975" class="invertory_link">INSPECT</a> </div><div class="offer_container_invertory_inactive"></div><div class="invertory_title_container"> <div class="invertory_title_text_quantity"> x<span class="count_in_stack">1</span> </div> <div class="invertory_title_container_marka">FN</div> </div> <img alt="★ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" src="https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJlY20kvrxIbrdklRc6ddzhuzI74nxt1i9rBsofT-ld9LDJgVsY1nX-QLtlejqg5bu7Zydm3Q1uSVzsXmOmUe3ghFKauBxxavJdWR7Gog/96x72" class="offer_container_img"> <div class="price_animation"></div> <div class="price">5278$</div> </div>
+        //         // <div market_hash_name=" StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" cost="5278" id="1090937021476561198315968061" class="offer_container_invertory" bot_steamid="76561198315968061" assetid="10909370214" data-original-title="" title="" style="background-color: rgba(39, 179, 22, 0.35);"><div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 29%;z-index: 999;width: 22px; color: #fff;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div><div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div><a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=%E2%98%85%20%20Karambit%20%7C%20Gamma%20Doppler&amp;sort=lh&amp;exterior=fn&amp;stat=1&amp;phase=ge" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a><img src="img/st.png" class="st"><div class="invertory_container_links"> <a title="view on marketplace" href="https://steamcommunity.com/market/listings/730/ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" class="invertory_link_view" target="_blank">VIEW</a> <a title="inspect in steam" href="steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S76561198315968061A10909370214D4964839033136993975" class="invertory_link">INSPECT</a> </div><div class="offer_container_invertory_inactive"></div><div class="invertory_title_container"> <div class="invertory_title_text_quantity"> x<span class="count_in_stack">1</span> </div> <div class="invertory_title_container_marka">FN</div> </div> <img alt=" StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" src="https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJlY20kvrxIbrdklRc6ddzhuzI74nxt1i9rBsofT-ld9LDJgVsY1nX-QLtlejqg5bu7Zydm3Q1uSVzsXmOmUe3ghFKauBxxavJdWR7Gog/96x72" class="offer_container_img"> <div class="price_animation"></div> <div class="price">5278$</div> </div>
         //     }
         //     else {
         //         $(this).html("Добавь хоть один скин!" + mark);
@@ -1448,12 +1459,12 @@
                 onerror: function (res) {
                     $("#scannerdb").html("Ошибка" + mark);
                     var msg = "An error occurred."
-                        + "\nresponseText: " + res.responseText
-                        + "\nreadyState: " + res.readyState
-                        + "\nresponseHeaders: " + res.responseHeaders
-                        + "\nstatus: " + res.status
-                        + "\nstatusText: " + res.statusText
-                        + "\nfinalUrl: " + res.finalUrl;
+                    + "\nresponseText: " + res.responseText
+                    + "\nreadyState: " + res.readyState
+                    + "\nresponseHeaders: " + res.responseHeaders
+                    + "\nstatus: " + res.status
+                    + "\nstatusText: " + res.statusText
+                    + "\nfinalUrl: " + res.finalUrl;
                     alert(msg);
                 }
             })
@@ -1489,46 +1500,46 @@
                         var fixd = checkd.trim();
                         switch (fixd) {
                             case 'Phase 1' :
-                                phase = '&phase=d1';
-                                break;
+                            phase = '&phase=d1';
+                            break;
                             case 'Phase 2' :
-                                phase = '&phase=d2';
-                                break;
+                            phase = '&phase=d2';
+                            break;
                             case 'Phase 3' :
-                                phase = '&phase=d3';
-                                break;
+                            phase = '&phase=d3';
+                            break;
                             case 'Phase 4' :
-                                phase = '&phase=d4';
-                                break;
+                            phase = '&phase=d4';
+                            break;
                             case 'Ruby' :
-                                phase = '&phase=dr';
-                                break;
+                            phase = '&phase=dr';
+                            break;
                             case 'Sapphire' :
-                                phase = '&phase=ds';
-                                break;
+                            phase = '&phase=ds';
+                            break;
                             case 'Black Pearl' :
-                                phase = '&phase=db';
-                                break;
+                            phase = '&phase=db';
+                            break;
                         }
                     }
                     if (typeof checkgd !== 'undefined') {
                         var fixgd = checkgd.trim();
                         switch (fixgd) {
                             case 'Phase 1' :
-                                phase = '&phase=g1';
-                                break;
+                            phase = '&phase=g1';
+                            break;
                             case 'Phase 2' :
-                                phase = '&phase=g2';
-                                break;
+                            phase = '&phase=g2';
+                            break;
                             case 'Phase 3' :
-                                phase = '&phase=g3';
-                                break;
+                            phase = '&phase=g3';
+                            break;
                             case 'Phase 4' :
-                                phase = '&phase=g4';
-                                break;
+                            phase = '&phase=g4';
+                            break;
                             case 'Emerald' :
-                                phase = '&phase=ge';
-                                break;
+                            phase = '&phase=ge';
+                            break;
                         }
                     }
                 }
@@ -1643,113 +1654,123 @@
             }
         });
 
-        function NotFav(elem, pack = "false") {
-            if (pack === "false") {
-                $(elem).find(".favourite").remove();
-                $(elem).prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-                $(elem).css("background-color", "");
-            } else {
-                $("div[hash='" + pack + "']").find(".favourite").remove();
-                $("div[hash='" + pack + "']").prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-                $("div[hash='" + pack + "']").css("background-color", "");
-                favSkins.splice(favSkins.indexOf(pack), 1);
-            }
+    function NotFav(elem, pack = "false") {
+        if (pack === "false") {
+            $(elem).find(".favourite").remove();
+            $(elem).prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $(elem).css("background-color", "");
+        } else {
+            $("div[hash='" + pack + "']").find(".favourite").remove();
+            $("div[hash='" + pack + "']").prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $("div[hash='" + pack + "']").css("background-color", "");
+            favSkins.splice(favSkins.indexOf(pack), 1);
         }
-
-        function Fav(elem, pack = "false") {
-            if (pack === "false") {
-                $(elem).find(".favourite").remove();
-                $(elem).prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-                $(elem).css("background-color", "rgba(39, 179, 22, 0.35)");
-            } else {
-                $("div[hash='" + pack + "']").find(".favourite").remove();
-                $("div[hash='" + pack + "']").prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-                $("div[hash='" + pack + "']").css("background-color", "rgba(39, 179, 22, 0.35)");
-                favSkins.push(pack);
-            }
-        }
-
-
     }
 
-    function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: opsUrl,
-            onload: function (result) {
-                if ($(result.responseText).find(".alert-danger").html()) {
-                    console.log($(result.responseText).find(".alert-danger").html());
-                    $("div["+blockName+"='" + fullName + "']").children(".parse_button").html("Not Found");
-                } else if ($(result.responseText).find(".error#message").html()) {
-                    var newWindow = window.open(opsUrl);
-                    $("div["+blockName+"='" + fullName + "']").children(".parse_button").html("Try again");
-                } else {
-                    var res = $(result.responseText).find(".item-amount").html().replace("$", "").replace(",", "");
-                    skin = {};
-                    skin['fullname'] = fullName;
-                    skin['opsprice'] = res;
+    function Fav(elem, pack = "false") {
+        if (pack === "false") {
+            $(elem).find(".favourite").remove();
+            $(elem).prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $(elem).css("background-color", "rgba(39, 179, 22, 0.35)");
+        } else {
+            $("div[hash='" + pack + "']").find(".favourite").remove();
+            $("div[hash='" + pack + "']").prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $("div[hash='" + pack + "']").css("background-color", "rgba(39, 179, 22, 0.35)");
+            favSkins.push(pack);
+        }
+    }
 
-                    skinsLoaded.push(skin);
-                    $(".popover.fade.bottom.in").remove();
-                    $(BtnParent).children(".parse_button").remove();
-                    if(func = "getLink"){
-                        getLink();
-                    }else{
-                        allAnotherGetLink(func);
-                    }
+
+}
+
+function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: opsUrl,
+        onload: function (result) {
+            if ($(result.responseText).find(".alert-danger").html()) {
+                console.log($(result.responseText).find(".alert-danger").html());
+                $("div["+blockName+"='" + fullName + "']").children(".parse_button").html("Not Found");
+            } else if ($(result.responseText).find(".error#message").html()) {
+                var newWindow = window.open(opsUrl);
+                $("div["+blockName+"='" + fullName + "']").children(".parse_button").html("Try again");
+            } else {
+                var res = $(result.responseText).find(".item-amount").html().replace("$", "").replace(",", "");
+                skin = {};
+                skin['fullname'] = fullName;
+                skin['opsprice'] = res;
+
+                skinsLoaded.push(skin);
+                $(".popover.fade.bottom.in").remove();
+                $(BtnParent).children(".parse_button").remove();
+                if(func = "getLink"){
+                    getLink();
+                }else{
+                    allAnotherGetLink(func);
                 }
             }
-        });
-    }
-
-    function allAnotherGetLink(changer) {
-        var items, name, phase, ext, stat;
-        var phase = "";
-        var type = "";
-        switch (changer) {
-            case 'CSOFFERme':
-                statArg = ".st";
-                extArg = ".invertory_title_container_marka";
-                nameArg = "market_hash_name";
-                currentItem = ".offer_container_invertory";
-                priceArg = "cost";
-                items = $(".invertory_container").children();
-                zindex = "z-index: 10000;";
-
-                break;
-            case 'LootFarm' :
-                statArg = ".is_st";
-                extArg = ".it_ext";
-                nameArg = "data-name";
-                currentItem = ".itemblock";
-                priceArg = "data-p";
-                items = $(".oitems").find(currentItem);
-                zindex = "";
-
-                break;
-            case 'TradeMe' :
-                statArg = ".st";
-                extArg = ".images_title_right";
-                nameArg = "market_hash_name";
-                currentItem = ".images.tooltip";
-                priceArg = "cost";
-                items = $("#bot_inventory").children();
-                zindex = "z-index: 10000;";
-
-                break;
-            case 'TradeSkins' :
-                statArg = ".st";
-                extArg = ".invertory_title_container_marka";
-                nameArg = "market_hash_name";
-                currentItem = ".offer_container_invertory";
-                priceArg = "cost";
-                items = $(".invertory_container").children();
-                zindex = "z-index: 10000;";
-
-                break;
         }
-        items.each(function () {
-            if (typeof $(this).find(".parse_button").html() === 'undefined') {
+    });
+}
+
+function allAnotherGetLink(changer) {
+    var items, name, phase, ext, stat;
+    var phase = "";
+    var type = "";
+    switch (changer) {
+        case 'CSOFFERme':
+        statArg = ".st";
+        extArg = ".invertory_title_container_marka";
+        nameArg = "market_hash_name";
+        currentItem = ".offer_container_invertory";
+        priceArg = "cost";
+        items = $(".invertory_container").children();
+        zindex = "z-index: 10000;";
+
+        break;
+        case 'LootFarm' :
+        statArg = ".is_st";
+        extArg = ".it_ext";
+        nameArg = "data-name";
+        currentItem = ".itemblock";
+        priceArg = "data-p";
+        items = $(".oitems").find(currentItem);
+        zindex = "";
+
+        break;
+        case 'TradeMe' :
+        statArg = ".st";
+        extArg = ".images_title_right";
+        nameArg = "market_hash_name";
+        currentItem = ".images.tooltip";
+        priceArg = "cost";
+        items = $("#bot_inventory").children();
+        zindex = "z-index: 10000;";
+
+        break;
+        case 'TradeSkins' :
+        statArg = ".st";
+        extArg = ".invertory_title_container_marka";
+        nameArg = "market_hash_name";
+        currentItem = ".offer_container_invertory";
+        priceArg = "cost";
+        items = $(".invertory_container").children();
+        zindex = "z-index: 10000;";
+
+        break;
+        case 'CSTrade' :
+        statArg = ".stattrak-label";
+        extArg = ".wear-name";
+        nameArg = "data-name";
+        currentItem = ".single-item";
+        priceArg = ".item-price";
+        items = $("#box-bot-inventory").children();
+        zindex = "z-index: 10000;";
+
+        break;
+    }
+    items.each(function () {
+        if (typeof $(this).find(".parse_button").html() === 'undefined') {
 
                 // $(this).css("position", "relative");
 
@@ -1773,46 +1794,46 @@
                         var fixd = checkd.trim();
                         switch (fixd) {
                             case 'Phase 1' :
-                                phase = '&phase=d1';
-                                break;
+                            phase = '&phase=d1';
+                            break;
                             case 'Phase 2' :
-                                phase = '&phase=d2';
-                                break;
+                            phase = '&phase=d2';
+                            break;
                             case 'Phase 3' :
-                                phase = '&phase=d3';
-                                break;
+                            phase = '&phase=d3';
+                            break;
                             case 'Phase 4' :
-                                phase = '&phase=d4';
-                                break;
+                            phase = '&phase=d4';
+                            break;
                             case 'Ruby' :
-                                phase = '&phase=dr';
-                                break;
+                            phase = '&phase=dr';
+                            break;
                             case 'Sapphire' :
-                                phase = '&phase=ds';
-                                break;
+                            phase = '&phase=ds';
+                            break;
                             case 'Black Pearl' :
-                                phase = '&phase=db';
-                                break;
+                            phase = '&phase=db';
+                            break;
                         }
                     }
                     if (typeof checkgd !== 'undefined') {
                         var fixgd = checkgd.trim();
                         switch (fixgd) {
                             case 'Phase 1' :
-                                phase = '&phase=g1';
-                                break;
+                            phase = '&phase=g1';
+                            break;
                             case 'Phase 2' :
-                                phase = '&phase=g2';
-                                break;
+                            phase = '&phase=g2';
+                            break;
                             case 'Phase 3' :
-                                phase = '&phase=g3';
-                                break;
+                            phase = '&phase=g3';
+                            break;
                             case 'Phase 4' :
-                                phase = '&phase=g4';
-                                break;
+                            phase = '&phase=g4';
+                            break;
                             case 'Emerald' :
-                                phase = '&phase=ge';
-                                break;
+                            phase = '&phase=ge';
+                            break;
                         }
                     }
                 }
@@ -1827,6 +1848,8 @@
                 if (typeof loaded !== 'undefined') {
                     if(changer === "LootFarm"){
                         var changerPrice = $(this).attr(priceArg) / 100;
+                    }else if(changer === "CSTrade"){
+                        var changerPrice = $(this).find(priceArg).html().replace("$","");
                     }else{
                         var changerPrice = $(this).attr(priceArg);
                     }
@@ -1840,17 +1863,21 @@
                         moops = moops + moops * (-2);
                     }
                     $(this).prepend('<div class="parse_button parse_done" data-ops="' + loaded['opsprice'] + '" style="height: 17px; min-width: 40px;top:10%; cursor: pointer; position: absolute; color: #000; background-color: transparent; margin-top: 40px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; width: 108%;text-align: center;'+zindex+'"></div>');
-                   if(changer !== "LootFarm"){
+                    if(changer !== "LootFarm"){
                        $(this).prepend("<span style='position: absolute;top: 32%;left: 0;font-size: 13px; font-weight: bold; color: #000;background: #fff;"+zindex+"'>" + loaded['opsprice'] + "$</span>");
                    }else{
                        $(this).prepend("<span style='position: absolute;top: 61%;right: 0;font-size: 13px; font-weight: bold; color: #000;background: #fff;"+zindex+"'>" + loaded['opsprice'] + "$</span>");
                    }
-                    $(this).find(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 46%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
-                    $(this).find(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 46%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
+                   $(this).find(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 46%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
+                   $(this).find(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 46%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
 
-                } else {
+               } else {
                     //cfdfsfs
-                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;'+ zindex +'"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    if(changer === "CSTrade"){
+                        $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; top:10%;width: 22px; color: #000;'+ zindex +'"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    }else{
+                        $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;'+ zindex +'"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    }
                 }
             }
             $(this).children(".link_button").unbind().on("click", function () {
@@ -1871,277 +1898,277 @@
                 return false;
             });
         })
-    }
+}
 
-    function csmomenu() {
-        if ($.cookie("opsbot") === 'on') {
+function csmomenu() {
+    if ($.cookie("opsbot") === 'on') {
+        csmobot();
+        setTimeout(function () {
+            $("#opsbot").prop("checked", true);
+        }, 600)
+    }
+    $(".profile__menu ul").prepend("<li><a href='#' class='skinsdbset '><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg> <div>Настройки SkinsDb</div></a></div></li>");
+    $(".overlay.hidden .overlay-wrapper").append('' +
+        '<div id="skinsDb" class="modal hidden">' +
+        '<a class="modal__close skindbClose" href="#">' +
+        '<svg class="icon-close">' +
+        '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#svg-icon-close"></use>' +
+        '</svg></a>' +
+        '<div class="modal__title">Настройки' + mark + '</div>' +
+        '<div class="modal__content">' +
+        '<label for="opsbot" style="cursor:pointer; width: 33%;">Включить ' + mark + '</label>' +
+        '<input type="checkbox" id="opsbot" name="opsbot" style="display: inline-block;">' +
+        '</div>');
+
+    $(".skinsdbset").on("click", function () {
+        $("#skinsDb").toggleClass("hidden");
+        $(".overlay").toggleClass("hidden");
+    })
+    $(".skindbClose").on("click", function () {
+        $("#skinsDb").toggleClass("hidden");
+        $(".overlay").toggleClass("hidden");
+    })
+    $("#opsbot").on("change", function () {
+        if (this.checked) {
+            $.cookie("opsbot", "on");
             csmobot();
+        } else {
+            $.removeCookie("opsbot");
             setTimeout(function () {
-                $("#opsbot").prop("checked", true);
-            }, 600)
+                location.reload();
+            }, 2000)
         }
-        $(".profile__menu ul").prepend("<li><a href='#' class='skinsdbset '><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg> <div>Настройки SkinsDb</div></a></div></li>");
-        $(".overlay.hidden .overlay-wrapper").append('' +
-            '<div id="skinsDb" class="modal hidden">' +
-            '<a class="modal__close skindbClose" href="#">' +
-            '<svg class="icon-close">' +
-            '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#svg-icon-close"></use>' +
-            '</svg></a>' +
-            '<div class="modal__title">Настройки' + mark + '</div>' +
-            '<div class="modal__content">' +
-            '<label for="opsbot" style="cursor:pointer; width: 33%;">Включить ' + mark + '</label>' +
-            '<input type="checkbox" id="opsbot" name="opsbot" style="display: inline-block;">' +
-            '</div>');
+    })
+}
 
-        $(".skinsdbset").on("click", function () {
-            $("#skinsDb").toggleClass("hidden");
-            $(".overlay").toggleClass("hidden");
-        })
-        $(".skindbClose").on("click", function () {
-            $("#skinsDb").toggleClass("hidden");
-            $(".overlay").toggleClass("hidden");
-        })
-        $("#opsbot").on("change", function () {
-            if (this.checked) {
-                $.cookie("opsbot", "on");
-                csmobot();
+function csmocounters() {
+    $(".column-2").prepend("<div class='block__header block__header_top' style='text-align: center;'><div class='block__title' style='width: 100%;'><div class='block__title__nowrap' style='width: 100%;text-align: center;padding: 0 44px;'><span class='currency_symbol'>$ </span><span id='sum_dif'>0.00</span></div></div></div>")
+    $("#user-search-block").after("<div class='block__search autoPickUp'><input type='number' class='block__search__field balanceClick' placeholder='$..'><span class='block__search__btn toofferClick' style='cursor: pointer; background-color: #000;'>GO</span></div>");
+
+    $(".autoPickUp").css({
+        "width": "123px",
+        "margin-left": "10px"
+    });
+    $(".column-2 .sidebar").css("height", "94%");
+    $(".bonus").css("top", "89%");
+
+    var user_offer = $("#user_offer_sum").text().replace("$", "").trim();
+    var bot_offer = $("#bots_offer_sum").text().replace("$", "").trim();
+
+    $(".toofferClick").on("click", function () {
+        $("#inventory_user").children().each(function () {
+            var count = $(this).find(".f").text().replace("x", "");
+            var i;
+            if ($(".balanceClick").val() === "") {
+                if ($(this).hasClass(".dis") === false) {
+                    for (i = 0; i < count; i++) {
+                        $(this).click();
+                    }
+                }
             } else {
-                $.removeCookie("opsbot");
-                setTimeout(function () {
-                    location.reload();
-                }, 2000)
-            }
-        })
-    }
-
-    function csmocounters() {
-        $(".column-2").prepend("<div class='block__header block__header_top' style='text-align: center;'><div class='block__title' style='width: 100%;'><div class='block__title__nowrap' style='width: 100%;text-align: center;padding: 0 44px;'><span class='currency_symbol'>$ </span><span id='sum_dif'>0.00</span></div></div></div>")
-        $("#user-search-block").after("<div class='block__search autoPickUp'><input type='number' class='block__search__field balanceClick' placeholder='$..'><span class='block__search__btn toofferClick' style='cursor: pointer; background-color: #000;'>GO</span></div>");
-
-        $(".autoPickUp").css({
-            "width": "123px",
-            "margin-left": "10px"
-        });
-        $(".column-2 .sidebar").css("height", "94%");
-        $(".bonus").css("top", "89%");
-
-        var user_offer = $("#user_offer_sum").text().replace("$", "").trim();
-        var bot_offer = $("#bots_offer_sum").text().replace("$", "").trim();
-
-        $(".toofferClick").on("click", function () {
-            $("#inventory_user").children().each(function () {
-                var count = $(this).find(".f").text().replace("x", "");
-                var i;
-                if ($(".balanceClick").val() === "") {
-                    if ($(this).hasClass(".dis") === false) {
-                        for (i = 0; i < count; i++) {
+                var maxCost = parseFloat($(".balanceClick").val());
+                var cost = parseFloat($("#currency_user").text());
+                if ($(this).hasClass(".dis") === false) {
+                    var skinCost = parseFloat($(this).find(".p").text().replace("$", ""));
+                    for (i = 0; i < count; i++) {
+                        if ((skinCost + cost) <= maxCost || (skinCost + cost) <= maxCost + 0.03) {
+                            cost = cost + skinCost;
                             $(this).click();
                         }
                     }
-                } else {
-                    var maxCost = parseFloat($(".balanceClick").val());
-                    var cost = parseFloat($("#currency_user").text());
-                    if ($(this).hasClass(".dis") === false) {
-                        var skinCost = parseFloat($(this).find(".p").text().replace("$", ""));
-                        for (i = 0; i < count; i++) {
-                            if ((skinCost + cost) <= maxCost || (skinCost + cost) <= maxCost + 0.03) {
-                                cost = cost + skinCost;
-                                $(this).click();
-                            }
-                        }
-                    }
                 }
-            })
-        })
-        $("#total_value_user").after("<span id='fullB'></span>")
-        setInterval(function () {
-            var counts = 0;
-            $("#inventory_user").children().each(function () {
-                counts += Number($(this).attr("cost") * $(this).find(".f").text().replace("x", ""));
-                if (counts === 0) {
-                    $("#fullB").html(" / $ 0.00");
-                } else {
-                    $("#fullB").html(" / $ " + Math.round(counts * 100) / 100);
-                }
-            })
-        }, 1600)
-        setInterval(function () {
-            if ($("#currency_user").text() !== "0.00" || $("#currency_bot").text() !== "0.00") {
-                var sum_dif = Number($("#currency_user").text() - $("#currency_bot").text());
-                $("#sum_dif").html(Math.round(sum_dif * 100) / 100);
-            }
-        }, 300)
-    }
-
-    function sellsinvChecker() {
-        $(document).ajaxComplete(function (event, xhr, settings) {
-            if (settings['url'] == '/ajax/get_inventory.php?appid=730&contextid=2&osi=0') {
-                setTimeout(salesInfo, 500);
             }
         })
-    };
-
-    function salesInfo() {
-        $("body").append('' +
-            '<div id="skinsDbSales" class="modal fade" role="dialog">' +
-            '<div class="modal-dialog">' +
-            '<div class="modal-content">' +
-            '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
-            '<h4 class="modal-title">Инфа про скин <span id="modalSkinName"></span>' + mark + '</h4>' +
-            '</div>' +
-            '<div class="modal-body">' +
-            '<span>Hi</span>' +
-            '</div>' +
-            '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
-            '</div>');
-        $("#skinsDbSales .modal-content").css({
-            "width": "800px",
-            "right": "10%"
-        });
-        showlogs("Загружено!" + mark);
-        $(".sell-item").on("click", function sellitem() {
-            $("#sell-selected-inspect-btn").attr("disabled", "disabled");
-            $("#realLowestPrice").remove();
-            var url,
-                skinname;
-            $("#sell-selected-inspect-btn").attr("href", "#");
-            $("#sell-selected-inspect-btn").attr("data-toggle", "modal");
-            $("#sell-selected-inspect-btn").attr("data-target", "#skinsDbSales");
-            $("#sell-selected-inspect-btn").css("background", "green");
-            $("#sell-selected-inspect-btn").text("Check Solds");
-            $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
-            url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
-            skinname = url.split("&sort");
-            skinname = skinname[0].split("&search_item=");
-            skinname = decodeURI(skinname[1]);
-            $("#modalSkinName").text(skinname);
-            var loaded = $.grep(skinsLoaded, function (e) {
-                return e.skinname == skinname;
-            });
-            if (typeof loaded[0] !== 'undefined') {
-                $("#skinsDbSales .modal-body").html("Not Loaded!");
-                $("#realLowestPrice").css("color", "green");
-                $("#realLowestPrice").html("<br>Real Lowest Price: " + loaded[0].price + "<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>" + loaded[0].moneyOps + "%</span>" +
-                    "<span class='label label-success opsMoney'style='background-color:#dc1010'>" + loaded[0].opsMoney + "%</span></div>");
-                $("#sell-selected-inspect-btn").removeAttr("disabled");
-                if (typeof loaded[0].sels !== 'undefined') {
-                    $("#skinsDbSales .modal-body").html(loaded[0].sels);
-                } else {
-                    var index = -1;
-                    for (var i = 0, len = skinsLoaded.length; i < len; i++) {
-                        if (skinsLoaded[i].skinnname === skinname) {
-                            index = i;
-                            break;
-                        }
-                    }
-                    skinsLoaded.splice(index, 1);
-                }
-                last20date("sell");
-                las20btn("sell");
+    })
+    $("#total_value_user").after("<span id='fullB'></span>")
+    setInterval(function () {
+        var counts = 0;
+        $("#inventory_user").children().each(function () {
+            counts += Number($(this).attr("cost") * $(this).find(".f").text().replace("x", ""));
+            if (counts === 0) {
+                $("#fullB").html(" / $ 0.00");
             } else {
-                $.post(url).done(function (e) {
-                    var price = $(e).find(".item-amount").html();
-                    var link = $(e).find(".market-link").attr("href");
-                    if (typeof price !== 'undefined') {
-                        price = price.replace("$", "") + " $";
-                        $("#realLowestPrice").css("color", "green");
-                        var myData = new FormData();
-                        myData.append("data", skinname);
-                        myData.append("price", price);
-                        GM_xmlhttpRequest({
-                            method: "POST",
-                            url: scriptUrl,
-                            data: myData,
-                            onload: function (result) {
-                                skin = [];
-                                skin['skinname'] = skinname;
-                                skin['price'] = price;
-                                var res = jQuery.parseJSON(result.responseText);
-                                if (res['opsMoney']) {
-                                    skin['moneyOps'] = res['moneyOps'];
-                                    skin['opsMoney'] = res['opsMoney'];
-                                } else if (res['error']) {
-                                    skin['opsMoney'] = res['Not Found'];
-                                } else {
-                                    skin['opsMoney'] = res['Error'];
-                                }
-                                var newLink = "https://opskins.com/" + link;
-                                $.post(newLink).done(function (res) {
-                                    var sels = $(res).find(".widget.clearfix").html();
-                                    skin['sels'] = sels;
-                                    skinsLoaded.push(skin);
-                                })
-                                sellitem();
-                            }
-                        })
-                    } else {
-                        $("#realLowestPrice").html("<br>Ошибка!");
-                    }
-                })
+                $("#fullB").html(" / $ " + Math.round(counts * 100) / 100);
             }
         })
-    }
+    }, 1600)
+    setInterval(function () {
+        if ($("#currency_user").text() !== "0.00" || $("#currency_bot").text() !== "0.00") {
+            var sum_dif = Number($("#currency_user").text() - $("#currency_bot").text());
+            $("#sum_dif").html(Math.round(sum_dif * 100) / 100);
+        }
+    }, 300)
+}
 
-    function realEarning() {
-        var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
-        var op = parseFloat($("#op-credits-count span").text().replace("$", "").replace(",", "").trim());
-        var fullBal = Math.round((balance + op) * 100) / 100;
-        $(document).ajaxComplete(function (event, xhr, settings) {
-            if (settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2') {
-                $("#collapseIS").append("<div id='infoLoader' style='width: 100%; heigth: 100%; text-align: center;'><h1>Загрузка..." + mark + "</h1></div>");
-                $("#collapseIS .panel-body").css("display", "none");
-                var myData = new FormData();
-                var onSold = 0;
-                var userdbupd = "http://skinsdb.xyz/scripts/usersales.php";
-                myData.append("usersales", true);
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: userdbupd,
-                    data: myData,
-                    onload: function (result) {
-                        $(".btn.btn-primary.pull-right:contains('Download History')").before("<a href='http://skinsdb.xyz/?mySales' class='btn btn-primary pull-right' target='_blank'>Мои продажи " + mark + "</a>");
-                        $("#iTrans table thead th:contains('Your Cut')").after("<th style='text-align: center'>CS.Money (забрал)</th>");
-                        $("#iTrans table thead th:contains('CS.Money (забрал)')").after("<th style='text-align: center'>CS.Money -> Opskins</th>");
-                        $("#iTrans table tbody td:contains('On Sale')").before("<td class='skinDBcsmoops'>CSMOOPS (Loading.. / No info)</td>");
-                        $("#iTrans table tbody td:contains('CSMOOPS (Loading.. / No info)')").before("<td class='skinDBcsmprice'>CSMOPRICE (Loading..  / No info)</td>");
+function sellsinvChecker() {
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        if (settings['url'] == '/ajax/get_inventory.php?appid=730&contextid=2&osi=0') {
+            setTimeout(salesInfo, 500);
+        }
+    })
+};
 
-                        var myData = new FormData();
-                        var onSold = 0;
+function salesInfo() {
+    $("body").append('' +
+        '<div id="skinsDbSales" class="modal fade" role="dialog">' +
+        '<div class="modal-dialog">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+        '<h4 class="modal-title">Инфа про скин <span id="modalSkinName"></span>' + mark + '</h4>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<span>Hi</span>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>');
+    $("#skinsDbSales .modal-content").css({
+        "width": "800px",
+        "right": "10%"
+    });
+    showlogs("Загружено!" + mark);
+    $(".sell-item").on("click", function sellitem() {
+        $("#sell-selected-inspect-btn").attr("disabled", "disabled");
+        $("#realLowestPrice").remove();
+        var url,
+        skinname;
+        $("#sell-selected-inspect-btn").attr("href", "#");
+        $("#sell-selected-inspect-btn").attr("data-toggle", "modal");
+        $("#sell-selected-inspect-btn").attr("data-target", "#skinsDbSales");
+        $("#sell-selected-inspect-btn").css("background", "green");
+        $("#sell-selected-inspect-btn").text("Check Solds");
+        $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
+        url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
+        skinname = url.split("&sort");
+        skinname = skinname[0].split("&search_item=");
+        skinname = decodeURI(skinname[1]);
+        $("#modalSkinName").text(skinname);
+        var loaded = $.grep(skinsLoaded, function (e) {
+            return e.skinname == skinname;
+        });
+        if (typeof loaded[0] !== 'undefined') {
+            $("#skinsDbSales .modal-body").html("Not Loaded!");
+            $("#realLowestPrice").css("color", "green");
+            $("#realLowestPrice").html("<br>Real Lowest Price: " + loaded[0].price + "<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>" + loaded[0].moneyOps + "%</span>" +
+                "<span class='label label-success opsMoney'style='background-color:#dc1010'>" + loaded[0].opsMoney + "%</span></div>");
+            $("#sell-selected-inspect-btn").removeAttr("disabled");
+            if (typeof loaded[0].sels !== 'undefined') {
+                $("#skinsDbSales .modal-body").html(loaded[0].sels);
+            } else {
+                var index = -1;
+                for (var i = 0, len = skinsLoaded.length; i < len; i++) {
+                    if (skinsLoaded[i].skinnname === skinname) {
+                        index = i;
+                        break;
+                    }
+                }
+                skinsLoaded.splice(index, 1);
+            }
+            last20date("sell");
+            las20btn("sell");
+        } else {
+            $.post(url).done(function (e) {
+                var price = $(e).find(".item-amount").html();
+                var link = $(e).find(".market-link").attr("href");
+                if (typeof price !== 'undefined') {
+                    price = price.replace("$", "") + " $";
+                    $("#realLowestPrice").css("color", "green");
+                    var myData = new FormData();
+                    myData.append("data", skinname);
+                    myData.append("price", price);
+                    GM_xmlhttpRequest({
+                        method: "POST",
+                        url: scriptUrl,
+                        data: myData,
+                        onload: function (result) {
+                            skin = [];
+                            skin['skinname'] = skinname;
+                            skin['price'] = price;
+                            var res = jQuery.parseJSON(result.responseText);
+                            if (res['opsMoney']) {
+                                skin['moneyOps'] = res['moneyOps'];
+                                skin['opsMoney'] = res['opsMoney'];
+                            } else if (res['error']) {
+                                skin['opsMoney'] = res['Not Found'];
+                            } else {
+                                skin['opsMoney'] = res['Error'];
+                            }
+                            var newLink = "https://opskins.com/" + link;
+                            $.post(newLink).done(function (res) {
+                                var sels = $(res).find(".widget.clearfix").html();
+                                skin['sels'] = sels;
+                                skinsLoaded.push(skin);
+                            })
+                            sellitem();
+                        }
+                    })
+                } else {
+                    $("#realLowestPrice").html("<br>Ошибка!");
+                }
+            })
+        }
+    })
+}
 
-                        myData.append("usersales", true);
-                        GM_xmlhttpRequest({
-                            method: "POST",
-                            url: scriptUrl,
-                            data: myData,
-                            onload: function (result) {
-                                var res = jQuery.parseJSON(result.responseText);
-                                res = res[0];
-                                console.log(res);
-                                for (var i = 0; i < res.length; i++) {
-                                    if (res[i]["actual"] === "0") {
-                                        $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().children("td").children("a").css({
-                                            "color": "red",
-                                            "font-weight": "bold"
-                                        });
-                                    }
-                                    $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").text("$" + res[i]["csmoney"]);
-                                    $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").css("text-align", "center");
-                                    var opsprice = parseFloat($("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".editable").text().replace("$", "").trim());
-                                    var resmo = 100 - opsprice * 95 / res[i]["csmoney"];
-                                    var res2 = Math.round(resmo * 100) / 100;
-                                    ;
-                                    if (res2 > 0) {
-                                        res2 = -res2;
-                                    } else if (res2 < 0) {
-                                        res2 = res2 + res2 * (-2);
-                                    }
-                                    $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmoops").text(res2 + "%");
-                                    $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmoops").css("text-align", "center");
+function realEarning() {
+    var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
+    var op = parseFloat($("#op-credits-count span").text().replace("$", "").replace(",", "").trim());
+    var fullBal = Math.round((balance + op) * 100) / 100;
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        if (settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2') {
+            $("#collapseIS").append("<div id='infoLoader' style='width: 100%; heigth: 100%; text-align: center;'><h1>Загрузка..." + mark + "</h1></div>");
+            $("#collapseIS .panel-body").css("display", "none");
+            var myData = new FormData();
+            var onSold = 0;
+            var userdbupd = "http://skinsdb.xyz/scripts/usersales.php";
+            myData.append("usersales", true);
+            GM_xmlhttpRequest({
+                method: "POST",
+                url: userdbupd,
+                data: myData,
+                onload: function (result) {
+                    $(".btn.btn-primary.pull-right:contains('Download History')").before("<a href='http://skinsdb.xyz/?mySales' class='btn btn-primary pull-right' target='_blank'>Мои продажи " + mark + "</a>");
+                    $("#iTrans table thead th:contains('Your Cut')").after("<th style='text-align: center'>CS.Money (забрал)</th>");
+                    $("#iTrans table thead th:contains('CS.Money (забрал)')").after("<th style='text-align: center'>CS.Money -> Opskins</th>");
+                    $("#iTrans table tbody td:contains('On Sale')").before("<td class='skinDBcsmoops'>CSMOOPS (Loading.. / No info)</td>");
+                    $("#iTrans table tbody td:contains('CSMOOPS (Loading.. / No info)')").before("<td class='skinDBcsmprice'>CSMOPRICE (Loading..  / No info)</td>");
+
+                    var myData = new FormData();
+                    var onSold = 0;
+
+                    myData.append("usersales", true);
+                    GM_xmlhttpRequest({
+                        method: "POST",
+                        url: scriptUrl,
+                        data: myData,
+                        onload: function (result) {
+                            var res = jQuery.parseJSON(result.responseText);
+                            res = res[0];
+                            console.log(res);
+                            for (var i = 0; i < res.length; i++) {
+                                if (res[i]["actual"] === "0") {
+                                    $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().children("td").children("a").css({
+                                        "color": "red",
+                                        "font-weight": "bold"
+                                    });
+                                }
+                                $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").text("$" + res[i]["csmoney"]);
+                                $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").css("text-align", "center");
+                                var opsprice = parseFloat($("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".editable").text().replace("$", "").trim());
+                                var resmo = 100 - opsprice * 95 / res[i]["csmoney"];
+                                var res2 = Math.round(resmo * 100) / 100;
+                                ;
+                                if (res2 > 0) {
+                                    res2 = -res2;
+                                } else if (res2 < 0) {
+                                    res2 = res2 + res2 * (-2);
+                                }
+                                $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmoops").text(res2 + "%");
+                                $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmoops").css("text-align", "center");
                                     // console.log(res[i]['id']);
                                     $("#collapseIS .panel-body").css("display", "block");
                                     $("#infoLoader").remove();
@@ -2149,301 +2176,327 @@
                             }
                         })
 
-                        $("#iTrans table tbody tr td.editable").each(function () {
-                            var price = parseFloat($(this).text().replace("$", "").trim());
-                            onSold += price;
-                        })
-                        onSold = Math.round((onSold * 0.95) * 100) / 100;
-                        realFullB = Math.round((fullBal + onSold) * 100) / 100;
-                        $("span[id='sold-items-earned']")[1].innerHTML = "<span style='color:green; font-weight: bold;'>" + onSold + "$</span> + <span style='color:green; font-weight: bold;'>" + fullBal + "$</span> = " + realFullB + "$";
+                    $("#iTrans table tbody tr td.editable").each(function () {
+                        var price = parseFloat($(this).text().replace("$", "").trim());
+                        onSold += price;
+                    })
+                    onSold = Math.round((onSold * 0.95) * 100) / 100;
+                    realFullB = Math.round((fullBal + onSold) * 100) / 100;
+                    $("span[id='sold-items-earned']")[1].innerHTML = "<span style='color:green; font-weight: bold;'>" + onSold + "$</span> + <span style='color:green; font-weight: bold;'>" + fullBal + "$</span> = " + realFullB + "$";
 
-                    }
-                })
-            }
-        })
-    }
-
-    function addFilterBtn() {
-        var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
-        var url = "https://opskins.com/?loc=good_deals&app=730_2&search_item=&min=&max=" + balance + "&sort=dhl&stat=&grade=&exterior=&souvenir=&wear_range_low=0&wear_range_high=&type=&phase=&want_stickers=&sticker_search=";
-        $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
-    }
-
-    function friendssells() {
-
-        var myData = new FormData();
-        myData.append("friendssolds", true);
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: scriptUrl,
-            data: myData,
-            onload: function (result) {
-                res = JSON.parse(result.responseText);
-                console.log(res);
-                check(res);
-                $(document).ajaxComplete(function () {
-                    check(res);
-                });
-            }
-        })
-
-        function check(array){
-                console.log("working");
-                $("#scroll").children(".scanned").each(function () {
-                    if(typeof $(this).find(".friendsicon").html() === 'undefined') {
-                        var skinId = Number($(this).find(".market-name.market-link").attr("href").replace("?loc=shop_view_item&item=", ""));
-                        var loaded = $.grep(array, function (e) {
-                            return e.skinid == skinId;
-                        });
-                        if (typeof loaded[0] !== 'undefined') {
-                            $(this).find(".item-amount").before("<div class='buyers-club-icon friendsicon'><span><img src='" + loaded[0].sellerimg + "' alt='" + loaded[0].skinid + "' style='border-radius: 60px; border:3px solid green;width: 45px;' title='"+loaded[0].sellername+"'></span></div>")
-                        }
-                    }
-                })
-
-        }
-    }
-
-    function getautopick() {
-        var main = $("#scroll");
-        showlogs("Авто-пикер загружается..");
-        setTimeout(function () {
-            if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
-                location.reload();
-            }
-        }, 13000)
-        setInterval(botOpsChecker, 60000);
-        setTimeout(function () {
-            var skinsforcheck = [];
-            main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div><a href='javascript:;' class='btn btn-warning clear_picker'>Очистить</a></div></div>");
-            $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
-            $(".clear_picker").on("click", function () {
-                $(".scanned").remove();
+                }
             })
-            var display = $('.scrtimer span');
-            if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                console.log("Низкий баланс. Количество запросов ограничено");
-                showlogs("Низкий баланс. Количество запросов ограничено");
-                reloadpage(display, 10);
+}
+})
+}
 
-                if ($.cookie("role") === "admin") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
-                } else if ($.cookie("role") === "superuser") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
-                }
-            } else {
-                reloadpage(display, 35);
+function addFilterBtn() {
+    var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
+    var url = "https://opskins.com/?loc=good_deals&app=730_2&search_item=&min=&max=" + balance + "&sort=dhl&stat=&grade=&exterior=&souvenir=&wear_range_low=0&wear_range_high=&type=&phase=&want_stickers=&sticker_search=";
+    $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
+}
 
-                if ($.cookie("role") === "admin") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                } else if ($.cookie("role") === "superuser") {
-                    getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
+function friendssells() {
+
+    var myData = new FormData();
+    myData.append("friendssolds", true);
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: scriptUrl,
+        data: myData,
+        onload: function (result) {
+            res = JSON.parse(result.responseText);
+            console.log(res);
+            check(res);
+            $(document).ajaxComplete(function () {
+                check(res);
+            });
+        }
+    })
+
+    function check(array){
+        console.log("working");
+        $("#scroll").children(".scanned").each(function () {
+            if(typeof $(this).find(".friendsicon").html() === 'undefined') {
+                var skinId = Number($(this).find(".market-name.market-link").attr("href").replace("?loc=shop_view_item&item=", ""));
+                var loaded = $.grep(array, function (e) {
+                    return e.skinid == skinId;
+                });
+                if (typeof loaded[0] !== 'undefined') {
+                    $(this).find(".item-amount").before("<div class='buyers-club-icon friendsicon'><span><img src='" + loaded[0].sellerimg + "' alt='" + loaded[0].skinid + "' style='border-radius: 60px; border:3px solid green;width: 45px;' title='"+loaded[0].sellername+"'></span></div>")
                 }
             }
+        })
 
-            function getFunction() {
-                var errors = $(".errorsSkins");
-                var allskins = $(".AllSkins");
-                var checkedskins = $(".checkedSkins");
-                var buyedskins = $(".buyedSkins");
-                $("#loading").remove();
-                $.get("https://opskins.com/ajax/browse_scroll.php?page=1&appId=730&contextId=2").done(function (res) {
+    }
+}
 
-                    var parsed = $.parseHTML(res);
-                    var i;
-                    allskins.html(parseInt(allskins.text()) + (parsed.length - 2));
+function getautopick() {
+    var main = $("#scroll");
+    showlogs("Авто-пикер загружается..");
+    setTimeout(function () {
+        if ($(".AllSkins").html() === "0" || $(".AllSkins").html() === "" || typeof $(".AllSkins").html() === "undefined") {
+            location.reload();
+        }
+    }, 13000)
+    setInterval(botOpsChecker, 60000);
+    setTimeout(function () {
+        var skinsforcheck = [];
+        main.html("<div style='text-align: center; margin: 2% auto; font-size: 21px; font-weight: bold;'><div>Пройдено: <span class='AllSkins'>0</span> скинов</div><div>Проверено: <span class='checkedSkins'>0</span></div><div><a href='javascript:;' class='btn btn-warning clear_picker'>Очистить</a></div></div>");
+        $("#scroll div:first").prepend("<div class='scrtimer' style='margin-bottom: 40px'><span></span></div>");
+        $(".clear_picker").on("click", function () {
+            $(".scanned").remove();
+        })
+        var display = $('.scrtimer span');
+        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+            console.log("Низкий баланс. Количество запросов ограничено");
+            showlogs("Низкий баланс. Количество запросов ограничено");
+            reloadpage(display, 10);
 
-                    for (i = 2; i < parsed.length; i++) {
-                        var html = parsed[i].innerHTML;
-                        var buyer = parsed[i].className.indexOf("buyers-club-item-sm") + 1;
-                        var wear = $(html).find('.text-muted').html()
-                        var grade = $(html).find('.text-muted').next().html();
-                        var name = $(html).find(".market-name.market-link").html().trim();
-                        if (wear !== "") {
-                            var phase = $(html).find('.text-muted').next().html();
-                            switch (phase) {
-                                case '★ Covert Knife (Ruby)' :
-                                    phase = " Ruby";
-                                    break;
-                                case '★ Covert Knife (Sapphire)' :
-                                    phase = " Sapphire";
-                                    break;
-                                case '★ Covert Knife (Black Pearl)' :
-                                    phase = " Black Pearl";
-                                    break;
-                                case '★ Covert Knife (Emerald)' :
-                                    phase = " Emerald";
-                                    break;
-                                default:
-                                    phase = phase.replace(/[/^\D+/()]/g, '');
-                            }
-                            switch (phase) {
-                                case '1' :
-                                    phase = " Phase 1";
-                                    break;
-                                case '2' :
-                                    phase = " Phase 2";
-                                    break;
-                                case '3' :
-                                    phase = " Phase 3";
-                                    break;
-                                case '4' :
-                                    phase = " Phase 4";
-                                    break;
-                                case '' :
-                                    phase = "";
-                                    break;
-                            }
-                            name = name + phase + " (" + wear + ")";
+            if ($.cookie("role") === "admin") {
+                getAutoInt = setTimeout(getFunction, randomInteger(50000, 100000));
+            } else if ($.cookie("role") === "superuser") {
+                getAutoInt = setTimeout(getFunction, randomInteger(60000, 120000));
+            }
+        } else {
+            reloadpage(display, 35);
+
+            if ($.cookie("role") === "admin") {
+                getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+            } else if ($.cookie("role") === "superuser") {
+                getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
+            }
+        }
+
+        function getFunction() {
+            var errors = $(".errorsSkins");
+            var allskins = $(".AllSkins");
+            var checkedskins = $(".checkedSkins");
+            var buyedskins = $(".buyedSkins");
+            $("#loading").remove();
+            $.get("https://opskins.com/ajax/browse_scroll.php?page=1&appId=730&contextId=2").done(function (res) {
+
+                var parsed = $.parseHTML(res);
+                var i;
+                allskins.html(parseInt(allskins.text()) + (parsed.length - 2));
+
+                for (i = 2; i < parsed.length; i++) {
+                    var html = parsed[i].innerHTML;
+                    var buyer = parsed[i].className.indexOf("buyers-club-item-sm") + 1;
+                    var wear = $(html).find('.text-muted').html()
+                    var grade = $(html).find('.text-muted').next().html();
+                    var name = $(html).find(".market-name.market-link").html().trim();
+                    if (wear !== "") {
+                        var phase = $(html).find('.text-muted').next().html();
+                        switch (phase) {
+                            case ' Covert Knife (Ruby)' :
+                            phase = " Ruby";
+                            break;
+                            case ' Covert Knife (Sapphire)' :
+                            phase = " Sapphire";
+                            break;
+                            case ' Covert Knife (Black Pearl)' :
+                            phase = " Black Pearl";
+                            break;
+                            case ' Covert Knife (Emerald)' :
+                            phase = " Emerald";
+                            break;
+                            default:
+                            phase = phase.replace(/[/^\D+/()]/g, '');
                         }
-                        var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
-                        var skinId = $(html).find(".market-link").attr("href").split("&item=");
-                        skinId = skinId[1];
-
-                        if (buyer === 0 && grade !== "Base Grade Key") {
-                            var skin = {};
-                            skin['skinName'] = name;
-                            skin['skinPrice'] = parseFloat(amount);
-                            skin['skinId'] = skinId;
-                            skin['html'] = html;
-                            skinsforcheck.push(skin);
+                        switch (phase) {
+                            case '1' :
+                            phase = " Phase 1";
+                            break;
+                            case '2' :
+                            phase = " Phase 2";
+                            break;
+                            case '3' :
+                            phase = " Phase 3";
+                            break;
+                            case '4' :
+                            phase = " Phase 4";
+                            break;
+                            case '' :
+                            phase = "";
+                            break;
                         }
+                        name = name + phase + " (" + wear + ")";
                     }
+                    var amount = $(html).find(".item-amount").html().replace("$", "").replace(",", "");
+                    var skinId = $(html).find(".market-link").attr("href").split("&item=");
+                    skinId = skinId[1];
 
-                    var n;
-                    var beforeW = 0;
-                    var random, resom = 0, opsmo = 0;
-
-                    var forBuyCounter = 0;
-                    var realBuyCounter = 0;
-
-                    if ($.cookie("savedDisc")) {
-                        savedDiscount = $.cookie("savedDisc");
+                    if (buyer === 0 && grade !== "Base Grade Key") {
+                        var skin = {};
+                        skin['skinName'] = name;
+                        skin['skinPrice'] = parseFloat(amount);
+                        skin['skinId'] = skinId;
+                        skin['html'] = html;
+                        skinsforcheck.push(skin);
                     }
+                }
 
-                    function getQuery(skinId, random, last, opsprice, opsmo, skinname, html, date, count, changer_price) {
-                        setTimeout(function () {
-                            random = randomInteger(1, 100);
+                var n;
+                var beforeW = 0;
+                var random, resom = 0, opsmo = 0;
+
+                var forBuyCounter = 0;
+                var realBuyCounter = 0;
+
+                if ($.cookie("savedDisc")) {
+                    savedDiscount = $.cookie("savedDisc");
+                }
+
+                function getQuery(skinId, random, last, opsprice, opsmo, skinname, html, date, count, changer_price) {
+                    setTimeout(function () {
+                        random = randomInteger(1, 100);
                             // oneClickBuyScr(skinId, opsprice, skinname, opsmo, last);
                             main.append('<div id="' + random + skinId + '" class="featured-item col-sxs-12 col-xs-6 col-sm-6 col-md-4 col-lg-3 center-block app_730_2 item_186106056 has-wear scanned">' + html + '</div>');
                             $("#" + random + skinId).find(".btn.btn-success").attr("onclick", $(html).find(".btn.btn-success").attr('onclick') + ";$(this).closest('.scanned').remove();");
                             $("#" + random + skinId).prepend('<div style="position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;"><span class="label label-success priceBtn" data-ext="autoparse" style="cursor: pointer; background-color: rgb(210, 29, 37); font-size: 90%; z-index: 999;"><span class="realOpsmo">' + opsmo + '</span>%</span></div>');
                             $("#" + random + skinId).prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + date + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + changer_price + "$)" + (count ? " - " + count + " шт." : "") + "</span></div>");
                         })
-                    }
+                }
 
+                for (i = 0; i < skinsforcheck.length; i++) {
+                    var target = skinsforcheck[i]['skinName'];
+                    var result = $.grep(skinsdbprices, function (e) {
+                        return e.skinname == target;
+                    });
+                    if (typeof result[0] != 'undefined' && result[0].actual === "fine") {
+                        resom = 100 - (skinsforcheck[i]['skinPrice'] * 100) / (result[0].price * 0.97);
+                        opsmo = Math.round(resom * 100) / 100;
+                        if (opsmo > savedDiscount) {
+                            forBuyCounter++;
+                        }
+                    }
+                }
+                checkedskins.html(parseInt(checkedskins.text()) + skinsforcheck.length);
+                if (skinsforcheck.length > 0) {
                     for (i = 0; i < skinsforcheck.length; i++) {
                         var target = skinsforcheck[i]['skinName'];
                         var result = $.grep(skinsdbprices, function (e) {
                             return e.skinname == target;
                         });
-                        if (typeof result[0] != 'undefined' && result[0].actual === "fine") {
+                        if (typeof result[0] !== 'undefined' && result[0].actual === "fine") {
                             resom = 100 - (skinsforcheck[i]['skinPrice'] * 100) / (result[0].price * 0.97);
                             opsmo = Math.round(resom * 100) / 100;
                             if (opsmo > savedDiscount) {
-                                forBuyCounter++;
-                            }
-                        }
-                    }
-                    checkedskins.html(parseInt(checkedskins.text()) + skinsforcheck.length);
-                    if (skinsforcheck.length > 0) {
-                        for (i = 0; i < skinsforcheck.length; i++) {
-                            var target = skinsforcheck[i]['skinName'];
-                            var result = $.grep(skinsdbprices, function (e) {
-                                return e.skinname == target;
-                            });
-                            if (typeof result[0] !== 'undefined' && result[0].actual === "fine") {
-                                resom = 100 - (skinsforcheck[i]['skinPrice'] * 100) / (result[0].price * 0.97);
-                                opsmo = Math.round(resom * 100) / 100;
-                                if (opsmo > savedDiscount) {
-                                    realBuyCounter++;
-                                    console.log("Я бы купил: " + skinsforcheck[i]['skinName'] + " в " + opsmo + " % за" + skinsforcheck[i]['skinPrice'] + " $");
-                                    if (realBuyCounter === forBuyCounter) {
-                                        var last = "update";
-                                        getQuery(skinsforcheck[i]['skinId'], random, last, skinsforcheck[i]['skinPrice'] * 100, opsmo, skinsforcheck[i]['skinName'], skinsforcheck[i]['html'], result[0].dataupd, result[0].counter, result[0].price);
-                                    } else {
-                                        getQuery(skinsforcheck[i]['skinId'], random, false, skinsforcheck[i]['skinPrice'] * 100, opsmo, skinsforcheck[i]['skinName'], skinsforcheck[i]['html'], result[0].dataupd, result[0].counter, result[0].price);
-                                    }
+                                realBuyCounter++;
+                                console.log("Я бы купил: " + skinsforcheck[i]['skinName'] + " в " + opsmo + " % за" + skinsforcheck[i]['skinPrice'] + " $");
+                                if (realBuyCounter === forBuyCounter) {
+                                    var last = "update";
+                                    getQuery(skinsforcheck[i]['skinId'], random, last, skinsforcheck[i]['skinPrice'] * 100, opsmo, skinsforcheck[i]['skinName'], skinsforcheck[i]['html'], result[0].dataupd, result[0].counter, result[0].price);
+                                } else {
+                                    getQuery(skinsforcheck[i]['skinId'], random, false, skinsforcheck[i]['skinPrice'] * 100, opsmo, skinsforcheck[i]['skinName'], skinsforcheck[i]['html'], result[0].dataupd, result[0].counter, result[0].price);
                                 }
                             }
-                            if (i === (skinsforcheck.length - 1)) {
-                                if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                                    console.log("Низкий баланс. Количество запросов ограничено");
-                                    showlogs("Низкий баланс. Количество запросов ограничено");
-                                    random = randomInteger(50000, 120000)
-                                    setTimeout(function () {
-                                        if ($.cookie("role") === "admin") {
-                                            getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
-                                        } else if ($.cookie("role") === "superuser") {
-                                            getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
-                                        }
-                                    }, random + 2000)
-                                } else {
+                        }
+                        if (i === (skinsforcheck.length - 1)) {
+                            if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+                                console.log("Низкий баланс. Количество запросов ограничено");
+                                showlogs("Низкий баланс. Количество запросов ограничено");
+                                random = randomInteger(50000, 120000)
+                                setTimeout(function () {
                                     if ($.cookie("role") === "admin") {
                                         getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
                                     } else if ($.cookie("role") === "superuser") {
                                         getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
                                     }
-                                }
-                                document.title = $(".scanned").length + mark;
-                            }
-                        }
-                    } else {
-                        if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                            console.log("Низкий баланс. Количество запросов ограничено");
-                            showlogs("Низкий баланс. Количество запросов ограничено");
-                            random = randomInteger(50000, 120000)
-                            setTimeout(function () {
+                                }, random + 2000)
+                            } else {
                                 if ($.cookie("role") === "admin") {
                                     getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
                                 } else if ($.cookie("role") === "superuser") {
                                     getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
                                 }
-                            }, random + 2000)
-                        } else {
+                            }
+                            document.title = $(".scanned").length + mark;
+                        }
+                    }
+                } else {
+                    if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
+                        console.log("Низкий баланс. Количество запросов ограничено");
+                        showlogs("Низкий баланс. Количество запросов ограничено");
+                        random = randomInteger(50000, 120000)
+                        setTimeout(function () {
                             if ($.cookie("role") === "admin") {
                                 getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
                             } else if ($.cookie("role") === "superuser") {
                                 getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
                             }
+                        }, random + 2000)
+                    } else {
+                        if ($.cookie("role") === "admin") {
+                            getAutoInt = setTimeout(getFunction, randomInteger(4000, 8000));
+                        } else if ($.cookie("role") === "superuser") {
+                            getAutoInt = setTimeout(getFunction, randomInteger(5000, 9000));
                         }
                     }
-                    skinsforcheck = [];
-
-                }).fail(function (xhr, status, error) {
-                    if (xhr['status'] === '503') {
-
-                        errors.css("color", "red");
-                        errors.html("Скоре всего у тебя бан IP.. Сори!");
-
-                    }
-                })
-            }
-        }, 1100)
-    }
-
-    function botOpsChecker() {
-        opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: opsUrl,
-            onload: function (result) {
-                if ($(result.responseText).find(".error#message").html()) {
-                    location.reload();
-                } else {
-                    showlogs("Бото-проверка прошла успешно!");
                 }
+                skinsforcheck = [];
+
+            }).fail(function (xhr, status, error) {
+                if (xhr['status'] === '503') {
+
+                    errors.css("color", "red");
+                    errors.html("Скоре всего у тебя бан IP.. Сори!");
+
+                }
+            })
+        }
+    }, 1100)
+}
+
+function buyerChecker(){
+
+    if(typeof $(document).find(".buyers-club-icon span").html() !== 'undefined'){
+        $(".item-amount").after("<span class='fa fa-spinner fa-spin'></span>")
+        var timer = $(".item-amount").after("<div class='skinsdbTimer'></div>");
+        var timetoupd = 3000;
+
+        setInterval(function(){
+            var currentBuyer = $(document).find(".buyers-club-icon span").attr("class");
+            $.post(site).done(function(callback){
+                var updatedBuyer = $(callback).find(".buyers-club-icon span").attr("class");
+                if(typeof $(callback).find(".buyers-club-icon").html() !== 'undefined'){
+                   $(document).find(".buyers-club-icon").html($(callback).find(".buyers-club-icon").html());
+                   if(currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") && $(".skinsdbTimer").html() === ""){
+                    startTimer(60,$(".skinsdbTimer"));
+                }
+                console.log(currentBuyer);
+            }else{
+                $(document).find(".buyers-club-icon").remove();
+                $(document).find(".skinsdbTimer").remove();
             }
         });
-    }
+        },timetoupd)
+    }    
+}
 
-    function reloadpage(display, timetorealod) {
-        startTimer(timetorealod * 60, display);
-        setTimeout(function () {
-            $(".mystery-item-inner .live-listings i.fa-play-circle").click();
-            location.reload();
-        }, timetorealod * 60000);
-    }
+function botOpsChecker() {
+    opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";
+    GM_xmlhttpRequest({
+        method: "POST",
+        url: opsUrl,
+        onload: function (result) {
+            if ($(result.responseText).find(".error#message").html()) {
+                location.reload();
+            } else {
+                showlogs("Бото-проверка прошла успешно!");
+            }
+        }
+    });
+}
+
+function reloadpage(display, timetorealod) {
+    startTimer(timetorealod * 60, display);
+    setTimeout(function () {
+        $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+        location.reload();
+    }, timetorealod * 60000);
+}
 
     // Additional functions
     function chromemes(mesbody) {
@@ -2503,7 +2556,7 @@
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            display.text("Перезагрузка через " + minutes + ":" + seconds);
+            display.text(minutes + ":" + seconds);
 
             if (--timer < 0) {
                 timer = duration;

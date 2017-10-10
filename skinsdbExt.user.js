@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.061
+// @version      2.062
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.061;
+var version = 2.062;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -145,6 +145,9 @@ var version = 2.061;
     if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
         dopplerChecker();
     }
+    if (site == "http://skinsdb.online/?knifes_checker") {
+        knifeChecker();
+    }
     steamAccept();
 }());
 
@@ -200,7 +203,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
         last20date();
         las20btn();
-        oneItemDiscount();
+        // oneItemDiscount();
         buyerChecker();
     }
     if (site == "https://opskins.com/?loc=shop_checkout") {
@@ -794,6 +797,73 @@ function offerAccept() {
             ConfirmTradeOffer();
         }
     }, 3000);
+}
+
+function knifeChecker() {
+    var knifes = [];
+    knifes_query();
+    function knifes_query(){
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: "https://opskins.com/?app=730_2&loc=shop_search&sort=n&type=k",
+            onload: function (result){
+               $(result.responseText).find("#scroll").children().each(function (i) {
+                   if(i > 0){
+                       var wear = $(this).find('.text-muted').html()
+                       var grade = $(this).find('.text-muted').next().html();
+                       var name = $(this).find(".market-name.market-link").html().trim();
+                       if (wear !== "") {
+                           var phase = $(this).find('.text-muted').next().html();
+                           switch (phase) {
+                               case ' Covert Knife (Ruby)' :
+                                   phase = " Ruby";
+                                   break;
+                               case ' Covert Knife (Sapphire)' :
+                                   phase = " Sapphire";
+                                   break;
+                               case ' Covert Knife (Black Pearl)' :
+                                   phase = " Black Pearl";
+                                   break;
+                               case ' Covert Knife (Emerald)' :
+                                   phase = " Emerald";
+                                   break;
+                               default:
+                                   phase = phase.replace(/[/^\D+/()]/g, '');
+                           }
+                           switch (phase) {
+                               case '1' :
+                                   phase = " Phase 1";
+                                   break;
+                               case '2' :
+                                   phase = " Phase 2";
+                                   break;
+                               case '3' :
+                                   phase = " Phase 3";
+                                   break;
+                               case '4' :
+                                   phase = " Phase 4";
+                                   break;
+                               case '' :
+                                   phase = "";
+                                   break;
+                           }
+                           name = name + phase + " (" + wear + ")";
+                       }
+                       var amount = $(this).find(".item-amount").html().replace("$", "").replace(",", "");
+                       var skinId = $(this).find(".market-link").attr("href").split("&item=");
+                       skinId = skinId[1];
+
+                       var skin = {};
+                       skin['skinName'] = name;
+                       skin['skinPrice'] = parseFloat(amount);
+                       skin['skinId'] = skinId;
+                       knifes.push(skin);
+                   }
+               });
+               console.log(knifes);
+            }
+        })
+    }
 }
 
 function dopplerChecker() {

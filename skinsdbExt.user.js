@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.062
+// @version      2.07
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.062;
+var version = 2.07;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -203,7 +203,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
         last20date();
         las20btn();
-        // oneItemDiscount();
+        oneItemDiscount();
         buyerChecker();
     }
     if (site == "https://opskins.com/?loc=shop_checkout") {
@@ -366,7 +366,7 @@ function sugestedDiscount(element) {
 };
 
 function oneItemDiscount() {
-    newgetprices();
+    newgetprices(true);
     $(".featured-item-large").addClass('featured-item').addClass('scanned');
     $(".scanned").prepend("<div class='priceBtn'>Price</div>");
     $(".priceBtn").css({
@@ -379,7 +379,7 @@ function oneItemDiscount() {
         "margin-right": "30px",
         "z-index": 999
     });
-    setTimeout(newloadallprices, 600);
+    // setTimeout(newloadallprices, 600);
 }
 
 function parseprice(red_btn, opd) {
@@ -935,10 +935,12 @@ function dopplerChecker() {
             method: "POST",
             url: opsUrl,
             onload: function (result) {
-                var res = $(result.responseText).find(".item-amount").html();
-                if ($(result.responseText).find(".alert-danger").html()) {
-                    console.log($(result.responseText).find(".alert-danger").html());
-                    if ($(result.responseText).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
+                var txt = result.responseText;
+                var cleanTxt= txt.replace(/<img[^>]*>/g, "");
+                var res = $(cleanTxt).find(".item-amount").html();
+                if ($(cleanTxt).find(".alert-danger").html()) {
+                    console.log($(cleanTxt).find(".alert-danger").html());
+                    if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
                         $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
                     if (counter < length - 1 && status === true) {
                         var timeer = randomInteger(600, 1600);
@@ -960,12 +962,12 @@ function dopplerChecker() {
                             }, timeer)
                         }
                     }
-                } else if ($(result.responseText).find(".error#message").html()) {
+                } else if ($(cleanTxt).find(".error#message").html()) {
                     var newWindow = window.open(opsUrl);
                     $(".doppler_check").removeAttr("disabled");
-                } else if ($(result.responseText).find("title").html() == "opskins.com | 504: Gateway time-out") {
+                } else if ($(cleanTxt).find("title").html() == "opskins.com | 504: Gateway time-out") {
                     newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
-                } else if ($(result.responseText).find("title").html() == "502 Bad Gateway") {
+                } else if ($(cleanTxt).find("title").html() == "502 Bad Gateway") {
                     newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                 }
                 else {
@@ -1021,7 +1023,7 @@ function dopplerChecker() {
     }
 }
 
-function newgetprices() {
+function newgetprices(start) {
     if (skinsdbprices.length > 0) {
         delete skinsdbprices;
         skinsdbprices = [];
@@ -1037,6 +1039,9 @@ function newgetprices() {
             res = res[0];
             skinsdbprices.push(res);
             skinsdbprices = skinsdbprices[0];
+            if(start){
+                newloadallprices();
+            }
         }
     })
 }
@@ -1155,7 +1160,7 @@ function newloadallprices(opd) {
                 } else {
                     skinName = skinName.trim();
                 }
-                console.log(skinName);
+                // console.log(skinName);
                 var loaded = $.grep(skinsdbprices, function (e) {
                     return e.skinname == skinName;
                 });
@@ -1218,14 +1223,14 @@ function newloadallprices(opd) {
 }
 
 function loadallprices() {
-    newgetprices();
+    newgetprices(true);
     setInterval(function () {
         newgetprices();
         showlogs("Цены обновлены" + mark);
     }, 30000)
-    setTimeout(function () {
-        newloadallprices();
-    }, 800)
+    // setTimeout(function () {
+    //     newloadallprices();
+    // }, 800)
     $(document).ajaxComplete(function () {
         newloadallprices();
     });
@@ -1762,14 +1767,16 @@ function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
         method: "POST",
         url: opsUrl,
         onload: function (result) {
-            if ($(result.responseText).find(".alert-danger").html()) {
-                console.log($(result.responseText).find(".alert-danger").html());
+            var txt = result.responseText;
+            var resC = txt.replace(/<img[^>]*>/g, "");
+            if ($(resC).find(".alert-danger").html()) {
+                console.log($(resC).find(".alert-danger").html());
                 $("div[" + blockName + "='" + fullName + "']").children(".parse_button").html("Not Found");
-            } else if ($(result.responseText).find(".error#message").html()) {
+            } else if ($(resC).find(".error#message").html()) {
                 var newWindow = window.open(opsUrl);
                 $("div[" + blockName + "='" + fullName + "']").children(".parse_button").html("Try again");
             } else {
-                var res = $(result.responseText).find(".item-amount").html().replace("$", "").replace(",", "");
+                var res = $(resC).find(".item-amount").html().replace("$", "").replace(",", "");
                 skin = {};
                 skin['fullname'] = fullName;
                 skin['opsprice'] = res;
@@ -2189,8 +2196,8 @@ function salesInfo() {
 }
 
 function realEarning() {
-    var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
-    var op = parseFloat($("#op-credits-count span").text().replace("$", "").replace(",", "").trim());
+    var balance = parseFloat($(".op-count").html().replace("$", "").replace(",", ""));
+    var op = parseFloat($(".op-credits-count span").text().replace("$", "").replace(",", "").trim());
     var fullBal = Math.round((balance + op) * 100) / 100;
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2') {

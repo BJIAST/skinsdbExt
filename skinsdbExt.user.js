@@ -1121,16 +1121,16 @@ function newloadallprices(opd) {
 
                     var phase = route.find(".text-muted").next().html();
                     switch (phase) {
-                        case ' Covert Knife (Ruby)' :
+                        case '★ Covert Knife (Ruby)' :
                             phase = " Ruby";
                             break;
-                        case ' Covert Knife (Sapphire)' :
+                        case '★ Covert Knife (Sapphire)' :
                             phase = " Sapphire";
                             break;
-                        case ' Covert Knife (Black Pearl)' :
+                        case '★ Covert Knife (Black Pearl)' :
                             phase = " Black Pearl";
                             break;
-                        case ' Covert Knife (Emerald)' :
+                        case '★ Covert Knife (Emerald)' :
                             phase = " Emerald";
                             break;
                         default:

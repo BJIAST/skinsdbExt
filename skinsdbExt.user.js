@@ -1119,7 +1119,7 @@ function newloadallprices(opd) {
                 if (route.find(".text-muted").html() != "") {
                     var exterior = "(" + route.find(".text-muted").html() + ")";
 
-                    var phase = route.find(".text-muted").next().html();
+                    var phase = route.find(".text-muted").next().html().replace(" StatTrak™","");
                     switch (phase) {
                         case '★ Covert Knife (Ruby)' :
                             phase = " Ruby";

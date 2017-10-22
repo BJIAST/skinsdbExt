@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.07
+// @version      2.071
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.07;
+var version = 2.071;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -411,18 +411,18 @@ function parseprice(red_btn, opd) {
         var skinPrice = $(this).parent().parent().find(".item-amount").text();
         if ($(this).parent().parent().find(".text-muted").html() != "") {
             var exterior = "(" + $(this).parent().parent().find(".text-muted").html() + ")";
-            var phase = $(this).parent().parent().find(".text-muted").next().html();
+            var phase = $(this).parent().parent().find(".text-muted").next().html().replace(" StatTrak™","");
             switch (phase) {
-                case ' Covert Knife (Ruby)' :
+                case '★ Covert Knife (Ruby)' :
                     phase = " Ruby";
                     break;
-                case ' Covert Knife (Sapphire)' :
+                case '★ Covert Knife (Sapphire)' :
                     phase = " Sapphire";
                     break;
-                case ' Covert Knife (Black Pearl)' :
+                case '★ Covert Knife (Black Pearl)' :
                     phase = " Black Pearl";
                     break;
-                case ' Covert Knife (Emerald)' :
+                case '★ Covert Knife (Emerald)' :
                     phase = " Emerald";
                     break;
                 default:
@@ -601,18 +601,18 @@ function las20btn(page = "item") {
             var unavailable = $(".item-add");
             if ($(".item-desc").children(".text-muted").html() != "") {
                 var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-                var phase = $(".text-muted").next().html();
+                var phase = $(".text-muted").next().html().replace(" StatTrak™","");
                 switch (phase) {
-                    case ' Covert Knife (Ruby)' :
+                    case '★ Covert Knife (Ruby)' :
                         phase = " Ruby";
                         break;
-                    case ' Covert Knife (Sapphire)' :
+                    case '★ Covert Knife (Sapphire)' :
                         phase = " Sapphire";
                         break;
-                    case ' Covert Knife (Black Pearl)' :
+                    case '★ Covert Knife (Black Pearl)' :
                         phase = " Black Pearl";
                         break;
-                    case ' Covert Knife (Emerald)' :
+                    case '★ Covert Knife (Emerald)' :
                         phase = " Emerald";
                         break;
                     default:
@@ -1091,7 +1091,7 @@ function newloadallprices(opd) {
             var route = $(this);
             if (route.find(".priceBtn").html() === 'Price') {
                 var skinName = route.find(".market-link").html();
-                var skinPrice = route.find(".item-amount").html().replace("$", "");
+                var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",","");
                 var unavailable = route.find(".item-add");
                 if (unavailable.html()) {
                     if (opd === "opd") {

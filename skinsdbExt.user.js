@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.071
+// @version      2.072
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.071;
+var version = 2.072;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -700,18 +700,18 @@ function last20date(page = 'item') {
         var unavailable = $(".item-add");
         if ($(".item-desc").children(".text-muted").html() != "") {
             var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-            var phase = $(".text-muted").next().html();
+            var phase = $(".text-muted").next().html().replace(" StatTrak™", "");
             switch (phase) {
-                case ' Covert Knife (Ruby)' :
+                case '★ Covert Knife (Ruby)' :
                     phase = " Ruby";
                     break;
-                case ' Covert Knife (Sapphire)' :
+                case '★ Covert Knife (Sapphire)' :
                     phase = " Sapphire";
                     break;
-                case ' Covert Knife (Black Pearl)' :
+                case '★ Covert Knife (Black Pearl)' :
                     phase = " Black Pearl";
                     break;
-                case ' Covert Knife (Emerald)' :
+                case '★ Covert Knife (Emerald)' :
                     phase = " Emerald";
                     break;
                 default:
@@ -877,7 +877,7 @@ function dopplerChecker() {
     })
     var statusChecker = (Cookies.get("cycle") ? "checked" : "");
     if (site === "http://skinsdb.online/?doppler_search") {
-        $("#tab_content10 .check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
+        $("#tab_content11 .check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
     } else {
         $(".check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
 
@@ -971,52 +971,56 @@ function dopplerChecker() {
                     newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                 }
                 else {
-                    // console.log(result);
-                    // console.log(result.responseText);
-                    res = res.replace("$", "");
-                    res = res.replace(",", "");
-                    var price = res;
-                    res = 100 - (res * 100) / (chprice * 0.97);
-                    res = Math.round(res * 100) / 100;
-                    var date = new Date();
-                    $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
-                    $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
-                    $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
-                    if (res > discount) {
-                        $(btn).parent().find("#count-" + id).parent().find(".discount").css({
-                            "color": "green",
-                            "font-weight": "bold"
-                        });
-                        window.open(opsUrl);
-                        soundFound.volume = 1;
-                        soundFound.play();
-                        chromemes("Найден скин " + skinname + " в " + res + "%");
-                    } else if (discount - res < 1.2) {
-                        $(btn).parent().find("#count-" + id).parent().find(".discount").css({
-                            "color": "blue",
-                            "font-weight": "bold"
-                        });
-                    }
-                    if (counter < length - 1 && status === true) {
-                        var timeer = randomInteger(600, 1600);
+                   if(res){
+                       // console.log(result);
+                       // console.log(result.responseText);
+                       res = res.replace("$", "");
+                       res = res.replace(",", "");
+                       var price = res;
+                       res = 100 - (res * 100) / (chprice * 0.97);
+                       res = Math.round(res * 100) / 100;
+                       var date = new Date();
+                       $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
+                       $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
+                       $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
+                       if (res > discount) {
+                           $(btn).parent().find("#count-" + id).parent().find(".discount").css({
+                               "color": "green",
+                               "font-weight": "bold"
+                           });
+                           window.open(opsUrl);
+                           soundFound.volume = 1;
+                           soundFound.play();
+                           chromemes("Найден скин " + skinname + " в " + res + "%");
+                       } else if (discount - res < 1.2) {
+                           $(btn).parent().find("#count-" + id).parent().find(".discount").css({
+                               "color": "blue",
+                               "font-weight": "bold"
+                           });
+                       }
+                       if (counter < length - 1 && status === true) {
+                           var timeer = randomInteger(600, 1600);
 
-                        counter++;
-                        $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                        checks = setTimeout(function () {
-                            dopplerPrice(counter, btn);
-                        }, timeer)
-                    } else {
-                        if (typeof Cookies.get("cycle") === "undefined") {
-                            $(".doppler_check").removeAttr("disabled");
-                            $(".loaderDoplers").html("Готов к работе");
-                        } else {
-                            counter = 0;
-                            $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                            checks = setTimeout(function () {
-                                dopplerPrice(counter, btn);
-                            }, timeer)
-                        }
-                    }
+                           counter++;
+                           $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                           checks = setTimeout(function () {
+                               dopplerPrice(counter, btn);
+                           }, timeer)
+                       } else {
+                           if (typeof Cookies.get("cycle") === "undefined") {
+                               $(".doppler_check").removeAttr("disabled");
+                               $(".loaderDoplers").html("Готов к работе");
+                           } else {
+                               counter = 0;
+                               $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                               checks = setTimeout(function () {
+                                   dopplerPrice(counter, btn);
+                               }, timeer)
+                           }
+                       }
+                   }else{
+                       newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                   }
                 }
             }
         })

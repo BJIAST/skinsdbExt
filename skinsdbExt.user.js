@@ -1226,7 +1226,7 @@ function newloadallprices(opd) {
         })
     }
     function overstockChecker(skin) {
-        var htmlres = "<button class='overstockChecker' skin='"+skin+"' style='border:0;cursor: pointer; background-color: rgb(210, 29, 37); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;'>Проверить</button>";
+        var htmlres = "<button class='overstockChecker' skin='"+skin+"' style='border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;'>Проверить</button>";
         return htmlres;
     }
     $(".overstockChecker").on("click",function () {
@@ -1240,6 +1240,7 @@ function newloadallprices(opd) {
             onload: function (result) {
                 var res = jQuery.parseJSON(result.responseText);
                 if(res.type === "Overstock"){
+                    $(currentBtn).css("background-color","red");
                     $(currentBtn).html("Оверсток. Лимит: " + res.overstock_difference);
                 }else if(res.type === "Tradable"){
                     $(currentBtn).css("background-color","green");

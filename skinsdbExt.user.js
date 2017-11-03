@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.072
+// @version      2.08
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.072;
+var version = 2.08;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1214,6 +1214,7 @@ function newloadallprices(opd) {
                             }
                         }
                     }
+                    route.prepend(overstockChecker(skinName));
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
                         route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
@@ -1224,14 +1225,50 @@ function newloadallprices(opd) {
             }
         })
     }
+    function overstockChecker(skin) {
+        var htmlres = "<button class='overstockChecker' skin='"+skin+"' style='border:0;cursor: pointer; background-color: rgb(210, 29, 37); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;'>Проверить</button>";
+        return htmlres;
+    }
+    $(".overstockChecker").on("click",function () {
+        var currentBtn = this;
+        $(currentBtn).html("Проверка..");
+        var skinname = $(currentBtn).attr("skin");
+        console.log(skinname);
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: "https://cs.money/check_skin_status?market_hash_name="+encodeURI(skinname),
+            onload: function (result) {
+                var res = jQuery.parseJSON(result.responseText);
+                if(res.type === "Overstock"){
+                    $(currentBtn).html("Оверсток. Лимит: " + res.overstock_difference);
+                }else if(res.type === "Tradable"){
+                    $(currentBtn).css("background-color","green");
+                    $(currentBtn).html("Рабочий. Лимит: " + res.overstock_difference);
+                }else{$(currentBtn).html("Ошибка запроса");}
+            },
+            onerror: function (res) {
+                $(currentBtn).html("Ошибка запроса");
+                console.log(res.responseText);
+
+                // var msg = "An error occurred."
+                //     + "\nresponseText: " + res.responseText
+                //     + "\nreadyState: " + res.readyState
+                //     + "\nresponseHeaders: " + res.responseHeaders
+                //     + "\nstatus: " + res.status
+                //     + "\nstatusText: " + res.statusText
+                //     + "\nfinalUrl: " + res.finalUrl;
+                // alert(msg);
+            }
+        })
+    })
 }
 
 function loadallprices() {
     newgetprices(true);
-    setInterval(function () {
+   setInterval(function () {
         newgetprices();
         showlogs("Цены обновлены" + mark);
-    }, 30000)
+     }, 30000)
     // setTimeout(function () {
     //     newloadallprices();
     // }, 800)

@@ -1238,14 +1238,21 @@ function newloadallprices(opd) {
             method: 'GET',
             url: "https://cs.money/check_skin_status?market_hash_name="+encodeURI(skinname),
             onload: function (result) {
-                var res = jQuery.parseJSON(result.responseText);
-                if(res.type === "Overstock"){
-                    $(currentBtn).css("background-color","red");
-                    $(currentBtn).html("Оверсток. Лимит: " + res.overstock_difference);
-                }else if(res.type === "Tradable"){
-                    $(currentBtn).css("background-color","green");
-                    $(currentBtn).html("Рабочий. Лимит: " + res.overstock_difference);
-                }else{$(currentBtn).html("Ошибка запроса");}
+                var check = result.responseText.indexOf("DDoS protection by Cloudflare");
+                if(check === -1){
+                    var res = jQuery.parseJSON(result.responseText);
+
+                    if(res.type === "Overstock"){
+                        $(currentBtn).css("background-color","red");
+                        $(currentBtn).html("Оверсток. Лимит: " + res.overstock_difference);
+                    }else if(res.type === "Tradable"){
+                        $(currentBtn).css("background-color","green");
+                        $(currentBtn).html("Рабочий. Лимит: " + res.overstock_difference);
+                    }else{$(currentBtn).html("Ошибка запроса");}
+                }else{
+                    window.open("https://cs.money/");
+                    $(currentBtn).html("Ошибка CloudFlare");
+                }
             },
             onerror: function (res) {
                 $(currentBtn).html("Ошибка запроса");

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.08
+// @version      2.081
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.08;
+var version = 2.081;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1229,7 +1229,7 @@ function newloadallprices(opd) {
         var htmlres = "<button class='overstockChecker' skin='"+skin+"' style='border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;'>Проверить</button>";
         return htmlres;
     }
-    $(".overstockChecker").on("click",function () {
+    $(".overstockChecker").unbind().on("click",function () {
         var currentBtn = this;
         $(currentBtn).html("Проверка..");
         var skinname = $(currentBtn).attr("skin");

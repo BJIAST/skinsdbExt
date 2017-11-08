@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.081
+// @version      2.082
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.081;
+var version = 2.082;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -974,6 +974,7 @@ function dopplerChecker() {
                    if(res){
                        // console.log(result);
                        // console.log(result.responseText);
+                       var float = $(cleanTxt).find(".wear-value .text-muted").html();
                        res = res.replace("$", "");
                        res = res.replace(",", "");
                        var price = res;
@@ -981,6 +982,7 @@ function dopplerChecker() {
                        res = Math.round(res * 100) / 100;
                        var date = new Date();
                        $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
+                       $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
                        $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
                        $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
                        if (res > discount) {
@@ -1226,7 +1228,8 @@ function newloadallprices(opd) {
         })
     }
     function overstockChecker(skin) {
-        var htmlres = "<button class='overstockChecker' skin='"+skin+"' style='border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;'>Проверить</button>";
+
+        var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
     $(".overstockChecker").unbind().on("click",function () {

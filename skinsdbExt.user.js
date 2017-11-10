@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.082
+// @version      2.083
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.082;
+var version = 2.083;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -876,12 +876,8 @@ function dopplerChecker() {
         init_PNotify('Парсинг цен', 'Парсер остановлен!', 'info');
     })
     var statusChecker = (Cookies.get("cycle") ? "checked" : "");
-    if (site === "http://skinsdb.online/?doppler_search") {
-        $("#tab_content11 .check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
-    } else {
-        $(".check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
+    $(".check_stop").after('<label><input type="checkbox" class="js-switch" ' + statusChecker + '> Цикл</label>');
 
-    }
     var elem = document.querySelector('.js-switch');
     var switchery = new Switchery(elem);
 

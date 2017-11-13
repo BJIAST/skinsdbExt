@@ -473,12 +473,18 @@ function parseprice(red_btn, opd) {
 
                     if (res['opsMoney'] > savedDiscount) {
                         if (res['datestatus'] === 'fine') {
-                            $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid green");
+                            if(typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() === 'undefined' && dif > -1 && skinPrice > 5){
+                                $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid #8500ff");
+                            }else if(typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() !== 'undefined' && dif > -1 && skinPrice > 100){
+                                $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid darkred");
+                            }else{
+                                $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid green");
+                            }
                         } else {
                             $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid orange");
                         }
                     } else {
-                        if (dif > 0 && dif < 1.2) {
+                        if (dif > 0 && dif <= 1) {
                             if (res['datestatus'] === 'fine') {
                                 setTimeout(function () {
                                     $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid darkblue");
@@ -1175,38 +1181,29 @@ function newloadallprices(opd) {
                     var dif = savedDiscount - res1;
                     if (res1 > savedDiscount) {
                         if (loaded[0].actual === 'fine') {
-                            var type = $(this).find(".text-muted").next().text();
-                            if (opd === "opd") {
-                                if (typeof $(this).find(".buyers-club-icon").html() === "undefined" && type !== "Base Grade Key") {
-                                    $(this).attr("style", "border:10px solid green;");
-                                    skin = [];
-                                    skin['skinid'] = skinId;
-                                    skin['skindisc'] = res1;
-                                    skin['skinname'] = $(this).find(".market-link").text() + " (" + $(this).find(".text-muted").text() + ")";
-                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
-                                    skinsLoaded.push(skin);
-                                }
-                            } else {
-                                if (type !== "Base Grade Key") {
-                                    $(this).attr("style", "border:10px solid green;");
-                                    $(this).attr('id', skinId);
-                                    skin = [];
-                                    skin['skinid'] = skinId;
-                                    skin['skinlink'] = "#" + skinId;
-                                    skin['skindisc'] = res1;
-                                    skin['skinname'] = $(this).find(".market-link").text()
-                                    skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
-                                    skinsLoaded.push(skin);
-                                    $("#ThatisDisc").show();
-                                    $("#ThatisDisc").html(skinsLoaded.length);
-                                    $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
-                                }
+                            if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
+                                $(this).attr("style", "border:10px solid #8500ff;");
+                            }else if(typeof $(this).find(".buyers-club-icon").html() !== 'undefined' && dif < -1 && skinPrice > 100){
+                                $(this).attr("style", "border:10px solid darkred;");
+                            }else{
+                                $(this).attr("style", "border:10px solid green;");
                             }
+                            $(this).attr('id', skinId);
+                            skin = [];
+                            skin['skinid'] = skinId;
+                            skin['skinlink'] = "#" + skinId;
+                            skin['skindisc'] = res1;
+                            skin['skinname'] = $(this).find(".market-link").text()
+                            skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                            skinsLoaded.push(skin);
+                            $("#ThatisDisc").show();
+                            $("#ThatisDisc").html(skinsLoaded.length);
+                            $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
                         } else if (loaded[0].actual === 'bad') {
                             $(this).attr("style", "border:10px solid orange;");
                         }
                     } else {
-                        if (dif > 0 && dif <= 1.2) {
+                        if (dif > 0 && dif <= 1) {
                             if (loaded[0].actual === 'fine') {
                                 $(this).attr("style", "border:10px solid darkblue;");
                             }

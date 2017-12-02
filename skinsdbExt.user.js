@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.084
+// @version      2.0841
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.084;
+var version = 2.0841;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -781,7 +781,6 @@ function steamAccept() {
             offerAccept();
         }
     } else if (web == steamsite[0] + "/receipt" && fromWeb == FromCut[0] + "tradeoffer/" + FromCut[1]) {
-        soundAccept.play();
         setTimeout(function () {
             window.close();
         }, 3000);
@@ -792,7 +791,6 @@ function steamAccept() {
 function offerAccept() {
     setInterval(function () {
         if (jQuery('.newmodal_content>div').html() == "Для завершения обмена подтвердите его на странице подтверждений в мобильном приложении Steam.") {
-            soundAccept.play();
             window.close();
         } else {
             jQuery(".newmodal").remove();
@@ -1234,6 +1232,7 @@ function newloadallprices(opd) {
             method: 'GET',
             url: "https://cs.money/check_skin_status?market_hash_name="+encodeURI(skinname),
             onload: function (result) {
+                $(currentBtn).css("background-color","rgba(24, 113, 206, 0.62)");
                 var check = result.responseText.indexOf("DDoS protection by Cloudflare");
                 if(check === -1){
                     var res = jQuery.parseJSON(result.responseText);
@@ -1244,7 +1243,10 @@ function newloadallprices(opd) {
                     }else if(res.type === "Tradable"){
                         $(currentBtn).css("background-color","green");
                         $(currentBtn).html("Рабочий. Лимит: " + res.overstock_difference);
-                    }else{$(currentBtn).html("Ошибка запроса");}
+                    }else{
+                        $(currentBtn).css("background-color","red");
+                        $(currentBtn).html("Не рабочий!");
+                    }
                 }else{
                     window.open("https://cs.money/");
                     $(currentBtn).html("Ошибка CloudFlare");
@@ -1399,7 +1401,9 @@ function autoWithdraw() {
                             var tradeoffers = res['response']['offers'];
                             $.each(tradeoffers, function (i, lvl) {
                                 if (lvl['tradeoffer_id'] !== null) {
-                                    window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
+                                   var win = window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
+                                    self.focus();
+
                                 }
                             })
                             $(element).html("Готово!" + mark);
@@ -2317,7 +2321,7 @@ function realEarning() {
 }
 
 function addFilterBtn() {
-    var balance = parseFloat($("#op-count").text().replace("$", "").replace(",", ""));
+    var balance = parseFloat($(".op-count").text().replace("$", "").replace(",", ""));
     var url = "https://opskins.com/?loc=good_deals&app=730_2&search_item=&min=&max=" + balance + "&sort=dhl&stat=&grade=&exterior=&souvenir=&wear_range_low=0&wear_range_high=&type=&phase=&want_stickers=&sticker_search=";
     $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
 }
@@ -2581,20 +2585,30 @@ function buyerChecker() {
         $(".item-amount").after("<span class='fa fa-spinner fa-spin'></span>")
         var timer = $(".item-amount").after("<div class='skinsdbTimer'></div>");
         var timetoupd = 3000;
+        n = 60;
 
-        setInterval(function () {
+      var IntChecker = setInterval(function () {
             var currentBuyer = $(document).find(".buyers-club-icon span").attr("class");
             $.post(site).done(function (callback) {
                 var updatedBuyer = $(callback).find(".buyers-club-icon span").attr("class");
                 if (typeof $(callback).find(".buyers-club-icon").html() !== 'undefined') {
                     $(document).find(".buyers-club-icon").html($(callback).find(".buyers-club-icon").html());
-                    if (currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") && $(".skinsdbTimer").html() === "") {
+                    if (currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") > -1 && $(".skinsdbTimer").html() === "") {
                         startTimer(60, $(".skinsdbTimer"));
                     }
-                    console.log(currentBuyer);
+                   if(currentBuyer.indexOf("red") > -1){
+                       n = n - 5;
+                       if(n < 20){
+                           timetoupd = 1000;
+                       }
+                   }
+                   console.log(n);
+                   console.log(currentBuyer);
                 } else {
+                    clearInterval(IntChecker);
                     $(document).find(".buyers-club-icon").remove();
                     $(document).find(".skinsdbTimer").remove();
+                    $(document).find(".fa-spin").remove();
                 }
             });
         }, timetoupd)
@@ -2619,7 +2633,7 @@ function botOpsChecker() {
 function reloadpage(display, timetorealod) {
     startTimer(timetorealod * 60, display);
     setTimeout(function () {
-        $(".mystery-item-inner .live-listings i.fa-play-circle").click();
+        // $(".mystery-item-inner .live-listings i.fa-play-circle").click();
         location.reload();
     }, timetorealod * 60000);
 }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.0841
+// @version      2.09
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.0841;
+var version = 2.09;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -2037,7 +2037,7 @@ function csmomenu() {
             $("#opsbot").prop("checked", true);
         }, 600)
     }
-    $(".profile__menu ul").prepend("<li><a href='#' class='skinsdbset '><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg> <div>Настройки SkinsDb</div></a></div></li>");
+    $(".profile__menu ul").prepend("<li class='profile__menu_list'><a href='#' class='skinsdbset profile__menu_link'><svg><use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='#header_support_icon'></use></svg> <div>Настройки SkinsDb</div></a></div></li>");
     $(".overlay.hidden .overlay-wrapper").append('' +
         '<div id="skinsDb" class="modal hidden">' +
         '<a class="modal__close skindbClose" href="#">' +
@@ -2321,7 +2321,7 @@ function realEarning() {
 }
 
 function addFilterBtn() {
-    var balance = parseFloat($(".op-count").text().replace("$", "").replace(",", ""));
+    var balance = parseFloat($(".op-count").html().replace("$", "").replace(",", ""));
     var url = "https://opskins.com/?loc=good_deals&app=730_2&search_item=&min=&max=" + balance + "&sort=dhl&stat=&grade=&exterior=&souvenir=&wear_range_low=0&wear_range_high=&type=&phase=&want_stickers=&sticker_search=";
     $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
 }

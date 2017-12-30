@@ -1220,7 +1220,7 @@ function newloadallprices(opd) {
                                    $(".calculateOverp").unbind().on("click", function () {
                                        var csm = $(this).attr("money-price");
                                        var ops = $(this).attr("ops-price");
-                                       var currOverpay = $(this).closest("tr.Selected").find("td.overpay").text();
+                                       var currOverpay = $(this).closest("tr").find("td.overpay").text();
                                        var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
                                        console.log(currentZaliv);
                                        var result = Math.round((100 - ops*100 / currentZaliv) * 100) / 100;

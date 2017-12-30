@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.09
+// @version      2.10
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.09;
+var version = 2.10;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1177,6 +1177,59 @@ function newloadallprices(opd) {
                     var resom = 100 - (skinPrice * 100) / (loaded[0].price * 0.97);
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
+                    var currBoxWear = $(this).find(".wear-value small");
+                    if(loaded[0]['overpay'][0] !== "no"){
+                        var closestFloat = null;
+                        var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
+                        var currentFloat = goal;
+                        var max = 0;
+                        $.each(loaded[0].overpay, function (a,b) {
+                            $.each(b,function (c,d) {
+                                if(c == "skinfloat"){
+                                    if(d > max){
+                                        max = d;
+                                    }
+                                    if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
+                                        closestFloat = d;
+                                    }
+                                }
+                            })
+                        })
+                        if(currentFloat < max){
+                            currBoxWear.css({
+                                "color" : "yellow",
+                                "font-weight" : "bold",
+                                "font-size" : "100%",
+                                "cursor" : "pointer"
+                            });
+                            $(this).attr("style", "border:10px solid grey;");
+                            currBoxWear.attr("href", "#");
+                            currBoxWear.attr("data-toggle", "modal");
+                            currBoxWear.attr("data-target", "#skinsDbSales");
+
+                            currBoxWear.on("click", function () {
+                                $("#skinsDbSales .modal-body").html("Подожди");
+                                data = [loaded[0].overpay];
+                                var opsPrice = skinPrice;
+                                var moneyPrice = loaded[0].price;
+                                makeTable($("#skinsDbSales .modal-body"), data, closestFloat, moneyPrice, opsPrice);
+                               setTimeout(function () {
+                                   var rowpos = $("#skinsDbSales .modal-body").find("tr.Selected").position();
+                                   $("#skinsDbSales").scrollTop(rowpos.top);
+
+                                   $(".calculateOverp").unbind().on("click", function () {
+                                       var csm = $(this).attr("money-price");
+                                       var ops = $(this).attr("ops-price");
+                                       var currOverpay = $(this).closest("tr.Selected").find("td.overpay").text();
+                                       var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
+                                       console.log(currentZaliv);
+                                       var result = Math.round((100 - ops*100 / currentZaliv) * 100) / 100;
+                                       alert("По текущим данным залив составит: " + result + "%. Цена залива: "+currentZaliv+"$");
+                                   })
+                           },1000);
+                            })
+                        }
+                    }
                     if (res1 > savedDiscount) {
                         if (loaded[0].actual === 'fine') {
                             if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
@@ -1208,6 +1261,7 @@ function newloadallprices(opd) {
                         }
                     }
                     route.prepend(overstockChecker(skinName));
+                    // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
                         route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
@@ -1218,6 +1272,38 @@ function newloadallprices(opd) {
             }
         })
     }
+    function makeTable(container, data,closestFloat, money, ops) {
+        var table = $("<table border='1px' width='100%' style='font-size: 20px'></table>").addClass('CSSTableGenerator');
+        table.append("<thead></thead>");
+        table.find("thead").prepend("<tr><th>Переплата</th><th>Флоат</th><th>Дата</th><th></th></tr>");
+        $.each(data, function (a,b) {
+            $.each(b, function(rowIndex, r) {
+                var row = $("<tr id='"+rowIndex+"'></tr>");
+                $.each(r, function(colIndex, c) {
+                    if(c == closestFloat) {
+                        row.css({
+                            "color" : "darkred",
+                            "font-weight" : "bold",
+                            "font-size" : "24px"
+                        });
+                       row.closest("tr").addClass("Selected");
+                        // row.append($("<td style='color: darkred; font-weight: bold; font-size: 24px'>").text(c));
+                    }
+                    row.append($("<td class='"+colIndex+"'>").text(c));
+                });
+                row.append("<button class='btn btn-warning calculateOverp' style='width: 100%; margin: 4px 0;' money-price='"+money+"' ops-price='"+ops+"'>Посчитать</button>")
+                table.append(row);
+            });
+        })
+        tbody = table.find('tbody');
+
+        tbody.find('tr').sort(function(a, b) {
+            return $('td.skinfloat', a).text().localeCompare($('td.skinfloat', b).text());
+        }).appendTo(tbody);
+        return container.append(table);
+    }
+
+
     function overstockChecker(skin) {
 
         var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
@@ -1274,7 +1360,7 @@ function loadallprices() {
    setInterval(function () {
         newgetprices();
         showlogs("Цены обновлены" + mark);
-     }, 30000)
+     }, 60000)
     // setTimeout(function () {
     //     newloadallprices();
     // }, 800)
@@ -1326,8 +1412,28 @@ function settingsMenu() {
         '</div>' +
         '</div>' +
         '</div>'
-    )
-    ;
+    );
+    $("body").append('' +
+        '<div id="skinsDbSales" class="modal fade" role="dialog">' +
+        '<div class="modal-dialog">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+        '<h4 class="modal-title">Инфа про скин <span id="modalSkinName"></span>' + mark + '</h4>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<span>Hi</span>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>');
+    $("#skinsDbSales .modal-content").css({
+        "width": "800px",
+        "right": "10%"
+    });
     if ($.cookie("role") !== 'superuser' && $.cookie("role") !== 'admin') {
         $(".atbuy").hide();
     }
@@ -1713,7 +1819,7 @@ function getLink() {
 
             } else {
                 //cfdfsfs
-                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;z-index: 999;width: 22px; color: #000;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;z-index: 999;width: 22px; color: #000;"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
             }
         }
         $(this).children(".link_button").unbind().on("click", function () {
@@ -2004,9 +2110,9 @@ function allAnotherGetLink(changer) {
             } else {
                 //cfdfsfs
                 if (changer === "CSTrade") {
-                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; top:10%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; top:10%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
                 } else {
-                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
                 }
             }
         }
@@ -2139,27 +2245,6 @@ function sellsinvChecker() {
 };
 
 function salesInfo() {
-    $("body").append('' +
-        '<div id="skinsDbSales" class="modal fade" role="dialog">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header">' +
-        '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
-        '<h4 class="modal-title">Инфа про скин <span id="modalSkinName"></span>' + mark + '</h4>' +
-        '</div>' +
-        '<div class="modal-body">' +
-        '<span>Hi</span>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>');
-    $("#skinsDbSales .modal-content").css({
-        "width": "800px",
-        "right": "10%"
-    });
     showlogs("Загружено!" + mark);
     $(".sell-item").on("click", function sellitem() {
         $("#sell-selected-inspect-btn").attr("disabled", "disabled");

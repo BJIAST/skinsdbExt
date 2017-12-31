@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.10
+// @version      2.101
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.10;
+var version = 2.101;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1178,7 +1178,7 @@ function newloadallprices(opd) {
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
                     var currBoxWear = $(this).find(".wear-value small");
-                    if(loaded[0]['overpay'][0] !== "no"){
+                    if(loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined'){
                         var closestFloat = null;
                         var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
                         var currentFloat = goal;

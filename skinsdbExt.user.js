@@ -1099,7 +1099,6 @@ function newloadallprices(opd) {
                 var skinName = route.find(".market-link").html();
                 var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",","");
                 var unavailable = route.find(".item-add");
-                route.prepend(overstockChecker(skinName));
                 if (unavailable.html()) {
                     if (opd === "opd") {
                         var skinId = route.find(".market-link").attr("href");
@@ -1261,6 +1260,7 @@ function newloadallprices(opd) {
                             }
                         }
                     }
+                    route.prepend(overstockChecker(skinName));
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {

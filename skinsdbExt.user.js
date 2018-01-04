@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.101
+// @version      2.11
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.101;
+var version = 2.11;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -113,7 +113,7 @@ var version = 2.101;
     if (site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/") {
         loadanalystprices();
     }
-    if (site == "https://cs.money/" || site == "https://cs.money/#" || site == "https://cs.money/ru" || site == "https://cs.money/ru/#" || site == "https://cs.money/ru/") {
+    if (site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
 
@@ -1099,6 +1099,7 @@ function newloadallprices(opd) {
                 var skinName = route.find(".market-link").html();
                 var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",","");
                 var unavailable = route.find(".item-add");
+                route.prepend(overstockChecker(skinName));
                 if (unavailable.html()) {
                     if (opd === "opd") {
                         var skinId = route.find(".market-link").attr("href");
@@ -1260,7 +1261,6 @@ function newloadallprices(opd) {
                             }
                         }
                     }
-                    route.prepend(overstockChecker(skinName));
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1574,7 +1574,7 @@ function csmobot() {
     setInterval(getLink, 2000);
 
     csmocounters();
-    $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div style='margin: 10px 0 20px;overflow: hidden;width: 100%;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканнер " + mark + "</button></div>");
+    $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div class='csmbtns hidden' style='margin: 10px 0 20px;overflow: hidden;width: 100%;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканнер " + mark + "</button></div>");
     // $("#scannerdb").before("<div class='btn btn-warning checkout-btn' id='favSkinView' style='margin-left: 32px; padding: 8px 4px;'>Избранные" + mark + "</div>");
     $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;padding: 8px 4px;'>Opskins -> CS.Money</button></div>");
     $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;padding: 8px 4px;'>CS.Money -> Opskins</button></div>");
@@ -1707,7 +1707,7 @@ function csmobot() {
 
 function getLink() {
     $(".items").children().each(function () {
-        if (typeof $(this).children(".parse_button").html() === 'undefined') {
+        if (typeof $(this).children(".parse_button").html() === 'undefined' && $(this).hasClass("item")) {
 
             $(this).css("position", "relative");
 
@@ -2137,6 +2137,13 @@ function allAnotherGetLink(changer) {
 }
 
 function csmomenu() {
+    if(!$.cookie("opsbot")){
+        $.cookie("opsbot", "on");
+        csmobot();
+        setTimeout(function () {
+            $("#opsbot").prop("checked", true);
+        }, 600)
+    }
     if ($.cookie("opsbot") === 'on') {
         csmobot();
         setTimeout(function () {
@@ -2154,11 +2161,15 @@ function csmomenu() {
         '<div class="modal__content">' +
         '<label for="opsbot" style="cursor:pointer; width: 33%;">Включить ' + mark + '</label>' +
         '<input type="checkbox" id="opsbot" name="opsbot" style="display: inline-block;">' +
+        '<div><button class="btn" id="csmbtns" style="padding: 4px 8px; margin-top: 10px">Отобразить кнопки</button></div>' +
         '</div>');
 
     $(".skinsdbset").on("click", function () {
         $("#skinsDb").toggleClass("hidden");
         $(".overlay").toggleClass("hidden");
+    })
+    $("#csmbtns").on("click", function () {
+        $(".csmbtns").toggleClass("hidden");
     })
     $(".skindbClose").on("click", function () {
         $("#skinsDb").toggleClass("hidden");
@@ -2179,12 +2190,8 @@ function csmomenu() {
 
 function csmocounters() {
     $(".column-2").prepend("<div class='block__header block__header_top' style='text-align: center;'><div class='block__title' style='width: 100%;'><div class='block__title__nowrap' style='width: 100%;text-align: center;padding: 0 44px;'><span class='currency_symbol'>$ </span><span id='sum_dif'>0.00</span></div></div></div>")
-    $("#user-search-block").after("<div class='block__search autoPickUp'><input type='number' class='block__search__field balanceClick' placeholder='$..'><span class='block__search__btn toofferClick' style='cursor: pointer; background-color: #000;'>GO</span></div>");
+    $("#user-search-block").after("<button class='toofferClick btn' style='padding: 0px 15px; height: 39px;'>MOVE!</button>");
 
-    $(".autoPickUp").css({
-        "width": "123px",
-        "margin-left": "10px"
-    });
     $(".column-2 .sidebar").css("height", "94%");
     $(".bonus").css("top", "89%");
 
@@ -2195,23 +2202,9 @@ function csmocounters() {
         $("#inventory_user").children().each(function () {
             var count = $(this).find(".f").text().replace("x", "");
             var i;
-            if ($(".balanceClick").val() === "") {
-                if ($(this).hasClass(".dis") === false) {
-                    for (i = 0; i < count; i++) {
-                        $(this).click();
-                    }
-                }
-            } else {
-                var maxCost = parseFloat($(".balanceClick").val());
-                var cost = parseFloat($("#currency_user").text());
-                if ($(this).hasClass(".dis") === false) {
-                    var skinCost = parseFloat($(this).find(".p").text().replace("$", ""));
-                    for (i = 0; i < count; i++) {
-                        if ((skinCost + cost) <= maxCost || (skinCost + cost) <= maxCost + 0.03) {
-                            cost = cost + skinCost;
-                            $(this).click();
-                        }
-                    }
+            if ($(this).hasClass(".dis") === false) {
+                for (i = 0; i < count; i++) {
+                    $(this).click();
                 }
             }
         })
@@ -2330,8 +2323,8 @@ function salesInfo() {
 }
 
 function realEarning() {
-    var balance = parseFloat($(".op-count").html().replace("$", "").replace(",", ""));
-    var op = parseFloat($(".op-credits-count span").text().replace("$", "").replace(",", "").trim());
+    var balance = parseFloat($(".op-count").html().replace(",", ""));
+    var op = parseFloat($(".op-credits-count span").text().replace(",", "").trim());
     var fullBal = Math.round((balance + op) * 100) / 100;
     $(document).ajaxComplete(function (event, xhr, settings) {
         if (settings['url'] === 'ajax/shop_account.php?type=itrans&page=1&filter=2') {
@@ -2665,6 +2658,10 @@ function getautopick() {
 }
 
 function buyerChecker() {
+
+    if(typeof $("#shopSellAmt").html() != "undefined"){
+        $("#shopSellAmt").attr("autocomplete", "off");
+    }
 
     if (typeof $(document).find(".buyers-club-icon span").html() !== 'undefined') {
         $(".item-amount").after("<span class='fa fa-spinner fa-spin'></span>")

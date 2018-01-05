@@ -113,7 +113,7 @@ var version = 2.12;
     if (site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/") {
         loadanalystprices();
     }
-    if (site == "https://cs.money#" || site == "https://cs.money" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
+    if (site == "https://cs.money/#" || site == "https://cs.money/" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.11
+// @version      2.12
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.11;
+var version = 2.12;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -113,7 +113,7 @@ var version = 2.11;
     if (site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/") {
         loadanalystprices();
     }
-    if (site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
+    if (site == "https://cs.money#" || site == "https://cs.money" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
 
@@ -940,7 +940,7 @@ function dopplerChecker() {
                 var res = $(cleanTxt).find(".item-amount").html();
                 if ($(cleanTxt).find(".alert-danger").html()) {
                     console.log($(cleanTxt).find(".alert-danger").html());
-                    if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. <span class="text-muted">Have a look at some of our featured items.</span>')
+                    if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. Have a look at some of our featured items:');
                         $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
                     if (counter < length - 1 && status === true) {
                         var timeer = randomInteger(600, 1600);
@@ -975,6 +975,8 @@ function dopplerChecker() {
                        // console.log(result);
                        // console.log(result.responseText);
                        var float = $(cleanTxt).find(".wear-value .text-muted").html();
+                       var currentFloat = parseFloat(float.replace("Wear: ","").replace("%",""));
+                       var currentMaxFloat = parseFloat($(btn).parent().find("#count-" + id).parent().find(".maxFloat").text());
                        res = res.replace("$", "");
                        res = res.replace(",", "");
                        var price = res;
@@ -982,7 +984,13 @@ function dopplerChecker() {
                        res = Math.round(res * 100) / 100;
                        var date = new Date();
                        $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
-                       $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
+                       if(currentFloat < currentMaxFloat && res - discount > -4){
+                           $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkred; font-weight: bold'>"+float+"</span>");
+                       }else if(currentFloat < currentMaxFloat){
+                           $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkblue; font-weight: bold'>"+float+"</span>");
+                       }else{
+                           $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
+                       }
                        $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
                        $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
                        if (res > discount) {
@@ -994,7 +1002,7 @@ function dopplerChecker() {
                            soundFound.volume = 1;
                            soundFound.play();
                            chromemes("Найден скин " + skinname + " в " + res + "%");
-                       } else if (discount - res < 1.2) {
+                       } else if (discount - res < 1) {
                            $(btn).parent().find("#count-" + id).parent().find(".discount").css({
                                "color": "blue",
                                "font-weight": "bold"

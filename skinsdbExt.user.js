@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.12
+// @version      2.13
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.12;
+var version = 2.13;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -113,7 +113,7 @@ var version = 2.12;
     if (site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/") {
         loadanalystprices();
     }
-    if (site == "https://cs.money/#" || site == "https://cs.money/" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
+    if (site == "https://cs.money#" || site == "https://cs.money" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
 
@@ -367,7 +367,12 @@ function sugestedDiscount(element) {
 
 function oneItemDiscount() {
     newgetprices(true);
-    $(".featured-item-large").addClass('featured-item').addClass('scanned');
+    if(typeof $(".featured-item-large-video").html() !== 'undefined'){
+        $(".featured-item-large-video").addClass('featured-item').addClass('scanned');
+    }else{
+        $(".featured-item-large").addClass('featured-item').addClass('scanned');
+    }
+    $(".scanned").closest(".view_item").parent().removeClass("col-lg-12").removeClass("col-md-12").addClass("col-lg-6").addClass("col-md-6");
     $(".scanned").prepend("<div class='priceBtn'>Price</div>");
     $(".priceBtn").css({
         "cursor": "pointer",
@@ -379,6 +384,8 @@ function oneItemDiscount() {
         "margin-right": "30px",
         "z-index": 999
     });
+    $(".scanned.featured-item").css("height","auto");
+
     // setTimeout(newloadallprices, 600);
 }
 
@@ -1241,11 +1248,11 @@ function newloadallprices(opd) {
                     if (res1 > savedDiscount) {
                         if (loaded[0].actual === 'fine') {
                             if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
-                                $(this).attr("style", "border:10px solid #8500ff;");
+                                $(this).css("border", "10px solid #8500ff");
                             }else if(typeof $(this).find(".buyers-club-icon").html() !== 'undefined' && dif < -1 && skinPrice > 100){
-                                $(this).attr("style", "border:10px solid darkred;");
+                                $(this).css("border", "10px solid darkred");
                             }else{
-                                $(this).attr("style", "border:10px solid green;");
+                                $(this).css("border", "10px solid green");
                             }
                             $(this).attr('id', skinId);
                             skin = [];
@@ -1259,12 +1266,12 @@ function newloadallprices(opd) {
                             $("#ThatisDisc").html(skinsLoaded.length);
                             $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
                         } else if (loaded[0].actual === 'bad') {
-                            $(this).attr("style", "border:10px solid orange;");
+                            $(this).css("border", "10px solid orange");
                         }
                     } else {
                         if (dif > 0 && dif <= 1) {
                             if (loaded[0].actual === 'fine') {
-                                $(this).attr("style", "border:10px solid darkblue;");
+                                $(this).css("border", "10px solid darkblue");
                             }
                         }
                     }
@@ -1723,8 +1730,8 @@ function getLink() {
             var phase = "";
             var type = "";
             stat = (typeof $(this).children(".st").html() !== 'undefined') ? 1 : 0;
-            ext = $(this).find(".r").text().trim();
-
+            // ext = $(this).find(".r").text().trim();
+            ext = $(this).find(".r").contents().filter(function(){return this.nodeType !== 1}).text().trim()
             var sticker = $(this).attr("hash").indexOf("Sticker");
             if (sticker > -1) {
                 name = $(this).attr("hash").replace("Sticker | ", "");
@@ -1836,7 +1843,7 @@ function getLink() {
             return false;
         });
         $(this).children(".parse_event").unbind().on("click", function () {
-            var allThis = $("div[hash='" + $(this).parent().attr("hash") + "']");
+            var allThis = $('div[hash="' + $(this).parent().attr("hash") + '"]');
             allThis.children(".parse_button").html("Load..");
             var nameToSave = $(this).parent().attr("hash");
             var link = $(this).parent().find(".link_button").attr("href");
@@ -1902,9 +1909,9 @@ function getLink() {
             $(elem).prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
             $(elem).css("background-color", "");
         } else {
-            $("div[hash='" + pack + "']").find(".favourite").remove();
-            $("div[hash='" + pack + "']").prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $("div[hash='" + pack + "']").css("background-color", "");
+            $('div[hash="' + pack + '"]').find(".favourite").remove();
+            $('div[hash="' + pack + '"]').prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $('div[hash="' + pack + '"]').css("background-color", "");
             favSkins.splice(favSkins.indexOf(pack), 1);
         }
     }
@@ -1915,9 +1922,9 @@ function getLink() {
             $(elem).prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
             $(elem).css("background-color", "rgba(39, 179, 22, 0.35)");
         } else {
-            $("div[hash='" + pack + "']").find(".favourite").remove();
-            $("div[hash='" + pack + "']").prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $("div[hash='" + pack + "']").css("background-color", "rgba(39, 179, 22, 0.35)");
+            $('div[hash="' + pack + '"]').find(".favourite").remove();
+            $('div[hash="' + pack + '"]').prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
+            $('div[hash="' + pack + '"]').css("background-color", "rgba(39, 179, 22, 0.35)");
             favSkins.push(pack);
         }
     }
@@ -2145,14 +2152,7 @@ function allAnotherGetLink(changer) {
 }
 
 function csmomenu() {
-    if(!$.cookie("opsbot")){
-        $.cookie("opsbot", "on");
-        csmobot();
-        setTimeout(function () {
-            $("#opsbot").prop("checked", true);
-        }, 600)
-    }
-    if ($.cookie("opsbot") === 'on') {
+    if($.cookie("opsbot") !== "off"){
         csmobot();
         setTimeout(function () {
             $("#opsbot").prop("checked", true);
@@ -2185,10 +2185,10 @@ function csmomenu() {
     })
     $("#opsbot").on("change", function () {
         if (this.checked) {
-            $.cookie("opsbot", "on");
+            $.removeCookie("opsbot");
             csmobot();
         } else {
-            $.removeCookie("opsbot");
+            $.cookie("opsbot", "off");
             setTimeout(function () {
                 location.reload();
             }, 2000)

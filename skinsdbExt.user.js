@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.13
+// @version      2.14
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.13;
+var version = 2.14;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1589,7 +1589,8 @@ function csmobot() {
     setInterval(getLink, 2000);
 
     csmocounters();
-    $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div class='csmbtns hidden' style='margin: 10px 0 20px;overflow: hidden;width: 100%;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканнер " + mark + "</button></div>");
+
+    $(".block_items.hint-aim-4.hint-clickable .hint-aim-6").append("<div style='width: 100%; text-align: center;'><button class='btn' id='csmbtns' style='padding: 4px 8px; margin: 10px 0;border: 10x solid transparent;border-radius:20px;outline: none;'>Отобразить кнопки</button></div><div class='csmbtns hidden' style='margin: 10px 0 20px;overflow: hidden;width: 100%;border-top:2px dashed #ff010147;padding: 20px;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканер " + mark + "</button></div>");
     // $("#scannerdb").before("<div class='btn btn-warning checkout-btn' id='favSkinView' style='margin-left: 32px; padding: 8px 4px;'>Избранные" + mark + "</div>");
     $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;padding: 8px 4px;'>Opskins -> CS.Money</button></div>");
     $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;padding: 8px 4px;'>CS.Money -> Opskins</button></div>");
@@ -1834,7 +1835,7 @@ function getLink() {
 
             } else {
                 //cfdfsfs
-                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;z-index: 999;width: 22px; color: #000;"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;z-index: 999;width: 22px; color: #000;"><img class="opsprice" src="https://static-cdn.jtvnw.net/emoticons/v1/87/1.0" alt="opsprice" style="width: 100%; height: auto;"></div>');
             }
         }
         $(this).children(".link_button").unbind().on("click", function () {
@@ -2125,9 +2126,9 @@ function allAnotherGetLink(changer) {
             } else {
                 //cfdfsfs
                 if (changer === "CSTrade") {
-                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; top:10%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; top:10%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="https://static-cdn.jtvnw.net/emoticons/v1/87/1.0" alt="opsprice" style="width: 100%; height: auto;"></div>');
                 } else {
-                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="http://skinsdb.online/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div>');
+                    $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;width: 22px; color: #000;' + zindex + '"><img class="opsprice" src="https://static-cdn.jtvnw.net/emoticons/v1/87/1.0" alt="opsprice" style="width: 100%; height: auto;"></div>');
                 }
             }
         }
@@ -2169,7 +2170,6 @@ function csmomenu() {
         '<div class="modal__content">' +
         '<label for="opsbot" style="cursor:pointer; width: 33%;">Включить ' + mark + '</label>' +
         '<input type="checkbox" id="opsbot" name="opsbot" style="display: inline-block;">' +
-        '<div><button class="btn" id="csmbtns" style="padding: 4px 8px; margin-top: 10px">Отобразить кнопки</button></div>' +
         '</div>');
 
     $(".skinsdbset").on("click", function () {
@@ -2177,7 +2177,10 @@ function csmomenu() {
         $(".overlay").toggleClass("hidden");
     })
     $("#csmbtns").on("click", function () {
-        $(".csmbtns").toggleClass("hidden");
+        $(".csmbtns").toggle('slow', function () {
+            $(this).toggleClass("hidden");
+            $("#csmbtns").val("Скрыть кнопки");
+        })
     })
     $(".skindbClose").on("click", function () {
         $("#skinsDb").toggleClass("hidden");
@@ -2198,7 +2201,7 @@ function csmomenu() {
 
 function csmocounters() {
     $(".column-2").prepend("<div class='block__header block__header_top' style='text-align: center;'><div class='block__title' style='width: 100%;'><div class='block__title__nowrap' style='width: 100%;text-align: center;padding: 0 44px;'><span class='currency_symbol'>$ </span><span id='sum_dif'>0.00</span></div></div></div>")
-    $("#user-search-block").after("<button class='toofferClick btn' style='padding: 0px 15px; height: 39px;'>MOVE!</button>");
+    $("#user-search-block").after("<button class='toofferClick btn' style='padding: 0px 15px; height: 39px;outline: none;'>MOVE!</button>");
 
     $(".column-2 .sidebar").css("height", "94%");
     $(".bonus").css("top", "89%");

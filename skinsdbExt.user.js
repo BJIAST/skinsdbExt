@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.14
+// @version      2.15
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.14;
+var version = 2.15;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1193,11 +1193,14 @@ function newloadallprices(opd) {
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
                     var currBoxWear = $(this).find(".wear-value small");
+                    var overpayThis = false;
+                    var overpayVal = 0;
                     if(loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined'){
                         var closestFloat = null;
                         var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
                         var currentFloat = goal;
                         var max = 0;
+
                         $.each(loaded[0].overpay, function (a,b) {
                             $.each(b,function (c,d) {
                                 if(c == "skinfloat"){
@@ -1206,22 +1209,26 @@ function newloadallprices(opd) {
                                     }
                                     if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
                                         closestFloat = d;
+                                        overpayVal = loaded[0]['overpay'][a]['overpay'];
                                     }
                                 }
                             })
                         })
                         if(currentFloat < max){
+                            overpayThis = true;
                             currBoxWear.css({
                                 "color" : "yellow",
                                 "font-weight" : "bold",
                                 "font-size" : "100%",
                                 "cursor" : "pointer"
                             });
-                            $(this).attr("style", "border:10px solid grey;");
+                            var curChangerPrice = parseFloat(overpayVal) + parseFloat(loaded[0].price);
+                            var overpayCounter = 100 - (skinPrice * 100) / (curChangerPrice * 0.97);
+                            overpayVal = Math.round(overpayCounter * 100) / 100;
+                            $(this).css("border", "10px solid grey");
                             currBoxWear.attr("href", "#");
                             currBoxWear.attr("data-toggle", "modal");
                             currBoxWear.attr("data-target", "#skinsDbSales");
-
                             currBoxWear.on("click", function () {
                                 $("#skinsDbSales .modal-body").html("Подожди");
                                 data = [loaded[0].overpay];
@@ -1279,7 +1286,12 @@ function newloadallprices(opd) {
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
-                        route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
+                        if(overpayThis){
+
+                            route.find(".priceBtn").html("<span class='realOpsmo'>" + overpayVal + "</span>% | " + res1 + "%");
+                        }else{
+                            route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
+                        }
                     }
                 } else {
                     route.find(".priceBtn").html("Not Found");
@@ -1468,8 +1480,11 @@ function settingsMenu() {
         saveDiscount($("#discValues").val());
     })
     $("#savDisc").on("click", function () {
-
-        sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
+        if(site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1){
+            sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
+        }else{
+            sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
+        }
         $("body").animate({
             scrollTop: 0
         }, 'fast');

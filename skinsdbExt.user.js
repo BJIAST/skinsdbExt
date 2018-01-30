@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.15
+// @version      2.16
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -13,8 +13,8 @@
 // @match       https://csgotrade.me/*
 // @match       https://csoffer.me/*
 // @match       https://trade-skins.com/*
+// @match       https://tradeit.gg/*
 // @match       https://opskins.com/*
-// @match      https://csgo.steamanalyst.com/*
 // @match       https://steamcommunity.com/trade/*
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -110,8 +110,14 @@ var version = 2.15;
             }, 2000);
         }, 400);
     }
-    if (site === "https://csgo.steamanalyst.com/hotdeals/all//discount/all/") {
-        loadanalystprices();
+    if (site === "https://tradeit.gg/") {
+        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
+
+        setTimeout(function () {
+            setInterval(function () {
+                allAnotherGetLink("TradeIt");
+            }, 2000);
+        }, 400);
     }
     if (site == "https://cs.money/#" || site == "https://cs.money/" || site == "https://cs.money/ru" || site == "https://cs.money/ru#" || site == "https://cs.money/ru/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
@@ -514,59 +520,6 @@ function parseprice(red_btn, opd) {
                     $("[data-loading='moneyOps']").removeAttr("data-loading");
                     $("[data-loading='opsMoney']").removeAttr("data-loading");
                 }
-                $(".divmoneyOps").on("click", function () {
-                    var skinName = $(this).parent().parent().children(".market-link").html();
-                    if ($(this).parent().parent().children(".item-desc").children(".text-muted").html() != "") {
-                        var exterior = "(" + $(this).parent().parent().children(".item-desc").children(".text-muted").html() + ")";
-                        var phase = $(this).parent().parent().find(".text-muted").next().html();
-                        switch (phase) {
-                            case ' Covert Knife (Ruby)' :
-                                phase = " Ruby";
-                                break;
-                            case ' Covert Knife (Sapphire)' :
-                                phase = " Sapphire";
-                                break;
-                            case ' Covert Knife (Black Pearl)' :
-                                phase = " Black Pearl";
-                                break;
-                            case ' Covert Knife (Emerald)' :
-                                phase = " Emerald";
-                                break;
-                            default:
-                                phase = phase.replace(/[/^\D+/()]/g, '');
-                        }
-                        switch (phase) {
-                            case 1 :
-                                phase = " Phase 1";
-                                break;
-                            case 2 :
-                                phase = " Phase 2";
-                                break;
-                            case 3 :
-                                phase = " Phase 3";
-                                break;
-                            case 4 :
-                                phase = " Phase 4";
-                                break;
-                            case '' :
-                                phase = "";
-                                break;
-                        }
-                        skinName = skinName.trim() + phase + " " + exterior;
-                    } else {
-                        skinName = skinName.trim();
-                    }
-                    var myData = new FormData();
-                    myData.append("skindate", skinName);
-                    GM_xmlhttpRequest({
-                        method: "POST",
-                        url: scriptUrl,
-                        data: myData,
-                        onload: function (result) {
-                            alert(result.responseText);
-                        }
-                    })
-                })
             },
             onerror: function (res) {
                 var msg = "An error occurred."
@@ -818,60 +771,60 @@ function knifeChecker() {
             method: "POST",
             url: "https://opskins.com/?app=730_2&loc=shop_search&sort=n&type=k",
             onload: function (result){
-               $(result.responseText).find("#scroll").children().each(function (i) {
-                   if(i > 0){
-                       var wear = $(this).find('.text-muted').html()
-                       var grade = $(this).find('.text-muted').next().html();
-                       var name = $(this).find(".market-name.market-link").html().trim();
-                       if (wear !== "") {
-                           var phase = $(this).find('.text-muted').next().html();
-                           switch (phase) {
-                               case ' Covert Knife (Ruby)' :
-                                   phase = " Ruby";
-                                   break;
-                               case ' Covert Knife (Sapphire)' :
-                                   phase = " Sapphire";
-                                   break;
-                               case ' Covert Knife (Black Pearl)' :
-                                   phase = " Black Pearl";
-                                   break;
-                               case ' Covert Knife (Emerald)' :
-                                   phase = " Emerald";
-                                   break;
-                               default:
-                                   phase = phase.replace(/[/^\D+/()]/g, '');
-                           }
-                           switch (phase) {
-                               case '1' :
-                                   phase = " Phase 1";
-                                   break;
-                               case '2' :
-                                   phase = " Phase 2";
-                                   break;
-                               case '3' :
-                                   phase = " Phase 3";
-                                   break;
-                               case '4' :
-                                   phase = " Phase 4";
-                                   break;
-                               case '' :
-                                   phase = "";
-                                   break;
-                           }
-                           name = name + phase + " (" + wear + ")";
-                       }
-                       var amount = $(this).find(".item-amount").html().replace("$", "").replace(",", "");
-                       var skinId = $(this).find(".market-link").attr("href").split("&item=");
-                       skinId = skinId[1];
+                $(result.responseText).find("#scroll").children().each(function (i) {
+                    if(i > 0){
+                        var wear = $(this).find('.text-muted').html()
+                        var grade = $(this).find('.text-muted').next().html();
+                        var name = $(this).find(".market-name.market-link").html().trim();
+                        if (wear !== "") {
+                            var phase = $(this).find('.text-muted').next().html();
+                            switch (phase) {
+                                case ' Covert Knife (Ruby)' :
+                                    phase = " Ruby";
+                                    break;
+                                case ' Covert Knife (Sapphire)' :
+                                    phase = " Sapphire";
+                                    break;
+                                case ' Covert Knife (Black Pearl)' :
+                                    phase = " Black Pearl";
+                                    break;
+                                case ' Covert Knife (Emerald)' :
+                                    phase = " Emerald";
+                                    break;
+                                default:
+                                    phase = phase.replace(/[/^\D+/()]/g, '');
+                            }
+                            switch (phase) {
+                                case '1' :
+                                    phase = " Phase 1";
+                                    break;
+                                case '2' :
+                                    phase = " Phase 2";
+                                    break;
+                                case '3' :
+                                    phase = " Phase 3";
+                                    break;
+                                case '4' :
+                                    phase = " Phase 4";
+                                    break;
+                                case '' :
+                                    phase = "";
+                                    break;
+                            }
+                            name = name + phase + " (" + wear + ")";
+                        }
+                        var amount = $(this).find(".item-amount").html().replace("$", "").replace(",", "");
+                        var skinId = $(this).find(".market-link").attr("href").split("&item=");
+                        skinId = skinId[1];
 
-                       var skin = {};
-                       skin['skinName'] = name;
-                       skin['skinPrice'] = parseFloat(amount);
-                       skin['skinId'] = skinId;
-                       knifes.push(skin);
-                   }
-               });
-               console.log(knifes);
+                        var skin = {};
+                        skin['skinName'] = name;
+                        skin['skinPrice'] = parseFloat(amount);
+                        skin['skinId'] = skinId;
+                        knifes.push(skin);
+                    }
+                });
+                console.log(knifes);
             }
         })
     }
@@ -948,7 +901,7 @@ function dopplerChecker() {
                 if ($(cleanTxt).find(".alert-danger").html()) {
                     console.log($(cleanTxt).find(".alert-danger").html());
                     if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. Have a look at some of our featured items:');
-                        $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
+                    $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
                     if (counter < length - 1 && status === true) {
                         var timeer = randomInteger(600, 1600);
 
@@ -978,66 +931,66 @@ function dopplerChecker() {
                     newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                 }
                 else {
-                   if(res){
-                       // console.log(result);
-                       // console.log(result.responseText);
-                       var float = $(cleanTxt).find(".wear-value .text-muted").html();
-                       var currentFloat = parseFloat(float.replace("Wear: ","").replace("%",""));
-                       var currentMaxFloat = parseFloat($(btn).parent().find("#count-" + id).parent().find(".maxFloat").text());
-                       res = res.replace("$", "");
-                       res = res.replace(",", "");
-                       var price = res;
-                       res = 100 - (res * 100) / (chprice * 0.97);
-                       res = Math.round(res * 100) / 100;
-                       var date = new Date();
-                       $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
-                       if(currentFloat < currentMaxFloat && res - discount > -4){
-                           $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkred; font-weight: bold'>"+float+"</span>");
-                       }else if(currentFloat < currentMaxFloat){
-                           $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkblue; font-weight: bold'>"+float+"</span>");
-                       }else{
-                           $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
-                       }
-                       $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
-                       $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
-                       if (res > discount) {
-                           $(btn).parent().find("#count-" + id).parent().find(".discount").css({
-                               "color": "green",
-                               "font-weight": "bold"
-                           });
-                           window.open(opsUrl);
-                           soundFound.volume = 1;
-                           soundFound.play();
-                           chromemes("Найден скин " + skinname + " в " + res + "%");
-                       } else if (discount - res < 1) {
-                           $(btn).parent().find("#count-" + id).parent().find(".discount").css({
-                               "color": "blue",
-                               "font-weight": "bold"
-                           });
-                       }
-                       if (counter < length - 1 && status === true) {
-                           var timeer = randomInteger(600, 1600);
+                    if(res){
+                        // console.log(result);
+                        // console.log(result.responseText);
+                        var float = $(cleanTxt).find(".wear-value .text-muted").html();
+                        var currentFloat = parseFloat(float.replace("Wear: ","").replace("%",""));
+                        var currentMaxFloat = parseFloat($(btn).parent().find("#count-" + id).parent().find(".maxFloat").text());
+                        res = res.replace("$", "");
+                        res = res.replace(",", "");
+                        var price = res;
+                        res = 100 - (res * 100) / (chprice * 0.97);
+                        res = Math.round(res * 100) / 100;
+                        var date = new Date();
+                        $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
+                        if(currentFloat < currentMaxFloat && res - discount > -4){
+                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkred; font-weight: bold'>"+float+"</span>");
+                        }else if(currentFloat < currentMaxFloat){
+                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkblue; font-weight: bold'>"+float+"</span>");
+                        }else{
+                            $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
+                        }
+                        $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
+                        $(btn).parent().find("#count-" + id).parent().find(".date").html(date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds());
+                        if (res > discount) {
+                            $(btn).parent().find("#count-" + id).parent().find(".discount").css({
+                                "color": "green",
+                                "font-weight": "bold"
+                            });
+                            window.open(opsUrl);
+                            soundFound.volume = 1;
+                            soundFound.play();
+                            chromemes("Найден скин " + skinname + " в " + res + "%");
+                        } else if (discount - res < 1) {
+                            $(btn).parent().find("#count-" + id).parent().find(".discount").css({
+                                "color": "blue",
+                                "font-weight": "bold"
+                            });
+                        }
+                        if (counter < length - 1 && status === true) {
+                            var timeer = randomInteger(600, 1600);
 
-                           counter++;
-                           $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                           checks = setTimeout(function () {
-                               dopplerPrice(counter, btn);
-                           }, timeer)
-                       } else {
-                           if (typeof Cookies.get("cycle") === "undefined") {
-                               $(".doppler_check").removeAttr("disabled");
-                               $(".loaderDoplers").html("Готов к работе");
-                           } else {
-                               counter = 0;
-                               $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                               checks = setTimeout(function () {
-                                   dopplerPrice(counter, btn);
-                               }, timeer)
-                           }
-                       }
-                   }else{
-                       newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
-                   }
+                            counter++;
+                            $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                            checks = setTimeout(function () {
+                                dopplerPrice(counter, btn);
+                            }, timeer)
+                        } else {
+                            if (typeof Cookies.get("cycle") === "undefined") {
+                                $(".doppler_check").removeAttr("disabled");
+                                $(".loaderDoplers").html("Готов к работе");
+                            } else {
+                                counter = 0;
+                                $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                                checks = setTimeout(function () {
+                                    dopplerPrice(counter, btn);
+                                }, timeer)
+                            }
+                        }
+                    }else{
+                        newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
+                    }
                 }
             }
         })
@@ -1066,47 +1019,7 @@ function newgetprices(start) {
         }
     })
 }
-
-function loadanalystprices() {
-    newgetprices();
-    setInterval(function () {
-        newgetprices();
-        showlogs("Цены обновлены" + mark);
-    }, 30000)
-    setTimeout(function () {
-        analystgetprices();
-    }, 800)
-    $(document).ajaxComplete(function () {
-        analystgetprices();
-    });
-}
-
-function analystgetprices() {
-
-    if (skinsdbprices.length > 0) {
-        $(".grid-item").each(function () {
-            if (typeof $(this).find(".changerprice").html() === 'undefined') {
-                var skinName = $(this).find(".card-header a").text();
-                var opsprice = $(this).find(".tag-primary.tag-deals").text().replace("$", "");
-                var loaded = $.grep(skinsdbprices, function (e) {
-                    return e.skinname == skinName;
-                });
-                $(this).find(".btn.btn-sm.btn-success").attr("href", "https://opskins.com/?loc=shop_search&sort=lh&app=730_2&search_item=" + encodeURI(skinName) + "&search_internal=1");
-                if (typeof loaded[0] !== 'undefined') {
-                    var resom = 100 - (opsprice * 100) / (loaded[0].price * 0.97);
-                    var res1 = Math.round(resom * 100) / 100;
-                    $(this).find(".tag-primary.tag-deals").after("<a class='tag tag-success tag-deals changerprice' title='Цена выбраного обменника!'>$" + loaded[0].price + "</a>");
-                    $(this).find(".changerprice").after("<a class='tag tag-danger tag-deals changerdiscount' title='Дисконт выбраного обменника!'>" + res1 + "%</a>");
-                    $(this).find(".card-footer").before("<div style='width: 100; text-align: center; " + (loaded[0].actual === "fine" ? "color: #2bab2b;" : "color: #fff;") + " font-weight: 600;'>" + loaded[0].dataupd + "</div>");
-                } else {
-                    $(this).remove();
-                }
-            }
-        })
-    }
-}
-
-function newloadallprices(opd) {
+ function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
         $('.featured-item.scanned').each(function () {
             var route = $(this);
@@ -1174,7 +1087,7 @@ function newloadallprices(opd) {
                             phase = "";
                             break;
                     }
-                    if ($.cookie('changer') === "LOOT.Farm") {
+                    if ($.cookie('changer') === "LOOT.Farm" || $.cookie('changer') === "TradeIt.gg") {
                         phase = "";
                     }
                     skinName = skinName.trim() + phase + " " + exterior;
@@ -1189,7 +1102,12 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    var resom = 100 - (skinPrice * 100) / (loaded[0].price * 0.97);
+                    if($.cookie("changer") === "TradeIt.gg"){
+                        var comission = 0.981;
+                    }else{
+                        var comission = 0.97;
+                    }
+                    var resom = 100 - (skinPrice * 100) / (loaded[0].price * comission);
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
                     var currBoxWear = $(this).find(".wear-value small");
@@ -1235,20 +1153,20 @@ function newloadallprices(opd) {
                                 var opsPrice = skinPrice;
                                 var moneyPrice = loaded[0].price;
                                 makeTable($("#skinsDbSales .modal-body"), data, closestFloat, moneyPrice, opsPrice);
-                               setTimeout(function () {
-                                   var rowpos = $("#skinsDbSales .modal-body").find("tr.Selected").position();
-                                   $("#skinsDbSales").scrollTop(rowpos.top);
+                                setTimeout(function () {
+                                    var rowpos = $("#skinsDbSales .modal-body").find("tr.Selected").position();
+                                    $("#skinsDbSales").scrollTop(rowpos.top);
 
-                                   $(".calculateOverp").unbind().on("click", function () {
-                                       var csm = $(this).attr("money-price");
-                                       var ops = $(this).attr("ops-price");
-                                       var currOverpay = $(this).closest("tr").find("td.overpay").text();
-                                       var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
-                                       console.log(currentZaliv);
-                                       var result = Math.round((100 - ops*100 / currentZaliv) * 100) / 100;
-                                       alert("По текущим данным залив составит: " + result + "%. Цена залива: "+currentZaliv+"$");
-                                   })
-                           },1000);
+                                    $(".calculateOverp").unbind().on("click", function () {
+                                        var csm = $(this).attr("money-price");
+                                        var ops = $(this).attr("ops-price");
+                                        var currOverpay = $(this).closest("tr").find("td.overpay").text();
+                                        var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
+                                        console.log(currentZaliv);
+                                        var result = Math.round((100 - ops*100 / currentZaliv) * 100) / 100;
+                                        alert("По текущим данным залив составит: " + result + "%. Цена залива: "+currentZaliv+"$");
+                                    })
+                                },1000);
                             })
                         }
                     }
@@ -1282,7 +1200,9 @@ function newloadallprices(opd) {
                             }
                         }
                     }
-                    route.prepend(overstockChecker(skinName));
+                    if($.cookie("changer") == "CS.Money"){
+                        route.prepend(overstockChecker(skinName));
+                    }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1313,7 +1233,7 @@ function newloadallprices(opd) {
                             "font-weight" : "bold",
                             "font-size" : "24px"
                         });
-                       row.closest("tr").addClass("Selected");
+                        row.closest("tr").addClass("Selected");
                         // row.append($("<td style='color: darkred; font-weight: bold; font-size: 24px'>").text(c));
                     }
                     row.append($("<td class='"+colIndex+"'>").text(c));
@@ -1384,10 +1304,10 @@ function newloadallprices(opd) {
 
 function loadallprices() {
     newgetprices(true);
-   setInterval(function () {
+    setInterval(function () {
         newgetprices();
         showlogs("Цены обновлены" + mark);
-     }, 60000)
+    }, 60000)
     // setTimeout(function () {
     //     newloadallprices();
     // }, 800)
@@ -1485,9 +1405,23 @@ function settingsMenu() {
         }else{
             sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
         }
-        $("body").animate({
+        $("html").animate({
             scrollTop: 0
         }, 'fast');
+    })
+    $(document).keypress(function (event) {
+        console.log(event.keyCode);
+        if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099){  // S и ]
+            if(site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1){
+                sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
+            }else{
+                sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
+                console.log("in sort function");
+            }
+            $("html").animate({
+                scrollTop: 0
+            }, 'fast');
+        }
     })
 }
 
@@ -1537,7 +1471,7 @@ function autoWithdraw() {
                             var tradeoffers = res['response']['offers'];
                             $.each(tradeoffers, function (i, lvl) {
                                 if (lvl['tradeoffer_id'] !== null) {
-                                   var win = window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
+                                    var win = window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
                                     self.focus();
 
                                 }
@@ -2035,13 +1969,25 @@ function allAnotherGetLink(changer) {
             zindex = "z-index: 10000;";
 
             break;
+        case 'TradeIt' :
+            statArg = ".stattrak";
+            extArg = ".quality";
+            nameArg = "data-original-title";
+            currentItem = ".item";
+            priceArg = "data-price";
+            items = $(".sactive-game-inv").children();
+            zindex = "z-index: 10000;";
+
+            break;
     }
     items.each(function () {
         if (typeof $(this).find(".parse_button").html() === 'undefined') {
 
             // $(this).css("position", "relative");
-
-            stat = (typeof $(this).children(statArg).html() !== 'undefined') ? 1 : 0;
+            if(changer == "TradeIt"){
+                $(this).css("position","relative");
+            }
+            stat = (typeof $(this).find(statArg).html() !== 'undefined') ? 1 : 0;
             ext = $(this).find(extArg).text();
 
             var sticker = $(this).attr(nameArg).indexOf("Sticker");
@@ -2113,14 +2059,19 @@ function allAnotherGetLink(changer) {
                 return item.fullname === skinname;
             });
             if (typeof loaded !== 'undefined') {
-                if (changer === "LootFarm") {
+                if (changer === "LootFarm" || changer == "TradeIt") {
                     var changerPrice = $(this).attr(priceArg) / 100;
                 } else if (changer === "CSTrade") {
                     var changerPrice = $(this).find(priceArg).html().replace("$", "");
                 } else {
                     var changerPrice = $(this).attr(priceArg);
                 }
-                var opsmo = 100 - (loaded['opsprice'] * 100) / (changerPrice * 0.97);
+                if(changer == "TradeIt"){
+                    var comission = 0.981;
+                }else{
+                    var comission = 0.97;
+                }
+                var opsmo = 100 - (loaded['opsprice'] * 100) / (changerPrice * comission);
                 opsmo = Math.round(opsmo * 100) / 100;
                 var moops = 100 - loaded['opsprice'] * 95 / changerPrice;
                 moops = Math.round(moops * 100) / 100;
@@ -2147,13 +2098,17 @@ function allAnotherGetLink(changer) {
                 }
             }
         }
-        $(this).children(".link_button").unbind().on("click", function () {
+        $(this).find(".link_button").unbind().on("click", function () {
             var link = $(this).attr("href");
             window.open(link);
             return false;
         });
-        $(this).children(".parse_event").unbind().on("click", function () {
-            var allThis = $("div[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
+        $(this).find(".parse_event").unbind().on("click", function () {
+            if(changer !== 'TradeIt'){
+                var allThis = $("div[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
+            }else{
+                var allThis = $("li[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
+            }
             allThis.children(".parse_button").html("Load..");
             var nameToSave = $(this).parent().attr(nameArg);
             var link = $(this).parent().find(".link_button").attr("href");
@@ -2695,7 +2650,7 @@ function buyerChecker() {
         var timetoupd = 3000;
         n = 60;
 
-      var IntChecker = setInterval(function () {
+        var IntChecker = setInterval(function () {
             var currentBuyer = $(document).find(".buyers-club-icon span").attr("class");
             $.post(site).done(function (callback) {
                 var updatedBuyer = $(callback).find(".buyers-club-icon span").attr("class");
@@ -2704,14 +2659,14 @@ function buyerChecker() {
                     if (currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") > -1 && $(".skinsdbTimer").html() === "") {
                         startTimer(60, $(".skinsdbTimer"));
                     }
-                   if(currentBuyer.indexOf("red") > -1){
-                       n = n - 5;
-                       if(n < 20){
-                           timetoupd = 1000;
-                       }
-                   }
-                   console.log(n);
-                   console.log(currentBuyer);
+                    if(currentBuyer.indexOf("red") > -1){
+                        n = n - 5;
+                        if(n < 20){
+                            timetoupd = 1000;
+                        }
+                    }
+                    console.log(n);
+                    console.log(currentBuyer);
                 } else {
                     clearInterval(IntChecker);
                     $(document).find(".buyers-club-icon").remove();

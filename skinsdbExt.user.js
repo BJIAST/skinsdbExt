@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.15;
+var version = 2.16;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");

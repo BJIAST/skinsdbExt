@@ -397,7 +397,7 @@ function parseprice(red_btn, opd) {
         "cursor": "pointer",
         "background-color": "#d21d25",
         "font-size": "90%",
-        "z-index": 999
+        "z-index": 99
     });
     $(red_btn).on("click", function () {
         $(this).html("Loading..");
@@ -808,7 +808,7 @@ function dopplerChecker() {
                 dopplers_knife.push(skin);
             }
         })
-        dopplerPrice(elem, this, false);
+        dopplerPrice(0, this, false);
         // for(var elem = 0; elem < dopplers_knife.length; elem++){
         //     dopplerPrice(elem, this, true);
         // }
@@ -1102,7 +1102,7 @@ function newgetprices(start) {
                         })
 
                         if(currentFloat < max){
-                            route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
+                            route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;z-index: 99;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
                             overpayThis = true;
                             currBoxWear.css({
                                 "color" : "yellow",

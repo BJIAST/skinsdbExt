@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.16
+// @version      2.17
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.16;
+var version = 2.17;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -150,9 +150,6 @@ var version = 2.16;
     }
     if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
         dopplerChecker();
-    }
-    if (site == "http://skinsdb.online/?knifes_checker") {
-        knifeChecker();
     }
     steamAccept();
 }());
@@ -763,73 +760,6 @@ function offerAccept() {
     }, 3000);
 }
 
-function knifeChecker() {
-    var knifes = [];
-    knifes_query();
-    function knifes_query(){
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: "https://opskins.com/?app=730_2&loc=shop_search&sort=n&type=k",
-            onload: function (result){
-                $(result.responseText).find("#scroll").children().each(function (i) {
-                    if(i > 0){
-                        var wear = $(this).find('.text-muted').html()
-                        var grade = $(this).find('.text-muted').next().html();
-                        var name = $(this).find(".market-name.market-link").html().trim();
-                        if (wear !== "") {
-                            var phase = $(this).find('.text-muted').next().html();
-                            switch (phase) {
-                                case ' Covert Knife (Ruby)' :
-                                    phase = " Ruby";
-                                    break;
-                                case ' Covert Knife (Sapphire)' :
-                                    phase = " Sapphire";
-                                    break;
-                                case ' Covert Knife (Black Pearl)' :
-                                    phase = " Black Pearl";
-                                    break;
-                                case ' Covert Knife (Emerald)' :
-                                    phase = " Emerald";
-                                    break;
-                                default:
-                                    phase = phase.replace(/[/^\D+/()]/g, '');
-                            }
-                            switch (phase) {
-                                case '1' :
-                                    phase = " Phase 1";
-                                    break;
-                                case '2' :
-                                    phase = " Phase 2";
-                                    break;
-                                case '3' :
-                                    phase = " Phase 3";
-                                    break;
-                                case '4' :
-                                    phase = " Phase 4";
-                                    break;
-                                case '' :
-                                    phase = "";
-                                    break;
-                            }
-                            name = name + phase + " (" + wear + ")";
-                        }
-                        var amount = $(this).find(".item-amount").html().replace("$", "").replace(",", "");
-                        var skinId = $(this).find(".market-link").attr("href").split("&item=");
-                        skinId = skinId[1];
-
-                        var skin = {};
-                        skin['skinName'] = name;
-                        skin['skinPrice'] = parseFloat(amount);
-                        skin['skinId'] = skinId;
-                        knifes.push(skin);
-                    }
-                });
-                console.log(knifes);
-            }
-        })
-    }
-}
-
 function dopplerChecker() {
     var dopplers_knife = [], checks, status = false;
     $(".check_stop").on("click", function () {
@@ -878,19 +808,51 @@ function dopplerChecker() {
                 dopplers_knife.push(skin);
             }
         })
-        dopplerPrice(0, this, 0);
+        dopplerPrice(elem, this, false);
+        // for(var elem = 0; elem < dopplers_knife.length; elem++){
+        //     dopplerPrice(elem, this, true);
+        // }
+    })
+    $(".doppler_check_full").on("click", function () {
+        status = true;
+        $(".doppler_check_full").removeAttr("disabled");
+        $(this).attr("disabled", "disabled");
+        clearTimeout(checks);
+        dopplers_knife = [];
+        var full = 0;
+        $(this).parent().find(".table tbody tr").each(function () {
+            if ($(this).find(".discount").html() !== "") {
+                full++;
+            }
+        })
+        if (full === $(this).parent().find(".table tbody tr .discount").length) {
+            $(this).parent().find(".table tbody tr .discount").html("");
+        }
+        $(this).parent().find(".table tbody tr").each(function () {
+            if ($(this).find(".discount").html() === "") {
+                var skin = {};
+                skin['id'] = $(this).find(".id-counter").text();
+                skin['skinname'] = $(this).find(".skinname a").text();
+                skin['skinlink'] = $(this).find(".skinname a").attr("href");
+                skin['changer_price'] = $(this).find(".changer_price").text();
+                dopplers_knife.push(skin);
+            }
+        })
+        for(var elem = 0; elem < dopplers_knife.length; elem++){
+            dopplerPrice(elem, this, true);
+        }
     })
 
-    function dopplerPrice(n, btn, i) {
+    function dopplerPrice(n, btn, method = false) {
         var discount = $("#discount-value").val();
         if (n === dopplers_knife.length - 1) {
-            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount);
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount,method);
         } else if (n < dopplers_knife.length) {
-            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount);
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount,method);
         }
     }
 
-    function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount) {
+    function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount,method) {
         GM_xmlhttpRequest({
             method: "POST",
             url: opsUrl,
@@ -902,7 +864,7 @@ function dopplerChecker() {
                     console.log($(cleanTxt).find(".alert-danger").html());
                     if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. Have a look at some of our featured items:');
                     $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
-                    if (counter < length - 1 && status === true) {
+                    if (counter < length - 1 && status === true && method !== true) {
                         var timeer = randomInteger(600, 1600);
 
                         counter++;
@@ -968,24 +930,26 @@ function dopplerChecker() {
                                 "font-weight": "bold"
                             });
                         }
-                        if (counter < length - 1 && status === true) {
+                        if (counter < length - 1 && status === true && method !== true) {
                             var timeer = randomInteger(600, 1600);
 
                             counter++;
                             $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                             checks = setTimeout(function () {
                                 dopplerPrice(counter, btn);
-                            }, timeer)
+                                }, timeer)
                         } else {
                             if (typeof Cookies.get("cycle") === "undefined") {
                                 $(".doppler_check").removeAttr("disabled");
                                 $(".loaderDoplers").html("Готов к работе");
                             } else {
-                                counter = 0;
-                                $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
-                                checks = setTimeout(function () {
-                                    dopplerPrice(counter, btn);
-                                }, timeer)
+                                if(method !== true){
+                                    counter = 0;
+                                    $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
+                                    checks = setTimeout(function () {
+                                        dopplerPrice(counter, btn);
+                                    }, timeer)
+                                }
                             }
                         }
                     }else{
@@ -1110,10 +1074,12 @@ function newgetprices(start) {
                     var resom = 100 - (skinPrice * 100) / (loaded[0].price * comission);
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
-                    var currBoxWear = $(this).find(".wear-value small");
                     var overpayThis = false;
                     var overpayVal = 0;
+                    var currBoxWear = $(this).find(".wear-value small");
+
                     if(loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined'){
+
                         var closestFloat = null;
                         var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
                         var currentFloat = goal;
@@ -1128,11 +1094,15 @@ function newgetprices(start) {
                                     if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
                                         closestFloat = d;
                                         overpayVal = loaded[0]['overpay'][a]['overpay'];
+                                        overpayCloseDate = loaded[0]['overpay'][a]['overpay_date'];
+                                        overpayCloseFloat = loaded[0]['overpay'][a]['skinfloat'];
                                     }
                                 }
                             })
                         })
+
                         if(currentFloat < max){
+                            route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
                             overpayThis = true;
                             currBoxWear.css({
                                 "color" : "yellow",
@@ -1170,7 +1140,7 @@ function newgetprices(start) {
                             })
                         }
                     }
-                    if (res1 > savedDiscount) {
+                    if (res1 >= savedDiscount || overpayThis == true && overpayVal >= savedDiscount) {
                         if (loaded[0].actual === 'fine') {
                             if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
                                 $(this).css("border", "10px solid #8500ff");
@@ -1207,7 +1177,6 @@ function newgetprices(start) {
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
                         if(overpayThis){
-
                             route.find(".priceBtn").html("<span class='realOpsmo'>" + overpayVal + "</span>% | " + res1 + "%");
                         }else{
                             route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");

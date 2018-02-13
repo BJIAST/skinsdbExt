@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.17
+// @version      2.18
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.17;
+var version = 2.18;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -342,7 +342,7 @@ function autoBuyclick() {
 function fullpageparse(opd = "not") {
     $(".scanned").each(function () {
         if ($(this).find(".priceBtn").length === 0) {
-            $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;'><span class='label label-success priceBtn'>Price</span></div>");
+            $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 99;'><span class='label label-success priceBtn'>Price</span></div>");
             $(this).find(".priceBtn").attr("data-ext", "autoparse");
             parseprice($(this).find(".priceBtn"), opd);
 
@@ -352,7 +352,7 @@ function fullpageparse(opd = "not") {
     $(document).ajaxComplete(function () {
         $(".scanned").each(function () {
             if ($(this).find(".priceBtn").length === 0) {
-                $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;'><span class='label label-success priceBtn'>Price</span></div>");
+                $(this).prepend("<div style='position:absolute; text-align: right; top: 6px; right: 32px;z-index: 99;'><span class='label label-success priceBtn'>Price</span></div>");
                 $(this).find(".priceBtn").attr("data-ext", "autoparse");
                 parseprice($(this).find(".priceBtn"), opd);
 
@@ -1222,7 +1222,7 @@ function newgetprices(start) {
 
     function overstockChecker(skin) {
 
-        var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 999;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
+        var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
     $(".overstockChecker").unbind().on("click",function () {
@@ -1235,8 +1235,8 @@ function newgetprices(start) {
             url: "https://cs.money/check_skin_status?market_hash_name="+encodeURI(skinname),
             onload: function (result) {
                 $(currentBtn).css("background-color","rgba(24, 113, 206, 0.62)");
-                var check = result.responseText.indexOf("DDoS protection by Cloudflare");
-                if(check === -1){
+                var check = IsJsonString(result.responseText);
+                if(check){
                     var res = jQuery.parseJSON(result.responseText);
 
                     if(res.type === "Overstock"){
@@ -1249,9 +1249,11 @@ function newgetprices(start) {
                         $(currentBtn).css("background-color","red");
                         $(currentBtn).html("Не рабочий!");
                     }
-                }else{
+                }else if(check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1){
                     window.open("https://cs.money/");
                     $(currentBtn).html("Ошибка CloudFlare");
+                }else{
+                    $(currentBtn).html("Ошибка сайта");
                 }
             },
             onerror: function (res) {
@@ -1277,9 +1279,6 @@ function loadallprices() {
         newgetprices();
         showlogs("Цены обновлены" + mark);
     }, 60000)
-    // setTimeout(function () {
-    //     newloadallprices();
-    // }, 800)
     $(document).ajaxComplete(function () {
         newloadallprices();
     });
@@ -2149,8 +2148,12 @@ function csmocounters() {
     var bot_offer = $("#bots_offer_sum").text().replace("$", "").trim();
 
     $(".toofferClick").on("click", function () {
-        $("#inventory_user").children().each(function () {
-            var count = $(this).find(".f").text().replace("x", "");
+        $("#inventory_user").children().each(function (i) {
+            var count = $(this).find(".ct").text().trim();
+            if(count.length === 0){
+                count = 1;
+            }
+            // var count = $$("#inventory_user > .item")..find('.ct').text().replace("x", "").trim();
             var i;
             if ($(this).hasClass(".dis") === false) {
                 for (i = 0; i < count; i++) {
@@ -2163,7 +2166,11 @@ function csmocounters() {
     setInterval(function () {
         var counts = 0;
         $("#inventory_user").children().each(function () {
-            counts += Number($(this).attr("cost") * $(this).find(".f").text().replace("x", ""));
+            var ct = $(this).find(".ct").text().trim();
+            if(ct.length === 0){
+                ct = 1;
+            }
+            counts += Number($(this).attr("cost") * ct);
             if (counts === 0) {
                 $("#fullB").html(" / $ 0.00");
             } else {
@@ -2512,7 +2519,7 @@ function getautopick() {
                         // oneClickBuyScr(skinId, opsprice, skinname, opsmo, last);
                         main.append('<div id="' + random + skinId + '" class="featured-item col-sxs-12 col-xs-6 col-sm-6 col-md-4 col-lg-3 center-block app_730_2 item_186106056 has-wear scanned">' + html + '</div>');
                         $("#" + random + skinId).find(".btn.btn-success").attr("onclick", $(html).find(".btn.btn-success").attr('onclick') + ";$(this).closest('.scanned').remove();");
-                        $("#" + random + skinId).prepend('<div style="position:absolute; text-align: right; top: 6px; right: 32px;z-index: 999;"><span class="label label-success priceBtn" data-ext="autoparse" style="cursor: pointer; background-color: rgb(210, 29, 37); font-size: 90%; z-index: 999;"><span class="realOpsmo">' + opsmo + '</span>%</span></div>');
+                        $("#" + random + skinId).prepend('<div style="position:absolute; text-align: right; top: 6px; right: 32px;z-index: 99;"><span class="label label-success priceBtn" data-ext="autoparse" style="cursor: pointer; background-color: rgb(210, 29, 37); font-size: 90%; z-index: 999;"><span class="realOpsmo">' + opsmo + '</span>%</span></div>');
                         $("#" + random + skinId).prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + date + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + changer_price + "$)" + (count ? " - " + count + " шт." : "") + "</span></div>");
                     })
                 }
@@ -2747,4 +2754,12 @@ function include(url) {
     var script = document.createElement('script');
     script.src = url;
     document.getElementsByTagName('head')[0].appendChild(script);
+}
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }

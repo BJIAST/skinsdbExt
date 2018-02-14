@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.xyz/
-// @version      2.18
+// @version      2.19
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.18;
+var version = 2.19;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");

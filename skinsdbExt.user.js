@@ -37,32 +37,39 @@ var version = 2.18;
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
-
-        var myData = new FormData();
-        myData.append("checkpay", true);
-        GM_xmlhttpRequest({
-            method: "POST",
-            url: scriptUrl,
-            data: myData,
-            onload: function (result) {
-                JSONdata = JSON.parse(result.responseText);
-                if (JSONdata['error']) {
-                    $(".navbar-nav").append("<li class='menu csmupd'>" + JSONdata['error'] + "</li>");
-                }
-                if (JSONdata['success']) {
-                    $.cookie("role", JSONdata['role']);
-                    $.cookie("apikey", JSONdata['key']);
-                    $.cookie("changer", JSONdata['main-changer']);
-                    if (JSONdata['discount'] !== null) {
-                        $.cookie("savedDisc", JSONdata['discount']);
-                    } else {
-                        $.cookie("savedDisc", "Укажи дисконт в настройках!");
+        if(typeof $.cookie('user-auth') !== 'undefined'){
+            console.log("Loaded without server!");
+            opsbotload(site);
+        }else{
+            var myData = new FormData();
+            myData.append("checkpay", true);
+            GM_xmlhttpRequest({
+                method: "POST",
+                url: scriptUrl,
+                data: myData,
+                onload: function (result) {
+                    JSONdata = JSON.parse(result.responseText);
+                    if (JSONdata['error']) {
+                        $(".navbar-nav").append("<li class='menu csmupd'>" + JSONdata['error'] + "</li>");
                     }
-                    versionChecker(JSONdata['user-version'], JSONdata['current-version']);
-                    opsbotload(site);
+                    if (JSONdata['success']) {
+                        var userAuthLife = new Date();
+                        userAuthLife.setTime(userAuthLife.getTime() + (600 * 1000));
+                        $.cookie('user-auth', true, { expires: userAuthLife });
+                        $.cookie("role", JSONdata['role']);
+                        $.cookie("apikey", JSONdata['key']);
+                        $.cookie("changer", JSONdata['main-changer']);
+                        if (JSONdata['discount'] !== null) {
+                            $.cookie("savedDisc", JSONdata['discount']);
+                        } else {
+                            $.cookie("savedDisc", "Укажи дисконт в настройках!");
+                        }
+                        versionChecker(JSONdata['user-version'], JSONdata['current-version']);
+                        opsbotload(site);
+                    }
                 }
-            }
-        })
+            })
+        }
     }
     if (site === "https://loot.farm/") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
@@ -369,7 +376,6 @@ function sugestedDiscount(element) {
 };
 
 function oneItemDiscount() {
-    newgetprices(true);
     if(typeof $(".featured-item-large-video").html() !== 'undefined'){
         $(".featured-item-large-video").addClass('featured-item').addClass('scanned');
     }else{
@@ -388,6 +394,8 @@ function oneItemDiscount() {
         "z-index": 999
     });
     $(".scanned.featured-item").css("height","auto");
+    newgetprices(true);
+
 
     // setTimeout(newloadallprices, 600);
 }
@@ -962,26 +970,41 @@ function dopplerChecker() {
 }
 
 function newgetprices(start) {
-    if (skinsdbprices.length > 0) {
-        delete skinsdbprices;
-        skinsdbprices = [];
-    }
-    var myData = new FormData();
-    myData.append("newgetprices", true);
-    GM_xmlhttpRequest({
-        method: "POST",
-        url: scriptUrl,
-        data: myData,
-        onload: function (result) {
-            var res = jQuery.parseJSON(result.responseText);
-            res = res[0];
-            skinsdbprices.push(res);
-            skinsdbprices = skinsdbprices[0];
-            if(start){
-                newloadallprices();
-            }
+    userStorage = window.localStorage;
+    if(start && userStorage.getItem('skinsdbExt') !== null && $.cookie('storageTimer')){
+        console.log("loaded from storage");
+        var res = jQuery.parseJSON(userStorage.getItem('skinsdbExt'));
+        res = res[0];
+        skinsdbprices.push(res);
+        skinsdbprices = skinsdbprices[0];
+        newloadallprices();
+    }else{
+        if (skinsdbprices.length > 0) {
+            delete skinsdbprices;
+            skinsdbprices = [];
         }
-    })
+        userStorage.removeItem("skinsdbExt");
+        var myData = new FormData();
+        myData.append("newgetprices", true);
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: scriptUrl,
+            data: myData,
+            onload: function (result) {
+                var res = jQuery.parseJSON(result.responseText);
+                res = res[0];
+                userStorage.setItem('skinsdbExt',result.responseText);
+                var storageLife = new Date();
+                storageLife.setTime(storageLife.getTime() + (60 * 1000));
+                $.cookie('storageTimer', true, { expires: storageLife });
+                skinsdbprices.push(res);
+                skinsdbprices = skinsdbprices[0];
+                if(start){
+                    newloadallprices();
+                }
+            }
+        })
+    }
 }
  function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
@@ -1349,10 +1372,7 @@ function settingsMenu() {
         "width": "800px",
         "right": "10%"
     });
-    if ($.cookie("role") !== 'superuser' && $.cookie("role") !== 'admin') {
-        $(".atbuy").hide();
-    }
-    $("#autobuy").on("change", function () {
+       $("#autobuy").on("change", function () {
         if (this.checked) {
             $.cookie("autobuy", "true");
         } else {
@@ -1713,7 +1733,7 @@ function getLink() {
             var skinname = $(this).attr("hash");
 
             if (typeof $(this).find(".link_button").html() === 'undefined') {
-                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;">Link</a>');
+                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=&quot;' + encodeURI(name) + '&quot;&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;">Link</a>');
 
                 if (favSkins.length > 0) {
                     var favs;
@@ -2414,8 +2434,8 @@ function getautopick() {
         })
         var display = $('.scrtimer span');
         if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-            console.log("Низкий баланс. Количество запросов ограничено");
-            showlogs("Низкий баланс. Количество запросов ограничено");
+            // console.log("Низкий баланс. Количество запросов ограничено");
+            // showlogs("Низкий баланс. Количество запросов ограничено");
             reloadpage(display, 10);
 
             if ($.cookie("role") === "admin") {
@@ -2560,8 +2580,8 @@ function getautopick() {
                         }
                         if (i === (skinsforcheck.length - 1)) {
                             if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                                console.log("Низкий баланс. Количество запросов ограничено");
-                                showlogs("Низкий баланс. Количество запросов ограничено");
+                                // console.log("Низкий баланс. Количество запросов ограничено");
+                                // showlogs("Низкий баланс. Количество запросов ограничено");
                                 random = randomInteger(50000, 120000)
                                 setTimeout(function () {
                                     if ($.cookie("role") === "admin") {
@@ -2582,8 +2602,8 @@ function getautopick() {
                     }
                 } else {
                     if (parseFloat($("#op-count").text().replace("$", "")) < 1) {
-                        console.log("Низкий баланс. Количество запросов ограничено");
-                        showlogs("Низкий баланс. Количество запросов ограничено");
+                        // console.log("Низкий баланс. Количество запросов ограничено");
+                        // showlogs("Низкий баланс. Количество запросов ограничено");
                         random = randomInteger(50000, 120000)
                         setTimeout(function () {
                             if ($.cookie("role") === "admin") {

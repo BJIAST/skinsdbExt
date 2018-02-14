@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         skinsdbExt
-// @namespace   http://skinsdb.xyz/
+// @namespace   https://skinsdb.online/
 // @version      2.19
 // @description  try to hard!
 // @author       BJIAST
-// @match       http://skinsdb.online/*
+// @match       https://skinsdb.online/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://cs.money/*
 // @match       http://cs.money/*
@@ -20,9 +20,9 @@
 // ==/UserScript==
 
 
-var scriptUrl = "http://skinsdb.online/scripts/opsinc.php";
+var scriptUrl = "https://skinsdb.online/scripts/opsinc.php";
 var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
-var soundFound = new Audio('http://skinsdb.online/assets/ready.mp3');
+var soundFound = new Audio('https://skinsdb.online/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 var skinsLoaded = [];
@@ -155,7 +155,7 @@ var version = 2.19;
             })
         }, 300)
     }
-    if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
+    if (site == "https://skinsdb.online/?doppler_search" || site == "https://skinsdb.online/?favsearch") {
         dopplerChecker();
     }
     steamAccept();
@@ -311,7 +311,7 @@ function csmoparser() {
                     myData.append("csmoprices", jsonReady);
                     GM_xmlhttpRequest({
                         method: "POST",
-                        url: "http://skinsdb.online/parsers/money.php",
+                        url: "https://skinsdb.online/parsers/money.php",
                         data: myData,
                         onload: function (result) {
                             console.log(result.responseText);

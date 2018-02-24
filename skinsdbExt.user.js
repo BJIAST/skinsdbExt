@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.19
+// @version      2.20
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.19;
+var version = 2.20;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -148,7 +148,7 @@ var version = 2.19;
                         include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
                         versionChecker(JSONdata['user-version'], JSONdata['current-version']);
                         csmomenu();
-                        csmoparser();
+                        // csmoparser();
                         favSkins = JSONdata['favskins'];
                     }
                 }
@@ -196,18 +196,18 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=good_deals" + opslink2[1]) {
         fullpageparse();
         loadallprices();
-        csmoparser();
+        // csmoparser();
         addFilterBtn();
     }
     if (site == "https://opskins.com/?loc=shop_browse") {
         fullpageparse();
         loadallprices();
-        csmoparser();
+        // csmoparser();
     }
     if (site == "https://opskins.com/?loc=shop_browse&sort=n") {
         var getAutoInt;
         getautopick();
-        csmoparser();
+        // csmoparser();
         loadallprices();
     }
     if (site == "https://opskins.com/?loc=shop_view_item" + opslink4[1]) {
@@ -235,93 +235,93 @@ function opsbotload(site) {
     }
 }
 
-function csmoparser() {
-    var myData = new FormData();
-    myData.append("checkparse", true);
-    GM_xmlhttpRequest({
-        method: "POST",
-        url: scriptUrl,
-        data: myData,
-        onload: function (result) {
-            res = jQuery.parseJSON(result.responseText);
-            if (res['success']) {
-                getQuery();
-                setInterval(getQuery, 120000);
-                showlogs("Парсер включен!");
-            }
-        }
-    })
-
-
-    function getQuery() {
-        var url_date = new Date().getTime() / 1000;
-        var url = "http://cs.money/load_bots_inventory?hash"+url_date;
-        console.log(url);
-        GM_xmlhttpRequest({
-            method: "GET",
-            url: url,
-            onload: function (res) {
-
-                if (res.responseText[0] === "<" && site == "https://opskins.com/" + opslink3[1]) {
-                    window.open("http://cs.money/");
-                } else {
-                    json = JSON.parse(res.responseText);
-                    // console.log(json);
-                    var skins = [];
-                    $.each(json, function (key, item) {
-                        var skinname = "";
-                        switch (item['e']) {
-                            case 'FN' :
-                                skinname = item['m'] + " (Factory New)";
-                                break;
-                            case 'MW' :
-                                skinname = item['m'] + " (Minimal Wear)";
-                                break;
-                            case 'FT' :
-                                skinname = item['m'] + " (Field-Tested)";
-                                break;
-                            case 'WW' :
-                                skinname = item['m'] + " (Well-Worn)";
-                                break;
-                            case 'BS' :
-                                skinname = item['m'] + " (Battle-Scarred)";
-                                break;
-                            default :
-                                skinname = item['m'];
-                                break;
-                        }
-                        var target = skinname;
-                        var result = $.grep(skins, function (e) {
-                            return e.skinname == target;
-                        });
-                        if (typeof result[0] == 'undefined' && typeof item['ar'] == 'undefined') {
-                            console.log(item['ar'] + " - "  + skinname);
-                            var thisskin = {};
-                            thisskin['skinname'] = skinname;
-                            thisskin['csmprice'] = item['p'];
-                            thisskin['counter'] = 1;
-                            skins.push(thisskin);
-                        } else if(typeof result[0] != 'undefined') {
-                            objIndex = skins.findIndex((obj => obj.skinname == skinname));
-                            skins[objIndex].counter = skins[objIndex].counter + 1;
-                        }
-                    });
-                    jsonReady = JSON.stringify(skins);
-                    var myData = new FormData();
-                    myData.append("csmoprices", jsonReady);
-                    GM_xmlhttpRequest({
-                        method: "POST",
-                        url: "https://skinsdb.online/parsers/money.php",
-                        data: myData,
-                        onload: function (result) {
-                            console.log(result.responseText);
-                        }
-                    })
-                }
-            }
-        })
-    }
-}
+// function csmoparser() {
+//     var myData = new FormData();
+//     myData.append("checkparse", true);
+//     GM_xmlhttpRequest({
+//         method: "POST",
+//         url: scriptUrl,
+//         data: myData,
+//         onload: function (result) {
+//             res = jQuery.parseJSON(result.responseText);
+//             if (res['success']) {
+//                 getQuery();
+//                 setInterval(getQuery, 120000);
+//                 showlogs("Парсер включен!");
+//             }
+//         }
+//     })
+//
+//
+//     function getQuery() {
+//         var url_date = new Date().getTime() / 1000;
+//         var url = "http://cs.money/load_bots_inventory?hash"+url_date;
+//         console.log(url);
+//         GM_xmlhttpRequest({
+//             method: "GET",
+//             url: url,
+//             onload: function (res) {
+//
+//                 if (res.responseText[0] === "<" && site == "https://opskins.com/" + opslink3[1]) {
+//                     window.open("http://cs.money/");
+//                 } else {
+//                     json = JSON.parse(res.responseText);
+//                     // console.log(json);
+//                     var skins = [];
+//                     $.each(json, function (key, item) {
+//                         var skinname = "";
+//                         switch (item['e']) {
+//                             case 'FN' :
+//                                 skinname = item['m'] + " (Factory New)";
+//                                 break;
+//                             case 'MW' :
+//                                 skinname = item['m'] + " (Minimal Wear)";
+//                                 break;
+//                             case 'FT' :
+//                                 skinname = item['m'] + " (Field-Tested)";
+//                                 break;
+//                             case 'WW' :
+//                                 skinname = item['m'] + " (Well-Worn)";
+//                                 break;
+//                             case 'BS' :
+//                                 skinname = item['m'] + " (Battle-Scarred)";
+//                                 break;
+//                             default :
+//                                 skinname = item['m'];
+//                                 break;
+//                         }
+//                         var target = skinname;
+//                         var result = $.grep(skins, function (e) {
+//                             return e.skinname == target;
+//                         });
+//                         if (typeof result[0] == 'undefined' && typeof item['ar'] == 'undefined') {
+//                             console.log(item['ar'] + " - "  + skinname);
+//                             var thisskin = {};
+//                             thisskin['skinname'] = skinname;
+//                             thisskin['csmprice'] = item['p'];
+//                             thisskin['counter'] = 1;
+//                             skins.push(thisskin);
+//                         } else if(typeof result[0] != 'undefined') {
+//                             objIndex = skins.findIndex((obj => obj.skinname == skinname));
+//                             skins[objIndex].counter = skins[objIndex].counter + 1;
+//                         }
+//                     });
+//                     jsonReady = JSON.stringify(skins);
+//                     var myData = new FormData();
+//                     myData.append("csmoprices", jsonReady);
+//                     GM_xmlhttpRequest({
+//                         method: "POST",
+//                         url: "https://skinsdb.online/parsers/money.php",
+//                         data: myData,
+//                         onload: function (result) {
+//                             console.log(result.responseText);
+//                         }
+//                     })
+//                 }
+//             }
+//         })
+//     }
+// }
 
 function autoBuyclick() {
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
@@ -1180,9 +1180,11 @@ function newgetprices(start) {
                             skin['skinname'] = $(this).find(".market-link").text()
                             skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
                             skinsLoaded.push(skin);
-                            $("#ThatisDisc").show();
                             $("#ThatisDisc").html(skinsLoaded.length);
                             $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                            if($("#ThatisDisc").css('display') === 'none'){
+                                $("#ThatisDisc").show();
+                            }
                         } else if (loaded[0].actual === 'bad') {
                             $(this).css("border", "10px solid orange");
                         }
@@ -1297,6 +1299,7 @@ function newgetprices(start) {
 }
 
 function loadallprices() {
+    $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
     newgetprices(true);
     setInterval(function () {
         newgetprices();
@@ -1305,7 +1308,6 @@ function loadallprices() {
     $(document).ajaxComplete(function () {
         newloadallprices();
     });
-    $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
     $("#ThatisDisc").on("click", function () {
         skinsLoaded.splice(0, 1);
         // console.table(skinsLoaded);

@@ -1467,6 +1467,8 @@ function saveDiscount(discount) {
         onload: function (result) {
             var res = jQuery.parseJSON(result.responseText);
             if (res['succces']) {
+                var userAuthLife = new Date();
+                userAuthLife.setTime(userAuthLife.getTime() + (600 * 1000));
                 $.cookie("savedDisc", discount, { expires: userAuthLife });
                 $("#savDisc").html(discount);
                 showlogs("Сохранено!");

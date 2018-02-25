@@ -1262,7 +1262,7 @@ function newgetprices(start) {
         var lowestPrice = Number($("body").find(".scanned .item-amount").html().replace("$","").replace(",",""));
         var myPrice = Number($(this).closest(".scanned").find(".item-amount").html().replace("$","").replace(",",""));
         var myNewPrice = lowestPrice - 0.01;
-        var answer = Number(prompt("Извенить цену?", Math.round(myNewPrice * 100) / 100));
+        var answer = Number(prompt("Извенить цену?", Math.round(myNewPrice * 100) / 100).replace(",","."));
         var changedDif = 0;
         var accept = false;
         if(isNaN(answer) || answer == false){

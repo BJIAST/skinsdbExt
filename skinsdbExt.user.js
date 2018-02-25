@@ -1276,7 +1276,8 @@ function newgetprices(start) {
             accept = confirm("Изменить цену на " + answer + "$");
         }
         if(accept){
-            answer = answer * 100;
+            answer = parseInt(answer * 100);
+            console.log(answer);
             $.post("https://api.opskins.com/ISales/EditPrice/v1/", {"saleid" : saleid, "price" : answer, "key" : apikey}).done(function (res) {
                 if(res['status'] === 1){
                     sendAlert("success", "Изменено!"+mark);

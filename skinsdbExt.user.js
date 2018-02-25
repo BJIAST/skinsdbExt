@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.20
+// @version      2.21
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.20;
+var version = 2.21;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1198,6 +1198,9 @@ function newgetprices(start) {
                     if($.cookie("changer") == "CS.Money"){
                         route.prepend(overstockChecker(skinName));
                     }
+                    if(typeof route.find(".fa.fa-user").html() !== 'undefined'){
+                        route.prepend(changeOpsPrice(skinId));
+                    }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1244,12 +1247,50 @@ function newgetprices(start) {
         return container.append(table);
     }
 
-
+    function changeOpsPrice(saleid) {
+        var htmlres = '<button class="changeOpsPrice" saleid="'+saleid+'" style="border:0;cursor: pointer; background-color: rgba(222, 4, 4, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;right: 13px;outline: none;">Изменить цену</button>';
+        return htmlres;
+    }
     function overstockChecker(skin) {
 
         var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
+    $(".changeOpsPrice").unbind().on("click", function () {
+        var saleid = $(this).attr('saleid');
+        var apikey = $.cookie("apikey");
+        var lowestPrice = Number($("body").find(".scanned .item-amount").html().replace("$","").replace(",",""));
+        var myPrice = Number($(this).closest(".scanned").find(".item-amount").html().replace("$","").replace(",",""));
+        var myNewPrice = lowestPrice - 0.01;
+        var answer = Number(prompt("Извенить цену?", Math.round(myNewPrice * 100) / 100));
+        var changedDif = 0;
+        var accept = false;
+        if(isNaN(answer) || answer == false){
+            sendAlert("warning", "Отмена!");
+            return false;
+        }
+        changedDif = 100 - (answer*100/myPrice);
+        if(changedDif > 5 || changedDif < -5){
+            accept = confirm("!!!!!ВНИМАНИЕ!!!!!!!!Цена "+answer+"$ слишком отличается, уверен?");
+        }else{
+            accept = confirm("Изменить цену на " + answer + "$");
+        }
+        if(accept){
+            answer = answer * 100;
+            $.post("https://api.opskins.com/ISales/EditPrice/v1/", {"saleid" : saleid, "price" : answer, "key" : apikey}).done(function (res) {
+                if(res['status'] === 1){
+                    sendAlert("success", "Изменено!"+mark);
+                    setTimeout(function () {
+                        location.reload();
+                    },1500)
+                }else{
+                    sendAlert("danger", res['message']+mark); // 2012 - no changeed
+                }
+            })
+        }else{
+            sendAlert("warning", "Отмена!"+mark);
+        }
+    })
     $(".overstockChecker").unbind().on("click",function () {
         var currentBtn = this;
         $(currentBtn).html("Проверка..");

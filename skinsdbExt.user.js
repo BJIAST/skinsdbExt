@@ -56,13 +56,13 @@ var version = 2.21;
                         var userAuthLife = new Date();
                         userAuthLife.setTime(userAuthLife.getTime() + (600 * 1000));
                         $.cookie('user-auth', true, { expires: userAuthLife });
-                        $.cookie("role", JSONdata['role']);
-                        $.cookie("apikey", JSONdata['key']);
-                        $.cookie("changer", JSONdata['main-changer']);
+                        $.cookie("role", JSONdata['role'], { expires: userAuthLife });
+                        $.cookie("apikey", JSONdata['key'], { expires: userAuthLife });
+                        $.cookie("changer", JSONdata['main-changer'], { expires: userAuthLife });
                         if (JSONdata['discount'] !== null) {
-                            $.cookie("savedDisc", JSONdata['discount']);
+                            $.cookie("savedDisc", JSONdata['discount'], { expires: userAuthLife });
                         } else {
-                            $.cookie("savedDisc", "Укажи дисконт в настройках!");
+                            $.cookie("savedDisc", "Укажи дисконт в настройках!", { expires: userAuthLife });
                         }
                         versionChecker(JSONdata['user-version'], JSONdata['current-version']);
                         opsbotload(site);
@@ -1467,7 +1467,7 @@ function saveDiscount(discount) {
         onload: function (result) {
             var res = jQuery.parseJSON(result.responseText);
             if (res['succces']) {
-                $.cookie("savedDisc", discount);
+                $.cookie("savedDisc", discount, { expires: userAuthLife });
                 $("#savDisc").html(discount);
                 showlogs("Сохранено!");
             }

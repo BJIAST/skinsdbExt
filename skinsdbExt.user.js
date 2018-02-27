@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.21
+// @version      2.22
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.21;
+var version = 2.22;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1178,7 +1178,7 @@ function newgetprices(start) {
                             skin['skinlink'] = "#" + skinId;
                             skin['skindisc'] = res1;
                             skin['skinname'] = $(this).find(".market-link").text()
-                            skin['skinprice'] = parseInt(parseFloat($(this).find(".item-amount").text().replace("$", "")) * 100);
+                            skin['skinprice'] = parseInt(Number($(this).find(".item-amount").text().replace("$", "").replace(",","")) * 100);
                             skinsLoaded.push(skin);
                             $("#ThatisDisc").html(skinsLoaded.length);
                             $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
@@ -1201,6 +1201,7 @@ function newgetprices(start) {
                     if(typeof route.find(".fa.fa-user").html() !== 'undefined'){
                         route.prepend(changeOpsPrice(skinId));
                     }
+                    extendedBuy(this,skinId,parseInt(Math.round(Number($(this).find(".item-amount").text().replace("$", "").replace(",","")) * 100)));
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1216,6 +1217,10 @@ function newgetprices(start) {
             }
         })
     }
+     function extendedBuy(item,id,price){
+        $(item).find(".btn-primary").remove();
+        $(item).find(".btn-orange").before("<button class='btn btn-primary buyext' skin-id='"+id+"' skin-price='"+price+"'>BN | Ext</button>");
+     }
     function makeTable(container, data,closestFloat, money, ops) {
         var table = $("<table border='1px' width='100%' style='font-size: 20px'></table>").addClass('CSSTableGenerator');
         table.append("<thead></thead>");
@@ -1256,13 +1261,39 @@ function newgetprices(start) {
         var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
+     $(".buyext").unbind().on("click",function () {
+         $.post("https://api.opskins.com/ISales/BuyItems/v1/", { key : $.cookie("apikey"), saleids : $(this).attr("skin-id"), total : $(this).attr("skin-price")}).done(function(res){
+             if(res['status'] == 2002){
+                 sendAlert(
+                     'warning',
+                     'Сори, еще нельзя!' + mark
+                 );
+             }else if (res['status'] == 2003){
+                 sendAlert(
+                     'warning',
+                     'Цена изменилась или предмета уже нету' + mark
+                 );
+             } else if (res['status'] == 1){
+                 sendAlert(
+                     'success',
+                     'Купил блеат!!' +mark
+                 );
+                 updateBalance(true);
+                 updateOsiCount(true);
+             }
+             console.log(res);
+         })
+     })
     $(".changeOpsPrice").unbind().on("click", function () {
         var saleid = $(this).attr('saleid');
         var apikey = $.cookie("apikey");
         var lowestPrice = Number($("body").find(".scanned .item-amount").html().replace("$","").replace(",",""));
         var myPrice = Number($(this).closest(".scanned").find(".item-amount").html().replace("$","").replace(",",""));
+        myPrice = parseInt(Math.round(myPrice * 100))
         var myNewPrice = lowestPrice - 0.01;
-        var answer = Number(prompt("Извенить цену?", Math.round(myNewPrice * 100) / 100).replace(",","."));
+        var answer = Number(prompt("Изменить цену?", Math.round(myNewPrice * 100) / 100).replace(",","."));
+        answer = parseInt(Math.round(answer * 100));
+        var outputAnsw = answer/100;
         var changedDif = 0;
         var accept = false;
         if(isNaN(answer) || answer == false){
@@ -1271,12 +1302,12 @@ function newgetprices(start) {
         }
         changedDif = 100 - (answer*100/myPrice);
         if(changedDif > 5 || changedDif < -5){
-            accept = confirm("!!!!!ВНИМАНИЕ!!!!!!!!Цена "+answer+"$ слишком отличается, уверен?");
+            sendAlert("warning", "Слишком большая разница. Я не буду этого делать!");
+            return false;
         }else{
-            accept = confirm("Изменить цену на " + answer + "$");
+            accept = confirm("Изменить цену на " + outputAnsw + "$");
         }
         if(accept){
-            answer = parseInt(answer * 100);
             console.log(answer);
             $.post("https://api.opskins.com/ISales/EditPrice/v1/", {"saleid" : saleid, "price" : answer, "key" : apikey}).done(function (res) {
                 if(res['status'] === 1){
@@ -1442,7 +1473,7 @@ function settingsMenu() {
         }, 'fast');
     })
     $(document).keypress(function (event) {
-        console.log(event.keyCode);
+        // console.log(event.keyCode);
         if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099){  // S и ]
             if(site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1){
                 sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
@@ -2446,7 +2477,7 @@ function friendssells() {
     })
 
     function check(array) {
-        console.log("working");
+        // console.log("working");
         $("#scroll").children(".scanned").each(function () {
             if (typeof $(this).find(".friendsicon").html() === 'undefined') {
                 var skinId = Number($(this).find(".market-name.market-link").attr("href").replace("?loc=shop_view_item&item=", ""));

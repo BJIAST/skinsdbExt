@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.22
+// @version      2.23
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.22;
+var version = 2.23;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1037,6 +1037,8 @@ function newgetprices(start) {
                         skinId = skinId.replace(")", "");
                     }
                 }
+                var inspectIdFull = route.find(".item-buttons > a").attr("href");
+                var inspectId = inspectIdFull.replace("steam://rungame/730/76561202255233023/+csgo_econ_action_preview%","");
                 if (route.find(".text-muted").html() != "") {
                     var exterior = "(" + route.find(".text-muted").html() + ")";
 
@@ -1201,7 +1203,8 @@ function newgetprices(start) {
                     if(typeof route.find(".fa.fa-user").html() !== 'undefined'){
                         route.prepend(changeOpsPrice(skinId));
                     }
-                    extendedBuy(this,skinId,parseInt(Math.round(Number($(this).find(".item-amount").text().replace("$", "").replace(",","")) * 100)));
+                    inspectExt(this,skinId,inspectId);
+                    inspectPaternId(this,skinId,inspectIdFull);
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1217,9 +1220,12 @@ function newgetprices(start) {
             }
         })
     }
-     function extendedBuy(item,id,price){
+     function inspectExt(item,id,inspectId){
         $(item).find(".btn-primary").remove();
-        $(item).find(".btn-orange").before("<button class='btn btn-primary buyext' skin-id='"+id+"' skin-price='"+price+"'>BN | Ext</button>");
+        $(item).find(".btn-orange").before("<button class='btn btn-primary inspectExt' skin-id='"+id+"' inspect-id='"+inspectId+"'>IS</button>");
+     }
+     function inspectPaternId(item,id,inspectId) {
+         $(item).find(".inspectExt").after("<button class='btn btn-primary inspectPatternId' skin-id='"+id+"' inspect-id='"+inspectId+"'>PI</button>");
      }
     function makeTable(container, data,closestFloat, money, ops) {
         var table = $("<table border='1px' width='100%' style='font-size: 20px'></table>").addClass('CSSTableGenerator');
@@ -1261,27 +1267,32 @@ function newgetprices(start) {
         var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
-     $(".buyext").unbind().on("click",function () {
-         $.post("https://api.opskins.com/ISales/BuyItems/v1/", { key : $.cookie("apikey"), saleids : $(this).attr("skin-id"), total : $(this).attr("skin-price")}).done(function(res){
-             if(res['status'] == 2002){
-                 sendAlert(
-                     'warning',
-                     'Сори, еще нельзя!' + mark
-                 );
-             }else if (res['status'] == 2003){
-                 sendAlert(
-                     'warning',
-                     'Цена изменилась или предмета уже нету' + mark
-                 );
-             } else if (res['status'] == 1){
-                 sendAlert(
-                     'success',
-                     'Купил блеат!!' +mark
-                 );
-                 updateBalance(true);
-                 updateOsiCount(true);
+     $(".inspectExt").unbind().on("click",function () {
+         var url = "https://metjm.net/csgo/#" + $(this).attr("inspect-id");
+        window.open(url);
+     })
+     $(".inspectPatternId").unbind().on("click",function () {
+         GM_xmlhttpRequest({
+             method: 'GET',
+             url: "https://cs.money/inspect_skin?inspect_link="+$(this).attr("inspect-id"),
+             onload: function (result) {
+                 var check = IsJsonString(result.responseText);
+                 if(check){
+                     var info = JSON.parse(result.responseText);
+                     console.log(result.responseText);
+                     sendAlert("success", "Pattern Index: " + info.paintseed);
+                 }else if(check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1){
+                     window.open("https://cs.money/");
+                     sendAlert("warning", "Ошибка CloudFlare");
+                 }else{
+                     sendAlert("warning", "Ошибка сайта");
+                 }
+             },
+             onerror: function (res) {
+                 sendAlert("danger","Ошибка запроса");
+                 console.log(res.responseText);
+
              }
-             console.log(res);
          })
      })
     $(".changeOpsPrice").unbind().on("click", function () {

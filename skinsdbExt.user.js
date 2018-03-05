@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.23
+// @version      2.24
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,7 +28,7 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-var version = 2.23;
+var version = 2.24;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1010,6 +1010,7 @@ function newgetprices(start) {
     if (skinsdbprices.length > 0) {
         $('.featured-item.scanned').each(function () {
             var route = $(this);
+            stickersOnIt = false;
             if (route.find(".priceBtn").html() === 'Price') {
                 var skinName = route.find(".market-link").html();
                 var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",","");
@@ -1037,8 +1038,10 @@ function newgetprices(start) {
                         skinId = skinId.replace(")", "");
                     }
                 }
-                var inspectIdFull = route.find(".item-buttons > a").attr("href");
-                var inspectId = inspectIdFull.replace("steam://rungame/730/76561202255233023/+csgo_econ_action_preview%","");
+                if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
+                    var inspectIdFull = route.find(".item-buttons > a").attr("href");
+                    var inspectId = inspectIdFull.replace("steam://rungame/730/76561202255233023/+csgo_econ_action_preview%","");
+                }
                 if (route.find(".text-muted").html() != "") {
                     var exterior = "(" + route.find(".text-muted").html() + ")";
 
@@ -1082,6 +1085,11 @@ function newgetprices(start) {
                     skinName = skinName.trim() + phase + " " + exterior;
                 } else {
                     skinName = skinName.trim();
+                }
+                if(typeof route.find(".op-stickers-bottom").html() !== 'undefined'){
+                    stickersOnIt = "op-stickers-bottom";
+                }else if(typeof route.find(".op-stickers").html() !== 'undefined'){
+                    stickersOnIt = "op-stickers";
                 }
                 // console.log(skinName);
                 var loaded = $.grep(skinsdbprices, function (e) {
@@ -1127,7 +1135,7 @@ function newgetprices(start) {
                         })
 
                         if(currentFloat < max){
-                            route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;z-index: 99;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
+                            // route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;z-index: 99;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
                             overpayThis = true;
                             currBoxWear.css({
                                 "color" : "yellow",
@@ -1197,14 +1205,33 @@ function newgetprices(start) {
                             }
                         }
                     }
+                    if(stickersOnIt){
+                        route.find("."+stickersOnIt).attr("style", "top: -44px;");
+                        route.find("."+stickersOnIt+" > div").attr("style","display: inline;")
+                        route.find("."+stickersOnIt+" > div").append("<ul class='stickerPrices' style='list-style-type: none; padding-left: 0px'></ul>");
+                        route.find("."+stickersOnIt+" > div").children("img").each(function () {
+                            var stickerName = "Sticker | " + $(this).attr("title");
+                            stickerName = stickerName.substring(0, stickerName.indexOf('Wear')).trim();
+                            var stickerInfo = $.grep(skinsdbprices, function (e) {
+                                return e.skinname == stickerName;
+                            });
+                            if (typeof stickerInfo[0] !== 'undefined') {
+                                $(this).siblings(".stickerPrices").append("<li style='display: inline-block; margin-left: 10px;'>"+stickerInfo[0].price+"$</li>")
+                            }else{
+                                console.log(stickerName);
+                            }
+                        })
+                    }
                     if($.cookie("changer") == "CS.Money"){
                         route.prepend(overstockChecker(skinName));
                     }
                     if(typeof route.find(".fa.fa-user").html() !== 'undefined'){
                         route.prepend(changeOpsPrice(skinId));
                     }
-                    inspectExt(this,skinId,inspectId);
-                    inspectPaternId(this,skinId,inspectIdFull);
+                    if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
+                        inspectExt(this,skinId,inspectId);
+                        inspectPaternId(this,skinId,inspectIdFull);
+                    }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
@@ -1221,8 +1248,9 @@ function newgetprices(start) {
         })
     }
      function inspectExt(item,id,inspectId){
-        $(item).find(".btn-primary").remove();
-        $(item).find(".btn-orange").before("<button class='btn btn-primary inspectExt' skin-id='"+id+"' inspect-id='"+inspectId+"'>IS</button>");
+        $(item).find(".item-buttons > a:first").addClass("oldInspect");
+        $(item).find(".oldInspect").before("<button class='btn btn-primary inspectExt' skin-id='"+id+"' inspect-id='"+inspectId+"'>IS</button>");
+        $(item).find(".oldInspect").remove();
      }
      function inspectPaternId(item,id,inspectId) {
          $(item).find(".inspectExt").after("<button class='btn btn-primary inspectPatternId' skin-id='"+id+"' inspect-id='"+inspectId+"'>PI</button>");

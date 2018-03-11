@@ -1506,9 +1506,9 @@ function newgetprices(start) {
 function loadallprices() {
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
     if(pattern_check){
-        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightgreen;'>Pattern Index ON<a/></li>")
+        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightgreen;'>Pattern Index ON</a></li>")
     }else{
-        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightblue;'>Pattern Index<a/></li>")
+        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightblue;'>Pattern Index</a></li>")
     }
     newgetprices(true);
     setInterval(function () {

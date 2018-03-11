@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.24
+// @version      2.25
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -28,9 +28,9 @@ var mark = " | skinsdbExt";
 var skinsLoaded = [];
 var skinsdbprices = [];
 var favSkins = [];
-pattern_check = false;
 
-var version = 2.241;
+
+var version = 2.25;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -39,7 +39,13 @@ var version = 2.241;
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
-        if(typeof $.cookie('user-auth') !== 'undefined'){
+
+        if($.cookie("pattern_check_cookie")){
+            pattern_check = true;
+        }else{
+            pattern_check = false;
+        }
+        if($.cookie('user-auth')){
             console.log("Loaded without server!");
             opsbotload(site);
         }else{
@@ -144,7 +150,7 @@ var version = 2.241;
                 onload: function (result) {
                     JSONdata = JSON.parse(result.responseText);
                     if (JSONdata['error']) {
-                        $(".header__menu").prepend("<li>" + JSONdata['error'] + "</li>");
+                        $(".header_menu").prepend("<li>" + JSONdata['error'] + "</li>");
                     }
                     if (JSONdata['success']) {
                         include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
@@ -155,7 +161,7 @@ var version = 2.241;
                     }
                 }
             })
-        }, 300)
+        }, 600)
     }
     if (site == "https://skinsdb.online/?doppler_search" || site == "https://skinsdb.online/?favsearch") {
         dopplerChecker();
@@ -986,7 +992,7 @@ function newgetprices(start) {
         }
         userStorage.removeItem("skinsdbExt");
         var myData = new FormData();
-        myData.append("newgetprices", true);
+        myData.append("newgetprices_dev", true);
         GM_xmlhttpRequest({
             method: "POST",
             url: scriptUrl,
@@ -1009,6 +1015,7 @@ function newgetprices(start) {
 }
  function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
+        patterns = [];
         $('.featured-item.scanned').each(function () {
             var route = $(this);
             stickersOnIt = false;
@@ -1118,21 +1125,22 @@ function newgetprices(start) {
                         var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
                         var currentFloat = goal;
                         var max = 0;
-
                         $.each(loaded[0].overpay, function (a,b) {
-                            $.each(b,function (c,d) {
-                                if(c == "skinfloat"){
-                                    if(d > max){
-                                        max = d;
+                            if(loaded[0]['overpay'][a]['reason'] === 'float'){
+                                $.each(b,function (c,d) {
+                                    if(c == "skinfloat"){
+                                        if(d > max){
+                                            max = d;
+                                        }
+                                        if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
+                                            closestFloat = d;
+                                            overpayVal = loaded[0]['overpay'][a]['overpay'];
+                                            overpayCloseDate = loaded[0]['overpay'][a]['overpay_date'];
+                                            overpayCloseFloat = loaded[0]['overpay'][a]['skinfloat'];
+                                        }
                                     }
-                                    if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
-                                        closestFloat = d;
-                                        overpayVal = loaded[0]['overpay'][a]['overpay'];
-                                        overpayCloseDate = loaded[0]['overpay'][a]['overpay_date'];
-                                        overpayCloseFloat = loaded[0]['overpay'][a]['skinfloat'];
-                                    }
-                                }
-                            })
+                                })
+                            }
                         })
 
                         if(currentFloat < max){
@@ -1218,8 +1226,6 @@ function newgetprices(start) {
                             });
                             if (typeof stickerInfo[0] !== 'undefined') {
                                 $(this).siblings(".stickerPrices").append("<li style='display: inline-block; margin-left: 10px;'>"+stickerInfo[0].price+"$</li>")
-                            }else{
-                                console.log(stickerName);
                             }
                         })
                     }
@@ -1232,9 +1238,17 @@ function newgetprices(start) {
                     if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
                         inspectExt(this,skinId,inspectId);
                         inspectPaternId(this,skinId,inspectIdFull);
-                        if($.cookie("role") === "admin" && pattern_check === true){
-                            patternAdmin(this,skinId,inspectId);
-                        }
+                    }
+                    if(pattern_check && typeof route.find(".ext_pattern").html() === 'undefined'){
+                        route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
+                        var pattern_this = [];
+                        pattern_this['item'] = this;
+                        pattern_this['inspectId'] = inspectId;
+                        pattern_this['skinName'] = skinName;
+                        pattern_this['csmoney'] = loaded[0].price;
+                        pattern_this['skinPrice'] = skinPrice;
+
+                        patterns.push(pattern_this);
                     }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
@@ -1250,33 +1264,73 @@ function newgetprices(start) {
                 }
             }
         })
+        if(pattern_check && patterns.length > 0) {
+            ext_pattern(patterns, 0);
+        }
     }
-    function patternAdmin(item,id,inspectId) {
-       $(item).find(".item-amount").append("<span class='admin_Pattern' style='font-size: 0.7em'></span>");
-        var inspectLink = "https://api.csgofloat.com:1738/?s="; //?m=563330426657599553&a=6710760926&d=9406593057029549017"
-        var s = inspectId.substring(inspectId.indexOf('%20S') + 4);
-        s = s.substring(0, s.indexOf('A'));
-        var a = inspectId.substring(inspectId.indexOf('A') + 1);
-        a = a.substring(0, a.indexOf("D"));
-        var d = inspectId.substring(inspectId.indexOf('D') + 1);
-        inspectLink += s + "&a=" + a + "&d=" + d;
-        // console.log("2 "+inspectId);
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: inspectLink,
-            onload: function (result) {
-                var check = IsJsonString(result.responseText);
-                if(check) {
-                    var info = JSON.parse(result.responseText);
-                    $(item).find(".admin_Pattern").text(" Pattern ID: "+info.iteminfo.paintseed);
-                }
-            },
-            onerror: function (res) {
-                sendAlert("danger","Ошибка запроса");
-                console.log(res.responseText);
+    function ext_pattern(array, counter) {
 
-            }
-        })
+        var item = array[counter]['item'];
+        var inspectId = array[counter]['inspectId'];
+        var skin = array[counter]['skinName'];
+        var money = array[counter]['csmoney'];
+        var ops = array[counter]['skinPrice'];
+
+        if($(item).find(".ext_pattern").html() === ''){
+            var inspectLink = "https://api.csgofloat.com:1738/?s="; //?m=563330426657599553&a=6710760926&d=9406593057029549017"
+            var s = inspectId.substring(inspectId.indexOf('%20S') + 4);
+            s = s.substring(0, s.indexOf('A'));
+            var a = inspectId.substring(inspectId.indexOf('A') + 1);
+            a = a.substring(0, a.indexOf("D"));
+            var d = inspectId.substring(inspectId.indexOf('D') + 1);
+            inspectLink += s + "&a=" + a + "&d=" + d;
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: inspectLink,
+                onload: function (result) {
+                    var check = IsJsonString(result.responseText);
+                    if(check) {
+                        var info = JSON.parse(result.responseText);
+                        if(info.iteminfo){
+                            $(item).find(".ext_pattern").text(" Pattern ID: "+info.iteminfo.paintseed);
+                            var findSkin = $.grep(skinsdbprices, function (e) {
+                                return e.skinname == skin;
+                            });
+                            var findPattern = $.grep(findSkin[0]['overpay'], function (e) {
+                                if(e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed){
+                                    return e;
+                                }
+                            })
+                            if(findPattern[0]){
+                                $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed red");
+                                $(item).find(".ext_pattern").attr("pattern-overpay",findPattern[0]['overpay']);
+                                $(item).find(".ext_pattern").attr("money-price",money);
+                                $(item).find(".ext_pattern").attr("ops-price",ops);
+                                $(item).find(".ext_pattern").css({
+                                    "cursor" : "pointer",
+                                    "color" : "orange"
+                                });
+                                console.log(findPattern[0]);
+                            }
+                            counter++;
+                            if(counter < array.length) {
+                                ext_pattern(array, counter);
+                            }else{
+                                showlogs("Паттерны прогружены!");
+                            }
+                        }else{
+                            console.log(info);
+                            if(counter < array.length) {
+                                ext_pattern(array, counter);
+                            }
+                        }
+                    }},
+                onerror: function (res) {
+                    sendAlert("danger","Ошибка запроса");
+                    console.log(res.responseText);
+                }
+            })
+        }
     }
      function inspectExt(item,id,inspectId){
         $(item).find(".item-buttons > a:first").addClass("oldInspect");
@@ -1289,7 +1343,7 @@ function newgetprices(start) {
     function makeTable(container, data,closestFloat, money, ops) {
         var table = $("<table border='1px' width='100%' style='font-size: 20px'></table>").addClass('CSSTableGenerator');
         table.append("<thead></thead>");
-        table.find("thead").prepend("<tr><th>Переплата</th><th>Флоат</th><th>Дата</th><th></th></tr>");
+        table.find("thead").prepend("<tr><th>Переплата</th><th>Флоат</th><th>Дата</th><th>Причина</th><th>Патерн ID</th><th></th></tr>");
         $.each(data, function (a,b) {
             $.each(b, function(rowIndex, r) {
                 var row = $("<tr id='"+rowIndex+"'></tr>");
@@ -1353,6 +1407,14 @@ function newgetprices(start) {
 
              }
          })
+     })
+     $(".ext_pattern").unbind().on("click", function () {
+         console.log("click");
+         var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("pattern-overpay"))) * 0.97;
+         onChange = Math.round(onChange *100) / 100;
+         var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
+         var res1 = Math.round(resom * 100) / 100;
+         sendAlert("success","Оверпей: " + Number($(this).attr("pattern-overpay")) + "$ Залив: " + onChange + "$ Выгода: " + res1 + "%");
      })
     $(".changeOpsPrice").unbind().on("click", function () {
         var saleid = $(this).attr('saleid');
@@ -1443,8 +1505,10 @@ function newgetprices(start) {
 
 function loadallprices() {
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
-    if($.cookie("role") === "admin"){
-        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: #4340e7;'>Pattern Index<a/></li>")
+    if(pattern_check){
+        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightgreen;'>Pattern Index ON<a/></li>")
+    }else{
+        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightblue;'>Pattern Index<a/></li>")
     }
     newgetprices(true);
     setInterval(function () {
@@ -1455,7 +1519,12 @@ function loadallprices() {
         newloadallprices();
     });
     $(".patterns_go").on("click", function () {
+        var paternCheckerLife = new Date();
+        paternCheckerLife.setTime(paternCheckerLife.getTime() + (60 * 1000));
         pattern_check = true;
+        $.cookie("pattern_check_cookie",true, { expires: paternCheckerLife, path: location.href });
+        $(this).css("color","lightgreen");
+        $(this).text("Pattern Index ON");
     })
     $("#ThatisDisc").on("click", function () {
         skinsLoaded.splice(0, 1);
@@ -1470,14 +1539,19 @@ function loadallprices() {
 }
 
 function settingsMenu() {
-    $(".nav.navbar-nav").append("<li class='menu'><a href='/?loc=shop_browse&sort=n'>Авто-пикер</a></li>");
-
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
     // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
 
     if ($.cookie("savedDisc")) {
         savedDiscount = $.cookie("savedDisc");
+    }else{
+        $.removeCookie("user-auth");
+        sendAlert("danger","Произошла ошибка авторизации расширения " + mark + ", перезагрузка!");
+        setTimeout(function () {
+            location.reload();
+        },2000)
     }
+
     $(".nav.navbar-nav").append("<li class='menu'><a id='savDisc' to-hide='true' style='cursor: pointer;'>" + savedDiscount + "</a></li>");
     $("body").append('' +
         '<div id="skinsDb" class="modal fade" role="dialog">' +

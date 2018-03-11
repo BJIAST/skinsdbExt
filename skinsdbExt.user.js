@@ -992,7 +992,7 @@ function newgetprices(start) {
         }
         userStorage.removeItem("skinsdbExt");
         var myData = new FormData();
-        myData.append("newgetprices_dev", true);
+        myData.append("newgetprices", true);
         GM_xmlhttpRequest({
             method: "POST",
             url: scriptUrl,

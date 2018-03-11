@@ -1238,7 +1238,7 @@ function newgetprices(start) {
                     if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
                         inspectExt(this,skinId,inspectId);
                         inspectPaternId(this,skinId,inspectIdFull);
-                        
+
                         if(pattern_check && typeof route.find(".ext_pattern").html() === 'undefined'){
                             route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
                             var pattern_this = [];
@@ -1410,12 +1410,13 @@ function newgetprices(start) {
          })
      })
      $(".ext_pattern").unbind().on("click", function () {
-         console.log("click");
-         var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("pattern-overpay"))) * 0.97;
-         onChange = Math.round(onChange *100) / 100;
-         var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
-         var res1 = Math.round(resom * 100) / 100;
-         sendAlert("success","Оверпей: " + Number($(this).attr("pattern-overpay")) + "$ Залив: " + onChange + "$ Выгода: " + res1 + "%");
+         if($(this).attr("pattern-overpay")){
+             var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("pattern-overpay"))) * 0.97;
+             onChange = Math.round(onChange *100) / 100;
+             var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
+             var res1 = Math.round(resom * 100) / 100;
+             sendAlert("success","Оверпей: " + Number($(this).attr("pattern-overpay")) + "$ Залив: " + onChange + "$ Выгода: " + res1 + "%");
+         }
      })
     $(".changeOpsPrice").unbind().on("click", function () {
         var saleid = $(this).attr('saleid');

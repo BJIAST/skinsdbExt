@@ -1238,17 +1238,18 @@ function newgetprices(start) {
                     if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
                         inspectExt(this,skinId,inspectId);
                         inspectPaternId(this,skinId,inspectIdFull);
-                    }
-                    if(pattern_check && typeof route.find(".ext_pattern").html() === 'undefined'){
-                        route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
-                        var pattern_this = [];
-                        pattern_this['item'] = this;
-                        pattern_this['inspectId'] = inspectId;
-                        pattern_this['skinName'] = skinName;
-                        pattern_this['csmoney'] = loaded[0].price;
-                        pattern_this['skinPrice'] = skinPrice;
+                        
+                        if(pattern_check && typeof route.find(".ext_pattern").html() === 'undefined'){
+                            route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
+                            var pattern_this = [];
+                            pattern_this['item'] = this;
+                            pattern_this['inspectId'] = inspectId;
+                            pattern_this['skinName'] = skinName;
+                            pattern_this['csmoney'] = loaded[0].price;
+                            pattern_this['skinPrice'] = skinPrice;
 
-                        patterns.push(pattern_this);
+                            patterns.push(pattern_this);
+                        }
                     }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");

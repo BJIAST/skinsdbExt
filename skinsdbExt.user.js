@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.25
+// @version      2.26
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -30,7 +30,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 2.25;
+var version = 2.26;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1134,7 +1134,7 @@ function newgetprices(start) {
                                         }
                                         if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
                                             closestFloat = d;
-                                            overpayVal = loaded[0]['overpay'][a]['overpay'];
+                                            overpayByFloat = loaded[0]['overpay'][a]['overpay'];
                                             overpayCloseDate = loaded[0]['overpay'][a]['overpay_date'];
                                             overpayCloseFloat = loaded[0]['overpay'][a]['skinfloat'];
                                         }
@@ -1152,13 +1152,15 @@ function newgetprices(start) {
                                 "font-size" : "100%",
                                 "cursor" : "pointer"
                             });
-                            var curChangerPrice = parseFloat(overpayVal) + parseFloat(loaded[0].price);
+                            var curChangerPrice = parseFloat(overpayByFloat) + parseFloat(loaded[0].price);
                             var overpayCounter = 100 - (skinPrice * 100) / (curChangerPrice * 0.97);
-                            overpayVal = Math.round(overpayCounter * 100) / 100;
+                            var overpayVal = Math.round(overpayCounter * 100) / 100;
                             $(this).css("border", "10px solid grey");
                             currBoxWear.attr("href", "#");
                             currBoxWear.attr("data-toggle", "modal");
                             currBoxWear.attr("data-target", "#skinsDbSales");
+                            currBoxWear.attr("overpayByFloat",overpayByFloat);
+                            currBoxWear.addClass("overpayByFloat");
                             currBoxWear.on("click", function () {
                                 $("#skinsDbSales .modal-body").html("Подожди");
                                 data = [loaded[0].overpay];
@@ -1297,27 +1299,60 @@ function newgetprices(start) {
                             var findSkin = $.grep(skinsdbprices, function (e) {
                                 return e.skinname == skin;
                             });
-                            var findPattern = $.grep(findSkin[0]['overpay'], function (e) {
-                                if(e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed){
-                                    return e;
+                            if(findSkin[0]){
+                                var findPattern = $.grep(findSkin[0]['overpay'], function (e) {
+                                    if(e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed){
+                                        return e;
+                                    }
+                                })
+                                if(findPattern.length > 0){
+                                    var itemInfo = findPattern.length - 1;
+                                    var itemOverpay = Number(findPattern[itemInfo]['overpay']);
+                                    console.log(findPattern);
+                                    if($(item).find(".overpayByFloat").attr("overpayByFloat")){
+                                        itemOverpay += Number($(item).find(".overpayByFloat").attr("overpayByFloat"));
+                                        itemOverpay = Math.round(itemOverpay *100) / 100;
+                                    }
+                                    var onChange = (Number(money) + itemOverpay) * 0.97;
+                                    onChange = Math.round(onChange *100) / 100;
+                                    var resom = 100 - (Number(ops) * 100) / onChange;
+                                    var res1 = Math.round(resom * 100) / 100;
+                                    var currentDisc = $(item).find(".priceBtn").text();
+                                    $(item).find(".priceBtn").html("<span class='realOpsmo'>"+res1+"</span>% | "+currentDisc);
+                                    if(res1 >= savedDiscount){
+                                        var skinId = $(item).find(".skinDBupd").attr("skin-id");
+                                        skin = [];
+                                        skin['skinlink'] = "#" + skinId;
+                                        skinsLoaded.push(skin);
+                                        $("#ThatisDisc").html(skinsLoaded.length);
+                                        $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
+                                        if($("#ThatisDisc").css('display') === 'none'){
+                                            $("#ThatisDisc").show();
+                                        }
+                                        $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed green");
+                                    }else{
+                                        $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed grey");
+                                    }
+                                    $(item).find(".ext_pattern").attr("pattern-overpay",findPattern[itemInfo]['overpay']);
+                                    $(item).find(".ext_pattern").attr("full-overpay",itemOverpay);
+                                    $(item).find(".ext_pattern").attr("money-price",money);
+                                    $(item).find(".ext_pattern").attr("ops-price",ops);
+                                    $(item).find(".ext_pattern").attr("overpay-upd",findPattern[itemInfo]['overpay_date']);
+
+                                    $(item).find(".ext_pattern").css({
+                                        "cursor" : "pointer",
+                                        "color" : "orange"
+                                    });
+                                    console.log(findPattern[itemInfo]);
                                 }
-                            })
-                            if(findPattern[0]){
-                                $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed red");
-                                $(item).find(".ext_pattern").attr("pattern-overpay",findPattern[0]['overpay']);
-                                $(item).find(".ext_pattern").attr("money-price",money);
-                                $(item).find(".ext_pattern").attr("ops-price",ops);
-                                $(item).find(".ext_pattern").css({
-                                    "cursor" : "pointer",
-                                    "color" : "orange"
-                                });
-                                console.log(findPattern[0]);
-                            }
-                            counter++;
-                            if(counter < array.length) {
-                                ext_pattern(array, counter);
+                                counter++;
+                                if(counter < array.length) {
+                                    ext_pattern(array, counter);
+                                }else{
+                                    showlogs("Паттерны прогружены!");
+                                }
                             }else{
-                                showlogs("Паттерны прогружены!");
+                                ext_pattern(array, counter);
                             }
                         }else{
                             console.log(info);
@@ -1411,11 +1446,15 @@ function newgetprices(start) {
      })
      $(".ext_pattern").unbind().on("click", function () {
          if($(this).attr("pattern-overpay")){
-             var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("pattern-overpay"))) * 0.97;
+             var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("full-overpay"))) * 0.97;
              onChange = Math.round(onChange *100) / 100;
              var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
              var res1 = Math.round(resom * 100) / 100;
-             sendAlert("success","Оверпей: " + Number($(this).attr("pattern-overpay")) + "$ Залив: " + onChange + "$ Выгода: " + res1 + "%");
+             var outputOverpay = Number($(this).attr("full-overpay")) + "$ (" + Number($(this).attr("pattern-overpay")) + "$)";
+             if(Number($(this).attr("full-overpay")) === Number($(this).attr("pattern-overpay"))){
+                 outputOverpay = Number($(this).attr("full-overpay")) + "$";
+             }
+             sendAlert("success","Оверпей: " + outputOverpay + " Залив: " + onChange + "$ Выгода: " + res1 + "% <small style='text-decoration: underline;'>(" + $(this).attr("overpay-upd") + ")</small>");
          }
      })
     $(".changeOpsPrice").unbind().on("click", function () {

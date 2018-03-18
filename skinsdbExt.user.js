@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.26
+// @version      2.27
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -30,7 +30,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 2.26;
+var version = 2.27;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1118,7 +1118,9 @@ function newgetprices(start) {
                     var overpayThis = false;
                     var overpayVal = 0;
                     var currBoxWear = $(this).find(".wear-value small");
-
+                    if(typeof currBoxWear.html() != 'undefined'){
+                      var skinfloat = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
+                    }
                     if(loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined'){
 
                         var closestFloat = null;
@@ -1249,6 +1251,7 @@ function newgetprices(start) {
                             pattern_this['skinName'] = skinName;
                             pattern_this['csmoney'] = loaded[0].price;
                             pattern_this['skinPrice'] = skinPrice;
+                            pattern_this['skinfloat'] = skinfloat;
 
                             patterns.push(pattern_this);
                         }
@@ -1278,6 +1281,7 @@ function newgetprices(start) {
         var skin = array[counter]['skinName'];
         var money = array[counter]['csmoney'];
         var ops = array[counter]['skinPrice'];
+        var float = array[counter]['skinfloat'];
 
         if($(item).find(".ext_pattern").html() === ''){
             var inspectLink = "https://api.csgofloat.com:1738/?s="; //?m=563330426657599553&a=6710760926&d=9406593057029549017"
@@ -1306,7 +1310,25 @@ function newgetprices(start) {
                                     }
                                 })
                                 if(findPattern.length > 0){
+                                    var closestFloat = null;
+                                    var currentFloat = float;
+                                    var max = 0;
                                     var itemInfo = findPattern.length - 1;
+
+                                    $.each(findPattern, function (a,b) {
+                                           $.each(b,function (c,d) {
+                                               if(c == "skinfloat"){
+                                                   if(d > max){
+                                                        max = d;
+                                                   }
+                                                   if (closestFloat == null || Math.abs(d - currentFloat) < Math.abs(closestFloat - currentFloat)) {
+                                                       closestFloat = d;
+                                                       itemInfo = a;
+                                                    }
+                                                }
+                                            })
+                                    })
+
                                     var itemOverpay = Number(findPattern[itemInfo]['overpay']);
                                     console.log(findPattern);
                                     if($(item).find(".overpayByFloat").attr("overpayByFloat")){
@@ -1334,10 +1356,12 @@ function newgetprices(start) {
                                         $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed grey");
                                     }
                                     $(item).find(".ext_pattern").attr("pattern-overpay",findPattern[itemInfo]['overpay']);
+                                    $(item).find(".ext_pattern").attr("pattern-overpays",JSON.stringify(findPattern));
                                     $(item).find(".ext_pattern").attr("full-overpay",itemOverpay);
                                     $(item).find(".ext_pattern").attr("money-price",money);
                                     $(item).find(".ext_pattern").attr("ops-price",ops);
                                     $(item).find(".ext_pattern").attr("overpay-upd",findPattern[itemInfo]['overpay_date']);
+                                    $(item).find(".ext_pattern").attr("overpay-float", closestFloat);
 
                                     $(item).find(".ext_pattern").css({
                                         "cursor" : "pointer",
@@ -1454,7 +1478,7 @@ function newgetprices(start) {
              if(Number($(this).attr("full-overpay")) === Number($(this).attr("pattern-overpay"))){
                  outputOverpay = Number($(this).attr("full-overpay")) + "$";
              }
-             sendAlert("success","Оверпей: " + outputOverpay + " Залив: " + onChange + "$ Выгода: " + res1 + "% <small style='text-decoration: underline;'>(" + $(this).attr("overpay-upd") + ")</small>");
+             sendAlert("success","Оверпей: " + outputOverpay + " Залив: " + onChange + "$ Выгода: " + res1 + "% <small style='text-decoration: underline; cursor: pointer;' onclick='alert("+ JSON.stringify($(this).attr("pattern-overpays")) +")'>[ Ближайший флоат:  " + $(this).attr("overpay-float") + " (" + $(this).attr("overpay-upd") + ")]</small>");
          }
      })
     $(".changeOpsPrice").unbind().on("click", function () {
@@ -2516,14 +2540,13 @@ function realEarning() {
             $("#collapseIS .panel-body").css("display", "none");
             var myData = new FormData();
             var onSold = 0;
-            var userdbupd = "http://skinsdb.xyz/scripts/usersales.php";
+            var userdbupd = "https://skinsdb.online/scripts/usersales.php";
             myData.append("usersales", true);
             GM_xmlhttpRequest({
                 method: "POST",
                 url: userdbupd,
                 data: myData,
                 onload: function (result) {
-                    $(".btn.btn-primary.pull-right:contains('Download History')").before("<a href='http://skinsdb.xyz/?mySales' class='btn btn-primary pull-right' target='_blank'>Мои продажи " + mark + "</a>");
                     $("#iTrans table thead th:contains('Your Cut')").after("<th style='text-align: center'>CS.Money (забрал)</th>");
                     $("#iTrans table thead th:contains('CS.Money (забрал)')").after("<th style='text-align: center'>CS.Money -> Opskins</th>");
                     $("#iTrans table tbody td:contains('On Sale')").before("<td class='skinDBcsmoops'>CSMOOPS (Loading.. / No info)</td>");

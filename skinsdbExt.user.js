@@ -1111,7 +1111,7 @@ function newloadallprices(opd) {
                         savedDiscount = $.cookie("savedDisc");
                     }
                     if ($.cookie("changer") === "Opskins AVG") {
-                        var comission = 1;
+                        var comission = 0.95;
                     } else {
                         var comission = 0.97;
                     }

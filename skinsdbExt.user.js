@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.27
+// @version      2.28
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -30,25 +30,26 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 2.27;
+var version = 2.28;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
 
     if (site == "https://opskins.com/" + opslink3[1]) {
+        include("https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js");
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
-        if($.cookie("pattern_check_cookie")){
+        if ($.cookie("pattern_check_cookie")) {
             pattern_check = true;
-        }else{
+        } else {
             pattern_check = false;
         }
-        if($.cookie('user-auth')){
+        if ($.cookie('user-auth')) {
             console.log("Loaded without server!");
             opsbotload(site);
-        }else{
+        } else {
             var myData = new FormData();
             myData.append("checkpay", true);
             GM_xmlhttpRequest({
@@ -63,14 +64,15 @@ var version = 2.27;
                     if (JSONdata['success']) {
                         var userAuthLife = new Date();
                         userAuthLife.setTime(userAuthLife.getTime() + (600 * 1000));
-                        $.cookie('user-auth', true, { expires: userAuthLife });
-                        $.cookie("role", JSONdata['role'], { expires: userAuthLife });
-                        $.cookie("apikey", JSONdata['key'], { expires: userAuthLife });
-                        $.cookie("changer", JSONdata['main-changer'], { expires: userAuthLife });
+                        console.log(JSONdata);
+                        $.cookie('user-auth', true, {expires: userAuthLife});
+                        $.cookie("role", JSONdata['role'], {expires: userAuthLife});
+                        $.cookie("apikey", JSONdata['key'], {expires: userAuthLife});
+                        $.cookie("changer", JSONdata['main-changer'], {expires: userAuthLife});
                         if (JSONdata['discount'] !== null) {
-                            $.cookie("savedDisc", JSONdata['discount'], { expires: userAuthLife });
+                            $.cookie("savedDisc", JSONdata['discount'], {expires: userAuthLife});
                         } else {
-                            $.cookie("savedDisc", "Укажи дисконт в настройках!", { expires: userAuthLife });
+                            $.cookie("savedDisc", "Укажи дисконт в настройках!", {expires: userAuthLife});
                         }
                         versionChecker(JSONdata['user-version'], JSONdata['current-version']);
                         opsbotload(site);
@@ -383,9 +385,9 @@ function sugestedDiscount(element) {
 };
 
 function oneItemDiscount() {
-    if(typeof $(".featured-item-large-video").html() !== 'undefined'){
+    if (typeof $(".featured-item-large-video").html() !== 'undefined') {
         $(".featured-item-large-video").addClass('featured-item').addClass('scanned');
-    }else{
+    } else {
         $(".featured-item-large").addClass('featured-item').addClass('scanned');
     }
     $(".scanned").closest(".view_item").parent().removeClass("col-lg-12").removeClass("col-md-12").addClass("col-lg-6").addClass("col-md-6");
@@ -400,7 +402,7 @@ function oneItemDiscount() {
         "margin-right": "30px",
         "z-index": 999
     });
-    $(".scanned.featured-item").css("height","auto");
+    $(".scanned.featured-item").css("height", "auto");
     newgetprices(true);
 
 
@@ -436,7 +438,7 @@ function parseprice(red_btn, opd) {
         var skinPrice = $(this).parent().parent().find(".item-amount").text();
         if ($(this).parent().parent().find(".text-muted").html() != "") {
             var exterior = "(" + $(this).parent().parent().find(".text-muted").html() + ")";
-            var phase = $(this).parent().parent().find(".text-muted").next().html().replace(" StatTrak™","");
+            var phase = $(this).parent().parent().find(".text-muted").next().html().replace(" StatTrak™", "");
             switch (phase) {
                 case '★ Covert Knife (Ruby)' :
                     phase = " Ruby";
@@ -498,11 +500,11 @@ function parseprice(red_btn, opd) {
 
                     if (res['opsMoney'] > savedDiscount) {
                         if (res['datestatus'] === 'fine') {
-                            if(typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() === 'undefined' && dif > -1 && skinPrice > 5){
+                            if (typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() === 'undefined' && dif > -1 && skinPrice > 5) {
                                 $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid #8500ff");
-                            }else if(typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() !== 'undefined' && dif > -1 && skinPrice > 100){
+                            } else if (typeof $(".skinDBupd[data-loading='moneyOps']").parent().find(".buyers-club-icon").html() !== 'undefined' && dif > -1 && skinPrice > 100) {
                                 $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid darkred");
-                            }else{
+                            } else {
                                 $(".skinDBupd[data-loading='moneyOps']").parent().css("border", "10px solid green");
                             }
                         } else {
@@ -579,7 +581,7 @@ function las20btn(page = "item") {
             var unavailable = $(".item-add");
             if ($(".item-desc").children(".text-muted").html() != "") {
                 var exterior = "(" + $(".item-desc").children(".text-muted").html() + ")";
-                var phase = $(".text-muted").next().html().replace(" StatTrak™","");
+                var phase = $(".text-muted").next().html().replace(" StatTrak™", "");
                 switch (phase) {
                     case '★ Covert Knife (Ruby)' :
                         phase = " Ruby";
@@ -853,7 +855,7 @@ function dopplerChecker() {
                 dopplers_knife.push(skin);
             }
         })
-        for(var elem = 0; elem < dopplers_knife.length; elem++){
+        for (var elem = 0; elem < dopplers_knife.length; elem++) {
             dopplerPrice(elem, this, true);
         }
     })
@@ -861,23 +863,23 @@ function dopplerChecker() {
     function dopplerPrice(n, btn, method = false) {
         var discount = $("#discount-value").val();
         if (n === dopplers_knife.length - 1) {
-            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount,method);
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, "", dopplers_knife.length, discount, method);
         } else if (n < dopplers_knife.length) {
-            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount,method);
+            newRequestForPrice(dopplers_knife[n]['skinlink'], dopplers_knife[n]['skinname'], dopplers_knife[n]['changer_price'], dopplers_knife[n]['id'], btn, n, dopplers_knife[n + 1]['skinname'], dopplers_knife.length, discount, method);
         }
     }
 
-    function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount,method) {
+    function newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount, method) {
         GM_xmlhttpRequest({
             method: "POST",
             url: opsUrl,
             onload: function (result) {
                 var txt = result.responseText;
-                var cleanTxt= txt.replace(/<img[^>]*>/g, "");
+                var cleanTxt = txt.replace(/<img[^>]*>/g, "");
                 var res = $(cleanTxt).find(".item-amount").html();
                 if ($(cleanTxt).find(".alert-danger").html()) {
                     console.log($(cleanTxt).find(".alert-danger").html());
-                    if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. Have a look at some of our featured items:');
+                    if ($(cleanTxt).find(".alert-danger").html() === '<i class="fa fa-exclamation-triangle"></i> We couldn\'t find any items that matched your search criteria. Have a look at some of our featured items:') ;
                     $(btn).parent().find("#count-" + id).parent().find(".discount").html("Нету");
                     if (counter < length - 1 && status === true && method !== true) {
                         var timeer = randomInteger(600, 1600);
@@ -908,11 +910,11 @@ function dopplerChecker() {
                     newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                 }
                 else {
-                    if(res){
+                    if (res) {
                         // console.log(result);
                         // console.log(result.responseText);
                         var float = $(cleanTxt).find(".wear-value .text-muted").html();
-                        var currentFloat = parseFloat(float.replace("Wear: ","").replace("%",""));
+                        var currentFloat = parseFloat(float.replace("Wear: ", "").replace("%", ""));
                         var currentMaxFloat = parseFloat($(btn).parent().find("#count-" + id).parent().find(".maxFloat").text());
                         res = res.replace("$", "");
                         res = res.replace(",", "");
@@ -921,11 +923,11 @@ function dopplerChecker() {
                         res = Math.round(res * 100) / 100;
                         var date = new Date();
                         $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
-                        if(currentFloat < currentMaxFloat && res - discount > -4){
-                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkred; font-weight: bold'>"+float+"</span>");
-                        }else if(currentFloat < currentMaxFloat){
-                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkblue; font-weight: bold'>"+float+"</span>");
-                        }else{
+                        if (currentFloat < currentMaxFloat && res - discount > -4) {
+                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkred; font-weight: bold'>" + float + "</span>");
+                        } else if (currentFloat < currentMaxFloat) {
+                            $(btn).parent().find("#count-" + id).parent().find(".float").html("<span style='color: darkblue; font-weight: bold'>" + float + "</span>");
+                        } else {
                             $(btn).parent().find("#count-" + id).parent().find(".float").html(float);
                         }
                         $(btn).parent().find("#count-" + id).parent().find(".discount").html(res + "%");
@@ -952,13 +954,13 @@ function dopplerChecker() {
                             $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                             checks = setTimeout(function () {
                                 dopplerPrice(counter, btn);
-                                }, timeer)
+                            }, timeer)
                         } else {
                             if (typeof Cookies.get("cycle") === "undefined") {
                                 $(".doppler_check").removeAttr("disabled");
                                 $(".loaderDoplers").html("Готов к работе");
                             } else {
-                                if(method !== true){
+                                if (method !== true) {
                                     counter = 0;
                                     $(".loaderDoplers").html(next + ' через ' + Math.round(timeer / 1000 * 100) / 100 + 'c. <i class="fa fa-spinner fa-spin" style="color:blue" aria-hidden="true"></i>');
                                     checks = setTimeout(function () {
@@ -967,7 +969,7 @@ function dopplerChecker() {
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         newRequestForPrice(opsUrl, skinname, chprice, id, btn, counter, next, length, discount);
                     }
                 }
@@ -978,14 +980,14 @@ function dopplerChecker() {
 
 function newgetprices(start) {
     userStorage = window.localStorage;
-    if(start && userStorage.getItem('skinsdbExt') !== null && $.cookie('storageTimer')){
+    if (start && userStorage.getItem('skinsdbExt') !== null && $.cookie('storageTimer')) {
         console.log("loaded from storage");
         var res = jQuery.parseJSON(userStorage.getItem('skinsdbExt'));
         res = res[0];
         skinsdbprices.push(res);
         skinsdbprices = skinsdbprices[0];
         newloadallprices();
-    }else{
+    } else {
         if (skinsdbprices.length > 0) {
             delete skinsdbprices;
             skinsdbprices = [];
@@ -1000,20 +1002,21 @@ function newgetprices(start) {
             onload: function (result) {
                 var res = jQuery.parseJSON(result.responseText);
                 res = res[0];
-                userStorage.setItem('skinsdbExt',result.responseText);
+                userStorage.setItem('skinsdbExt', result.responseText);
                 var storageLife = new Date();
                 storageLife.setTime(storageLife.getTime() + (60 * 1000));
-                $.cookie('storageTimer', true, { expires: storageLife });
+                $.cookie('storageTimer', true, {expires: storageLife});
                 skinsdbprices.push(res);
                 skinsdbprices = skinsdbprices[0];
-                if(start){
+                if (start) {
                     newloadallprices();
                 }
             }
         })
     }
 }
- function newloadallprices(opd) {
+
+function newloadallprices(opd) {
     if (skinsdbprices.length > 0) {
         patterns = [];
         $('.featured-item.scanned').each(function () {
@@ -1021,7 +1024,7 @@ function newgetprices(start) {
             stickersOnIt = false;
             if (route.find(".priceBtn").html() === 'Price') {
                 var skinName = route.find(".market-link").html();
-                var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",","");
+                var skinPrice = route.find(".item-amount").html().replace("$", "").replace(",", "");
                 var unavailable = route.find(".item-add");
                 if (unavailable.html()) {
                     if (opd === "opd") {
@@ -1046,14 +1049,14 @@ function newgetprices(start) {
                         skinId = skinId.replace(")", "");
                     }
                 }
-                if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
+                if (typeof route.find(".item-buttons > a").html() !== 'undefined') {
                     var inspectIdFull = route.find(".item-buttons > a").attr("href");
-                    var inspectId = inspectIdFull.replace("steam://rungame/730/76561202255233023/+csgo_econ_action_preview%","");
+                    var inspectId = inspectIdFull.replace("steam://rungame/730/76561202255233023/+csgo_econ_action_preview%", "");
                 }
                 if (route.find(".text-muted").html() != "") {
                     var exterior = "(" + route.find(".text-muted").html() + ")";
 
-                    var phase = route.find(".text-muted").next().html().replace(" StatTrak™","");
+                    var phase = route.find(".text-muted").next().html().replace(" StatTrak™", "");
                     switch (phase) {
                         case '★ Covert Knife (Ruby)' :
                             phase = " Ruby";
@@ -1094,9 +1097,9 @@ function newgetprices(start) {
                 } else {
                     skinName = skinName.trim();
                 }
-                if(typeof route.find(".op-stickers-bottom").html() !== 'undefined'){
+                if (typeof route.find(".op-stickers-bottom").html() !== 'undefined') {
                     stickersOnIt = "op-stickers-bottom";
-                }else if(typeof route.find(".op-stickers").html() !== 'undefined'){
+                } else if (typeof route.find(".op-stickers").html() !== 'undefined') {
                     stickersOnIt = "op-stickers";
                 }
                 // console.log(skinName);
@@ -1107,9 +1110,9 @@ function newgetprices(start) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    if($.cookie("changer") === "TradeIt.gg"){
-                        var comission = 0.981;
-                    }else{
+                    if ($.cookie("changer") === "Opskins AVG") {
+                        var comission = 1;
+                    } else {
                         var comission = 0.97;
                     }
                     var resom = 100 - (skinPrice * 100) / (loaded[0].price * comission);
@@ -1118,20 +1121,20 @@ function newgetprices(start) {
                     var overpayThis = false;
                     var overpayVal = 0;
                     var currBoxWear = $(this).find(".wear-value small");
-                    if(typeof currBoxWear.html() != 'undefined'){
-                      var skinfloat = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
+                    if (typeof currBoxWear.html() != 'undefined') {
+                        var skinfloat = parseFloat(currBoxWear.html().replace("Wear: ", "").replace("%", ""));
                     }
-                    if(loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined'){
+                    if (loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined') {
 
                         var closestFloat = null;
-                        var goal = parseFloat(currBoxWear.html().replace("Wear: ","").replace("%",""));
+                        var goal = parseFloat(currBoxWear.html().replace("Wear: ", "").replace("%", ""));
                         var currentFloat = goal;
                         var max = 0;
-                        $.each(loaded[0].overpay, function (a,b) {
-                            if(loaded[0]['overpay'][a]['reason'] === 'float'){
-                                $.each(b,function (c,d) {
-                                    if(c == "skinfloat"){
-                                        if(d > max){
+                        $.each(loaded[0].overpay, function (a, b) {
+                            if (loaded[0]['overpay'][a]['reason'] === 'float') {
+                                $.each(b, function (c, d) {
+                                    if (c == "skinfloat") {
+                                        if (d > max) {
                                             max = d;
                                         }
                                         if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
@@ -1145,14 +1148,14 @@ function newgetprices(start) {
                             }
                         })
 
-                        if(currentFloat < max){
+                        if (currentFloat < max) {
                             // route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;z-index: 99;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
                             overpayThis = true;
                             currBoxWear.css({
-                                "color" : "yellow",
-                                "font-weight" : "bold",
-                                "font-size" : "100%",
-                                "cursor" : "pointer"
+                                "color": "yellow",
+                                "font-weight": "bold",
+                                "font-size": "100%",
+                                "cursor": "pointer"
                             });
                             var curChangerPrice = parseFloat(overpayByFloat) + parseFloat(loaded[0].price);
                             var overpayCounter = 100 - (skinPrice * 100) / (curChangerPrice * 0.97);
@@ -1161,7 +1164,7 @@ function newgetprices(start) {
                             currBoxWear.attr("href", "#");
                             currBoxWear.attr("data-toggle", "modal");
                             currBoxWear.attr("data-target", "#skinsDbSales");
-                            currBoxWear.attr("overpayByFloat",overpayByFloat);
+                            currBoxWear.attr("overpayByFloat", overpayByFloat);
                             currBoxWear.addClass("overpayByFloat");
                             currBoxWear.on("click", function () {
                                 $("#skinsDbSales .modal-body").html("Подожди");
@@ -1179,10 +1182,10 @@ function newgetprices(start) {
                                         var currOverpay = $(this).closest("tr").find("td.overpay").text();
                                         var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
                                         console.log(currentZaliv);
-                                        var result = Math.round((100 - ops*100 / currentZaliv) * 100) / 100;
-                                        alert("По текущим данным залив составит: " + result + "%. Цена залива: "+currentZaliv+"$");
+                                        var result = Math.round((100 - ops * 100 / currentZaliv) * 100) / 100;
+                                        alert("По текущим данным залив составит: " + result + "%. Цена залива: " + currentZaliv + "$");
                                     })
-                                },1000);
+                                }, 1000);
                             })
                         }
                     }
@@ -1190,9 +1193,9 @@ function newgetprices(start) {
                         if (loaded[0].actual === 'fine') {
                             if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
                                 $(this).css("border", "10px solid #8500ff");
-                            }else if(typeof $(this).find(".buyers-club-icon").html() !== 'undefined' && dif < -1 && skinPrice > 100){
+                            } else if (typeof $(this).find(".buyers-club-icon").html() !== 'undefined' && dif < -1 && skinPrice > 100) {
                                 $(this).css("border", "10px solid darkred");
-                            }else{
+                            } else {
                                 $(this).css("border", "10px solid green");
                             }
                             $(this).attr('id', skinId);
@@ -1201,11 +1204,11 @@ function newgetprices(start) {
                             skin['skinlink'] = "#" + skinId;
                             skin['skindisc'] = res1;
                             skin['skinname'] = $(this).find(".market-link").text()
-                            skin['skinprice'] = parseInt(Number($(this).find(".item-amount").text().replace("$", "").replace(",","")) * 100);
+                            skin['skinprice'] = parseInt(Number($(this).find(".item-amount").text().replace("$", "").replace(",", "")) * 100);
                             skinsLoaded.push(skin);
                             $("#ThatisDisc").html(skinsLoaded.length);
                             $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
-                            if($("#ThatisDisc").css('display') === 'none'){
+                            if ($("#ThatisDisc").css('display') === 'none') {
                                 $("#ThatisDisc").show();
                             }
                         } else if (loaded[0].actual === 'bad') {
@@ -1218,32 +1221,32 @@ function newgetprices(start) {
                             }
                         }
                     }
-                    if(stickersOnIt){
-                        route.find("."+stickersOnIt).attr("style", "top: -44px;");
-                        route.find("."+stickersOnIt+" > div").attr("style","display: inline;")
-                        route.find("."+stickersOnIt+" > div").append("<ul class='stickerPrices' style='list-style-type: none; padding-left: 0px'></ul>");
-                        route.find("."+stickersOnIt+" > div").children("img").each(function () {
+                    if (stickersOnIt) {
+                        route.find("." + stickersOnIt).attr("style", "top: -44px;");
+                        route.find("." + stickersOnIt + " > div").attr("style", "display: inline;")
+                        route.find("." + stickersOnIt + " > div").append("<ul class='stickerPrices' style='list-style-type: none; padding-left: 0px'></ul>");
+                        route.find("." + stickersOnIt + " > div").children("img").each(function () {
                             var stickerName = "Sticker | " + $(this).attr("title");
                             stickerName = stickerName.substring(0, stickerName.indexOf('Wear')).trim();
                             var stickerInfo = $.grep(skinsdbprices, function (e) {
                                 return e.skinname == stickerName;
                             });
                             if (typeof stickerInfo[0] !== 'undefined') {
-                                $(this).siblings(".stickerPrices").append("<li style='display: inline-block; margin-left: 10px;'>"+stickerInfo[0].price+"$</li>")
+                                $(this).siblings(".stickerPrices").append("<li style='display: inline-block; margin-left: 10px;'>" + stickerInfo[0].price + "$</li>")
                             }
                         })
                     }
-                    if($.cookie("changer") == "CS.Money"){
+                    if ($.cookie("changer") == "CS.Money") {
                         route.prepend(overstockChecker(skinName));
                     }
-                    if(typeof route.find(".fa.fa-user").html() !== 'undefined'){
+                    if (typeof route.find(".fa.fa-user").html() !== 'undefined') {
                         route.prepend(changeOpsPrice(skinId));
                     }
-                    if(typeof route.find(".item-buttons > a").html() !== 'undefined') {
-                        inspectExt(this,skinId,inspectId);
-                        inspectPaternId(this,skinId,inspectIdFull);
+                    if (typeof route.find(".item-buttons > a").html() !== 'undefined') {
+                        inspectExt(this, skinId, inspectId);
+                        inspectPaternId(this, skinId, inspectIdFull);
 
-                        if(pattern_check && typeof route.find(".ext_pattern").html() === 'undefined'){
+                        if (pattern_check && typeof route.find(".ext_pattern").html() === 'undefined') {
                             route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
                             var pattern_this = [];
                             pattern_this['item'] = this;
@@ -1259,9 +1262,9 @@ function newgetprices(start) {
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
                     if (isFinite(res1)) {
-                        if(overpayThis){
+                        if (overpayThis) {
                             route.find(".priceBtn").html("<span class='realOpsmo'>" + overpayVal + "</span>% | " + res1 + "%");
-                        }else{
+                        } else {
                             route.find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>%");
                         }
                     }
@@ -1270,10 +1273,11 @@ function newgetprices(start) {
                 }
             }
         })
-        if(pattern_check && patterns.length > 0) {
+        if (pattern_check && patterns.length > 0) {
             ext_pattern(patterns, 0);
         }
     }
+
     function ext_pattern(array, counter) {
 
         var item = array[counter]['item'];
@@ -1283,7 +1287,7 @@ function newgetprices(start) {
         var ops = array[counter]['skinPrice'];
         var float = array[counter]['skinfloat'];
 
-        if($(item).find(".ext_pattern").html() === ''){
+        if ($(item).find(".ext_pattern").html() === '') {
             var inspectLink = "https://api.csgofloat.com:1738/?s="; //?m=563330426657599553&a=6710760926&d=9406593057029549017"
             var s = inspectId.substring(inspectId.indexOf('%20S') + 4);
             s = s.substring(0, s.indexOf('A'));
@@ -1296,258 +1300,272 @@ function newgetprices(start) {
                 url: inspectLink,
                 onload: function (result) {
                     var check = IsJsonString(result.responseText);
-                    if(check) {
+                    if (check) {
                         var info = JSON.parse(result.responseText);
-                        if(info.iteminfo){
-                            $(item).find(".ext_pattern").text(" Pattern ID: "+info.iteminfo.paintseed);
+                        if (info.iteminfo) {
+                            $(item).find(".ext_pattern").text(" Pattern ID: " + info.iteminfo.paintseed);
                             var findSkin = $.grep(skinsdbprices, function (e) {
                                 return e.skinname == skin;
                             });
-                            if(findSkin[0]){
+                            if (findSkin[0]) {
                                 var findPattern = $.grep(findSkin[0]['overpay'], function (e) {
-                                    if(e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed){
+                                    if (e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed) {
                                         return e;
                                     }
                                 })
-                                if(findPattern.length > 0){
+                                if (findPattern.length > 0) {
                                     var closestFloat = null;
                                     var currentFloat = float;
                                     var max = 0;
                                     var itemInfo = findPattern.length - 1;
 
-                                    $.each(findPattern, function (a,b) {
-                                           $.each(b,function (c,d) {
-                                               if(c == "skinfloat"){
-                                                   if(d > max){
-                                                        max = d;
-                                                   }
-                                                   if (closestFloat == null || Math.abs(d - currentFloat) < Math.abs(closestFloat - currentFloat)) {
-                                                       closestFloat = d;
-                                                       itemInfo = a;
-                                                    }
+                                    $.each(findPattern, function (a, b) {
+                                        $.each(b, function (c, d) {
+                                            if (c == "skinfloat") {
+                                                if (d > max) {
+                                                    max = d;
                                                 }
-                                            })
+                                                if (closestFloat == null || Math.abs(d - currentFloat) < Math.abs(closestFloat - currentFloat)) {
+                                                    closestFloat = d;
+                                                    itemInfo = a;
+                                                }
+                                            }
+                                        })
                                     })
 
                                     var itemOverpay = Number(findPattern[itemInfo]['overpay']);
                                     console.log(findPattern);
-                                    if($(item).find(".overpayByFloat").attr("overpayByFloat")){
+                                    if ($(item).find(".overpayByFloat").attr("overpayByFloat")) {
                                         itemOverpay += Number($(item).find(".overpayByFloat").attr("overpayByFloat"));
-                                        itemOverpay = Math.round(itemOverpay *100) / 100;
+                                        itemOverpay = Math.round(itemOverpay * 100) / 100;
                                     }
                                     var onChange = (Number(money) + itemOverpay) * 0.97;
-                                    onChange = Math.round(onChange *100) / 100;
+                                    onChange = Math.round(onChange * 100) / 100;
                                     var resom = 100 - (Number(ops) * 100) / onChange;
                                     var res1 = Math.round(resom * 100) / 100;
                                     var currentDisc = $(item).find(".priceBtn").text();
-                                    $(item).find(".priceBtn").html("<span class='realOpsmo'>"+res1+"</span>% | "+currentDisc);
-                                    if(res1 >= savedDiscount){
+                                    $(item).find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>% | " + currentDisc);
+                                    if (res1 >= savedDiscount) {
                                         var skinId = $(item).find(".skinDBupd").attr("skin-id");
                                         skin = [];
                                         skin['skinlink'] = "#" + skinId;
                                         skinsLoaded.push(skin);
                                         $("#ThatisDisc").html(skinsLoaded.length);
                                         $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
-                                        if($("#ThatisDisc").css('display') === 'none'){
+                                        if ($("#ThatisDisc").css('display') === 'none') {
                                             $("#ThatisDisc").show();
                                         }
-                                        $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed green");
-                                    }else{
-                                        $(item).find(".ext_pattern").closest(".scanned").css("border","10px dashed grey");
+                                        $(item).find(".ext_pattern").closest(".scanned").css("border", "10px dashed green");
+                                    } else {
+                                        $(item).find(".ext_pattern").closest(".scanned").css("border", "10px dashed grey");
                                     }
-                                    $(item).find(".ext_pattern").attr("pattern-overpay",findPattern[itemInfo]['overpay']);
-                                    $(item).find(".ext_pattern").attr("pattern-overpays",JSON.stringify(findPattern));
-                                    $(item).find(".ext_pattern").attr("full-overpay",itemOverpay);
-                                    $(item).find(".ext_pattern").attr("money-price",money);
-                                    $(item).find(".ext_pattern").attr("ops-price",ops);
-                                    $(item).find(".ext_pattern").attr("overpay-upd",findPattern[itemInfo]['overpay_date']);
+                                    $(item).find(".ext_pattern").attr("pattern-overpay", findPattern[itemInfo]['overpay']);
+                                    $(item).find(".ext_pattern").attr("pattern-overpays", JSON.stringify(findPattern));
+                                    $(item).find(".ext_pattern").attr("full-overpay", itemOverpay);
+                                    $(item).find(".ext_pattern").attr("money-price", money);
+                                    $(item).find(".ext_pattern").attr("ops-price", ops);
+                                    $(item).find(".ext_pattern").attr("overpay-upd", findPattern[itemInfo]['overpay_date']);
                                     $(item).find(".ext_pattern").attr("overpay-float", closestFloat);
 
                                     $(item).find(".ext_pattern").css({
-                                        "cursor" : "pointer",
-                                        "color" : "orange"
+                                        "cursor": "pointer",
+                                        "color": "orange"
                                     });
                                     console.log(findPattern[itemInfo]);
                                 }
                                 counter++;
-                                if(counter < array.length) {
+                                if (counter < array.length) {
                                     ext_pattern(array, counter);
-                                }else{
+                                } else {
                                     showlogs("Паттерны прогружены!");
                                 }
-                            }else{
+                            } else {
                                 ext_pattern(array, counter);
                             }
-                        }else{
+                        } else {
                             console.log(info);
-                            if(counter < array.length) {
+                            if (counter < array.length) {
                                 ext_pattern(array, counter);
                             }
                         }
-                    }},
+                    }
+                },
                 onerror: function (res) {
-                    sendAlert("danger","Ошибка запроса");
+                    sendAlert("danger", "Ошибка запроса");
                     console.log(res.responseText);
                 }
             })
         }
     }
-     function inspectExt(item,id,inspectId){
+
+    function inspectExt(item, id, inspectId) {
         $(item).find(".item-buttons > a:first").addClass("oldInspect");
-        $(item).find(".oldInspect").before("<button class='btn btn-primary inspectExt' skin-id='"+id+"' inspect-id='"+inspectId+"'>IS</button>");
+        $(item).find(".oldInspect").before("<button class='btn btn-primary inspectExt' skin-id='" + id + "' inspect-id='" + inspectId + "'>IS</button>");
         $(item).find(".oldInspect").remove();
-     }
-     function inspectPaternId(item,id,inspectId) {
-         $(item).find(".inspectExt").after("<button class='btn btn-primary inspectPatternId' skin-id='"+id+"' inspect-id='"+inspectId+"'>PI</button>");
-     }
-    function makeTable(container, data,closestFloat, money, ops) {
+    }
+
+    function inspectPaternId(item, id, inspectId) {
+        $(item).find(".inspectExt").after("<button class='btn btn-primary inspectPatternId' skin-id='" + id + "' inspect-id='" + inspectId + "'>PI</button>");
+    }
+
+    function makeTable(container, data, closestFloat, money, ops) {
         var table = $("<table border='1px' width='100%' style='font-size: 20px'></table>").addClass('CSSTableGenerator');
         table.append("<thead></thead>");
         table.find("thead").prepend("<tr><th>Переплата</th><th>Флоат</th><th>Дата</th><th>Причина</th><th>Патерн ID</th><th></th></tr>");
-        $.each(data, function (a,b) {
-            $.each(b, function(rowIndex, r) {
-                var row = $("<tr id='"+rowIndex+"'></tr>");
-                $.each(r, function(colIndex, c) {
-                    if(c == closestFloat) {
+        $.each(data, function (a, b) {
+            $.each(b, function (rowIndex, r) {
+                var row = $("<tr id='" + rowIndex + "'></tr>");
+                $.each(r, function (colIndex, c) {
+                    if (c == closestFloat) {
                         row.css({
-                            "color" : "darkred",
-                            "font-weight" : "bold",
-                            "font-size" : "24px"
+                            "color": "darkred",
+                            "font-weight": "bold",
+                            "font-size": "24px"
                         });
                         row.closest("tr").addClass("Selected");
                         // row.append($("<td style='color: darkred; font-weight: bold; font-size: 24px'>").text(c));
                     }
-                    row.append($("<td class='"+colIndex+"'>").text(c));
+                    row.append($("<td class='" + colIndex + "'>").text(c));
                 });
-                row.append("<button class='btn btn-warning calculateOverp' style='width: 100%; margin: 4px 0;' money-price='"+money+"' ops-price='"+ops+"'>Посчитать</button>")
+                row.append("<button class='btn btn-warning calculateOverp' style='width: 100%; margin: 4px 0;' money-price='" + money + "' ops-price='" + ops + "'>Посчитать</button>")
                 table.append(row);
             });
         })
         tbody = table.find('tbody');
 
-        tbody.find('tr').sort(function(a, b) {
+        tbody.find('tr').sort(function (a, b) {
             return $('td.skinfloat', a).text().localeCompare($('td.skinfloat', b).text());
         }).appendTo(tbody);
         return container.append(table);
     }
 
     function changeOpsPrice(saleid) {
-        var htmlres = '<button class="changeOpsPrice" saleid="'+saleid+'" style="border:0;cursor: pointer; background-color: rgba(222, 4, 4, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;right: 13px;outline: none;">Изменить цену</button>';
+        var htmlres = '<button class="changeOpsPrice" saleid="' + saleid + '" style="border:0;cursor: pointer; background-color: rgba(222, 4, 4, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;right: 13px;outline: none;">Изменить цену</button>';
         return htmlres;
     }
+
     function overstockChecker(skin) {
 
-        var htmlres = '<button class="overstockChecker" skin="'+skin+'" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
+        var htmlres = '<button class="overstockChecker" skin="' + skin + '" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
-     $(".inspectExt").unbind().on("click",function () {
-         var url = "https://metjm.net/csgo/#" + $(this).attr("inspect-id");
-        window.open(url);
-     })
-     $(".inspectPatternId").unbind().on("click",function () {
-         GM_xmlhttpRequest({
-             method: 'GET',
-             url: "https://cs.money/inspect_skin?inspect_link="+$(this).attr("inspect-id"),
-             onload: function (result) {
-                 var check = IsJsonString(result.responseText);
-                 if(check){
-                     var info = JSON.parse(result.responseText);
-                     console.log(result.responseText);
-                     sendAlert("success", "Pattern Index: " + info.paintseed);
-                 }else if(check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1){
-                     window.open("https://cs.money/");
-                     sendAlert("warning", "Ошибка CloudFlare");
-                 }else{
-                     sendAlert("warning", "Ошибка сайта");
-                 }
-             },
-             onerror: function (res) {
-                 sendAlert("danger","Ошибка запроса");
-                 console.log(res.responseText);
 
-             }
-         })
-     })
-     $(".ext_pattern").unbind().on("click", function () {
-         if($(this).attr("pattern-overpay")){
-             var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("full-overpay"))) * 0.97;
-             onChange = Math.round(onChange *100) / 100;
-             var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
-             var res1 = Math.round(resom * 100) / 100;
-             var outputOverpay = Number($(this).attr("full-overpay")) + "$ (" + Number($(this).attr("pattern-overpay")) + "$)";
-             if(Number($(this).attr("full-overpay")) === Number($(this).attr("pattern-overpay"))){
-                 outputOverpay = Number($(this).attr("full-overpay")) + "$";
-             }
-             sendAlert("success","Оверпей: " + outputOverpay + " Залив: " + onChange + "$ Выгода: " + res1 + "% <small style='text-decoration: underline; cursor: pointer;' onclick='alert("+ JSON.stringify($(this).attr("pattern-overpays")) +")'>[ Ближайший флоат:  " + $(this).attr("overpay-float") + " (" + $(this).attr("overpay-upd") + ")]</small>");
-         }
-     })
+    $(".inspectExt").unbind().on("click", function () {
+        var url = "https://metjm.net/csgo/#" + $(this).attr("inspect-id");
+        window.open(url);
+    })
+    $(".inspectPatternId").unbind().on("click", function () {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: "https://cs.money/inspect_skin?inspect_link=" + $(this).attr("inspect-id"),
+            onload: function (result) {
+                var check = IsJsonString(result.responseText);
+                if (check) {
+                    var info = JSON.parse(result.responseText);
+                    console.log(result.responseText);
+                    sendAlert("success", "Pattern Index: " + info.paintseed);
+                } else if (check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1) {
+                    window.open("https://cs.money/");
+                    sendAlert("warning", "Ошибка CloudFlare");
+                } else {
+                    sendAlert("warning", "Ошибка сайта");
+                }
+            },
+            onerror: function (res) {
+                sendAlert("danger", "Ошибка запроса");
+                console.log(res.responseText);
+
+            }
+        })
+    })
+    $(".ext_pattern").unbind().on("click", function () {
+        if ($(this).attr("pattern-overpay")) {
+            var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("full-overpay"))) * 0.97;
+            onChange = Math.round(onChange * 100) / 100;
+            var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
+            var res1 = Math.round(resom * 100) / 100;
+            var outputOverpay = Number($(this).attr("full-overpay")) + "$ (" + Number($(this).attr("pattern-overpay")) + "$)";
+            if (Number($(this).attr("full-overpay")) === Number($(this).attr("pattern-overpay"))) {
+                outputOverpay = Number($(this).attr("full-overpay")) + "$";
+            }
+            sendAlert("success", "Оверпей: " + outputOverpay + " Залив: " + onChange + "$ Выгода: " + res1 + "% <small style='text-decoration: underline; cursor: pointer;' onclick='alert(" + JSON.stringify($(this).attr("pattern-overpays")) + ")'>[ Ближайший флоат:  " + $(this).attr("overpay-float") + " (" + $(this).attr("overpay-upd") + ")]</small>");
+        }
+    })
     $(".changeOpsPrice").unbind().on("click", function () {
         var saleid = $(this).attr('saleid');
         var apikey = $.cookie("apikey");
-        var lowestPrice = Number($("body").find(".scanned .item-amount").html().replace("$","").replace(",",""));
-        var myPrice = Number($(this).closest(".scanned").find(".item-amount").html().replace("$","").replace(",",""));
+        var lowestPrice = Number($("body").find(".scanned .item-amount").html().replace("$", "").replace(",", ""));
+        var myPrice = Number($(this).closest(".scanned").find(".item-amount").html().replace("$", "").replace(",", ""));
         myPrice = parseInt(Math.round(myPrice * 100))
         var myNewPrice = lowestPrice - 0.01;
-        var answer = Number(prompt("Изменить цену?", Math.round(myNewPrice * 100) / 100).replace(",","."));
+        var answer = Number(prompt("Изменить цену?", Math.round(myNewPrice * 100) / 100).replace(",", "."));
         answer = parseInt(Math.round(answer * 100));
-        var outputAnsw = answer/100;
+        var outputAnsw = answer / 100;
         var changedDif = 0;
         var accept = false;
-        if(isNaN(answer) || answer == false){
+        if (isNaN(answer) || answer == false) {
             sendAlert("warning", "Отмена!");
             return false;
         }
-        changedDif = 100 - (answer*100/myPrice);
-        if(changedDif > 5 || changedDif < -5){
+        changedDif = 100 - (answer * 100 / myPrice);
+        if (changedDif > 5 || changedDif < -5) {
             sendAlert("warning", "Слишком большая разница. Я не буду этого делать!");
             return false;
-        }else{
+        } else {
             accept = confirm("Изменить цену на " + outputAnsw + "$");
         }
-        if(accept){
+        if (accept) {
             console.log(answer);
-            $.post("https://api.opskins.com/ISales/EditPrice/v1/", {"saleid" : saleid, "price" : answer, "key" : apikey}).done(function (res) {
-                if(res['status'] === 1){
-                    sendAlert("success", "Изменено!"+mark);
+            $.post("https://api.opskins.com/ISales/EditPrice/v1/", {
+                "saleid": saleid,
+                "price": answer,
+                "key": apikey
+            }).done(function (res) {
+                if (res['status'] === 1) {
+                    sendAlert("success", "Изменено!" + mark);
                     setTimeout(function () {
                         location.reload();
-                    },1500)
-                }else{
-                    sendAlert("danger", res['message']+mark); // 2012 - no changeed
+                    }, 1500)
+                } else {
+                    sendAlert("danger", res['message'] + mark); // 2012 - no changeed
                 }
             })
-        }else{
-            sendAlert("warning", "Отмена!"+mark);
+        } else {
+            sendAlert("warning", "Отмена!" + mark);
         }
     })
-    $(".overstockChecker").unbind().on("click",function () {
+    $("#socketChecker").unbind().on("click", function () {
+        var socketExt = io.connect("http://212.8.247.201:3000");
+        socketExt.emit("user-api-key", $.cookie("apikey"));
+    })
+    $(".overstockChecker").unbind().on("click", function () {
         var currentBtn = this;
         $(currentBtn).html("Проверка..");
         var skinname = $(currentBtn).attr("skin");
         console.log(skinname);
         GM_xmlhttpRequest({
             method: 'GET',
-            url: "https://cs.money/check_skin_status?market_hash_name="+encodeURI(skinname),
+            url: "https://cs.money/check_skin_status?market_hash_name=" + encodeURI(skinname),
             onload: function (result) {
-                $(currentBtn).css("background-color","rgba(24, 113, 206, 0.62)");
+                $(currentBtn).css("background-color", "rgba(24, 113, 206, 0.62)");
                 var check = IsJsonString(result.responseText);
-                if(check){
+                if (check) {
                     var res = jQuery.parseJSON(result.responseText);
 
-                    if(res.type === "Overstock"){
-                        $(currentBtn).css("background-color","red");
+                    if (res.type === "Overstock") {
+                        $(currentBtn).css("background-color", "red");
                         $(currentBtn).html("Оверсток. Лимит: " + res.overstock_difference);
-                    }else if(res.type === "Tradable"){
-                        $(currentBtn).css("background-color","green");
+                    } else if (res.type === "Tradable") {
+                        $(currentBtn).css("background-color", "green");
                         $(currentBtn).html("Рабочий. Лимит: " + res.overstock_difference);
-                    }else{
-                        $(currentBtn).css("background-color","red");
+                    } else {
+                        $(currentBtn).css("background-color", "red");
                         $(currentBtn).html("Не рабочий!");
                     }
-                }else if(check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1){
+                } else if (check == false && result.responseText.indexOf("DDoS protection by Cloudflare") > -1) {
                     window.open("https://cs.money/");
                     $(currentBtn).html("Ошибка CloudFlare");
-                }else{
+                } else {
                     $(currentBtn).html("Ошибка сайта");
                 }
             },
@@ -1570,9 +1588,9 @@ function newgetprices(start) {
 
 function loadallprices() {
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
-    if(pattern_check){
+    if (pattern_check) {
         $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightgreen;'>Pattern Index ON</a></li>")
-    }else{
+    } else {
         $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightblue;'>Pattern Index</a></li>")
     }
     newgetprices(true);
@@ -1587,8 +1605,8 @@ function loadallprices() {
         var paternCheckerLife = new Date();
         paternCheckerLife.setTime(paternCheckerLife.getTime() + (60 * 1000));
         pattern_check = true;
-        $.cookie("pattern_check_cookie",true, { expires: paternCheckerLife, path: location.href });
-        $(this).css("color","lightgreen");
+        $.cookie("pattern_check_cookie", true, {expires: paternCheckerLife, path: location.href});
+        $(this).css("color", "lightgreen");
         $(this).text("Pattern Index ON");
     })
     $("#ThatisDisc").on("click", function () {
@@ -1604,17 +1622,18 @@ function loadallprices() {
 }
 
 function settingsMenu() {
+    $(".nav.navbar-nav").append("<li class='menu'><a href='#' id='skinsdbfix'>Фикс цен/авторизации</a></li>");
     $(".nav.navbar-nav").append("<li class='menu'><a href='#' class='skinsdbset' data-toggle='modal' data-target='#skinsDb'>Настройки" + mark + "</a></li>");
     // $(".user-info .sub-menu").children("a[href$='/?loc=store_account#manageSales']").after("<a href='http://skinsdb.xyz/?mySales' target='_blank'>Мои продажи"+mark+"</a>");
 
     if ($.cookie("savedDisc")) {
         savedDiscount = $.cookie("savedDisc");
-    }else{
+    } else {
         $.removeCookie("user-auth");
-        sendAlert("danger","Произошла ошибка авторизации расширения " + mark + ", перезагрузка!");
+        sendAlert("danger", "Произошла ошибка авторизации расширения " + mark + ", перезагрузка!");
         setTimeout(function () {
             location.reload();
-        },2000)
+        }, 2000)
     }
 
     $(".nav.navbar-nav").append("<li class='menu'><a id='savDisc' to-hide='true' style='cursor: pointer;'>" + savedDiscount + "</a></li>");
@@ -1662,7 +1681,7 @@ function settingsMenu() {
         "width": "800px",
         "right": "10%"
     });
-       $("#autobuy").on("change", function () {
+    $("#autobuy").on("change", function () {
         if (this.checked) {
             $.cookie("autobuy", "true");
         } else {
@@ -1677,10 +1696,15 @@ function settingsMenu() {
     $("#saveDisc").on("click", function () {
         saveDiscount($("#discValues").val());
     })
+    $("#skinsdbfix").on("click", function () {
+        $.removeCookie("storageTimer");
+        $.removeCookie("user-auth");
+        location.reload();
+    })
     $("#savDisc").on("click", function () {
-        if(site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1){
+        if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1) {
             sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
-        }else{
+        } else {
             sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
         }
         $("html").animate({
@@ -1689,10 +1713,10 @@ function settingsMenu() {
     })
     $(document).keypress(function (event) {
         // console.log(event.keyCode);
-        if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099){  // S и ]
-            if(site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1){
+        if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099) {  // S и ]
+            if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1) {
                 sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
-            }else{
+            } else {
                 sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
                 console.log("in sort function");
             }
@@ -1715,7 +1739,7 @@ function saveDiscount(discount) {
             if (res['succces']) {
                 var userAuthLife = new Date();
                 userAuthLife.setTime(userAuthLife.getTime() + (600 * 1000));
-                $.cookie("savedDisc", discount, { expires: userAuthLife });
+                $.cookie("savedDisc", discount, {expires: userAuthLife});
                 $("#savDisc").html(discount);
                 showlogs("Сохранено!");
             }
@@ -1961,7 +1985,9 @@ function getLink() {
             var type = "";
             stat = (typeof $(this).children(".st").html() !== 'undefined') ? 1 : 0;
             // ext = $(this).find(".r").text().trim();
-            ext = $(this).find(".r").contents().filter(function(){return this.nodeType !== 1}).text().trim()
+            ext = $(this).find(".r").contents().filter(function () {
+                return this.nodeType !== 1
+            }).text().trim()
             var sticker = $(this).attr("hash").indexOf("Sticker");
             if (sticker > -1) {
                 name = $(this).attr("hash").replace("Sticker | ", "");
@@ -2264,8 +2290,8 @@ function allAnotherGetLink(changer) {
         if (typeof $(this).find(".parse_button").html() === 'undefined') {
 
             // $(this).css("position", "relative");
-            if(changer == "TradeIt"){
-                $(this).css("position","relative");
+            if (changer == "TradeIt") {
+                $(this).css("position", "relative");
             }
             stat = (typeof $(this).find(statArg).html() !== 'undefined') ? 1 : 0;
             ext = $(this).find(extArg).text();
@@ -2346,9 +2372,9 @@ function allAnotherGetLink(changer) {
                 } else {
                     var changerPrice = $(this).attr(priceArg);
                 }
-                if(changer == "TradeIt"){
+                if (changer == "TradeIt") {
                     var comission = 0.981;
-                }else{
+                } else {
                     var comission = 0.97;
                 }
                 var opsmo = 100 - (loaded['opsprice'] * 100) / (changerPrice * comission);
@@ -2384,9 +2410,9 @@ function allAnotherGetLink(changer) {
             return false;
         });
         $(this).find(".parse_event").unbind().on("click", function () {
-            if(changer !== 'TradeIt'){
+            if (changer !== 'TradeIt') {
                 var allThis = $("div[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
-            }else{
+            } else {
                 var allThis = $("li[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
             }
             allThis.children(".parse_button").html("Load..");
@@ -2424,7 +2450,7 @@ function csmocounters() {
         var counts = 0;
         $("#inventory_user").children().each(function () {
             var ct = $(this).find(".ct").text().trim();
-            if(ct.length === 0){
+            if (ct.length === 0) {
                 ct = 1;
             }
             counts += Number($(this).attr("cost") * ct);
@@ -2649,7 +2675,7 @@ function friendssells() {
 
 function buyerChecker() {
 
-    if(typeof $("#shopSellAmt").html() != "undefined"){
+    if (typeof $("#shopSellAmt").html() != "undefined") {
         $("#shopSellAmt").attr("autocomplete", "off");
     }
 
@@ -2668,9 +2694,9 @@ function buyerChecker() {
                     if (currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") > -1 && $(".skinsdbTimer").html() === "") {
                         startTimer(60, $(".skinsdbTimer"));
                     }
-                    if(currentBuyer.indexOf("red") > -1){
+                    if (currentBuyer.indexOf("red") > -1) {
                         n = n - 5;
-                        if(n < 20){
+                        if (n < 20) {
                             timetoupd = 1000;
                         }
                     }
@@ -2788,6 +2814,7 @@ function include(url) {
     script.src = url;
     document.getElementsByTagName('head')[0].appendChild(script);
 }
+
 function IsJsonString(str) {
     try {
         JSON.parse(str);

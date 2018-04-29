@@ -209,7 +209,7 @@ function opsbotload(site) {
         // csmoparser();
         addFilterBtn();
     }
-    if (site == "https://opskins.com/?loc=shop_browse") {
+    if (site == "https://opskins.com/?loc=shop_browse" || site == "https://opskins.com/?loc=shop_browse&app=578080_2" || site == "https://opskins.com/?loc=shop_browse&app=730_2") {
         fullpageparse();
         loadallprices();
         // csmoparser();

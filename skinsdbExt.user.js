@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   https://skinsdb.online/
-// @version      2.28
+// @version      2.29
 // @description  try to hard!
 // @author       BJIAST
 // @match       https://skinsdb.online/*
@@ -30,7 +30,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 2.28;
+var version = 2.29;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -238,7 +238,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=store_account#manageSales") {
         realEarning();
     }
-    if (site == "https://opskins.com/index.php?loc=game" + opslink6[1]) {
+    if (site == "https://opskins.com/index.php?loc=game" + opslink6[1] || site == "https://opskins.com/?loc=game") {
         fullpageparse();
         loadallprices();
     }
@@ -622,7 +622,7 @@ function las20btn(page = "item") {
         } else {
             var skinName = $("#modalSkinName").text();
         }
-        var skinPrice = $(this).parent().children(".text-left").html();
+        var skinPrice = $(this).parent().children(".text-left").text();
         skinPrice = skinPrice.split("<small");
         skinPrice = skinPrice[0];
         skinPrice = skinPrice.replace("$", "");
@@ -1702,7 +1702,7 @@ function settingsMenu() {
         location.reload();
     })
     $("#savDisc").on("click", function () {
-        if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1) {
+        if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1 || site.indexOf("https://opskins.com/?loc=game") > -1 ) {
             sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
         } else {
             sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
@@ -1716,7 +1716,9 @@ function settingsMenu() {
         if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099) {  // S и ]
             if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1) {
                 sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
-            } else {
+            } else if (site.indexOf("https://opskins.com/?loc=game") > -1){
+                sortUsingNestedText($("body"), "div.scanned", ".priceBtn .realOpsmo");
+            }else {
                 sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
                 console.log("in sort function");
             }
@@ -2236,7 +2238,7 @@ function allAnotherGetLink(changer) {
 
             break;
         case 'LootFarm' :
-            statArg = ".is_st";
+            statArg = ".it_st";
             extArg = ".it_ext";
             nameArg = "data-name";
             currentItem = ".itemblock";
@@ -2295,7 +2297,6 @@ function allAnotherGetLink(changer) {
             }
             stat = (typeof $(this).find(statArg).html() !== 'undefined') ? 1 : 0;
             ext = $(this).find(extArg).text();
-
             var sticker = $(this).attr(nameArg).indexOf("Sticker");
             if (sticker > -1) {
                 name = $(this).attr(nameArg).replace("Sticker | ", "");
@@ -2358,7 +2359,11 @@ function allAnotherGetLink(changer) {
             }
             var skinname = $(this).attr(nameArg);
             if (typeof $(this).find(".link_button").html() === 'undefined') {
-                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '">Link</a>');
+                if($("#bLoadGame").attr('data-game') == 578080){
+                    $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=578080_2&amp;search_item=&quot;' + encodeURI(skinname) + '&quot;&amp;sort=lh" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '">Link</a>');
+                }else{
+                    $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '">Link</a>');
+                }
             }
             var loaded;
             loaded = _.find(skinsLoaded, function (item) {
@@ -2411,7 +2416,7 @@ function allAnotherGetLink(changer) {
         });
         $(this).find(".parse_event").unbind().on("click", function () {
             if (changer !== 'TradeIt') {
-                var allThis = $("div[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
+                var allThis = $('div[' + nameArg + '="' + $(this).parent().attr(nameArg) + '"]');
             } else {
                 var allThis = $("li[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
             }

@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         skinsdbExt
-// @namespace   https://skinsdb.online/
+// @namespace   http://skinsdb.online/
 // @version      2.29
 // @description  try to hard!
 // @author       BJIAST
-// @match       https://skinsdb.online/*
+// @match       http://skinsdb.online/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://cs.money/*
 // @match       http://cs.money/*
@@ -20,9 +20,9 @@
 // ==/UserScript==
 
 
-var scriptUrl = "https://skinsdb.online/scripts/opsinc.php";
+var scriptUrl = "http://skinsdb.online/scripts/opsinc.php";
 var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
-var soundFound = new Audio('https://skinsdb.online/assets/ready.mp3');
+var soundFound = new Audio('http://skinsdb.online/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 var skinsLoaded = [];
@@ -165,7 +165,7 @@ var version = 2.29;
             })
         }, 600)
     }
-    if (site == "https://skinsdb.online/?doppler_search" || site == "https://skinsdb.online/?favsearch") {
+    if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
         dopplerChecker();
     }
     steamAccept();
@@ -1110,7 +1110,7 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    if ($.cookie("changer") === "Opskins AVG") {
+                    if ($.cookie("changer") === "Opskins AVG" || $.cookie("changer") === "CS.Money") {
                         var comission = 0.95;
                     } else {
                         var comission = 0.97;
@@ -1446,7 +1446,7 @@ function newloadallprices(opd) {
 
     function overstockChecker(skin) {
 
-        var htmlres = '<button class="overstockChecker" skin="' + skin + '" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 127px;left: 13px;outline: none;">Проверить</button>';
+        var htmlres = '<button class="overstockChecker" skin="' + skin + '" style="border:0;cursor: pointer; background-color: rgba(24, 113, 206, 0.62); font-size: 94%; z-index: 99;position:absolute;top: 155px;left: 13px;outline: none;">Проверить</button>';
         return htmlres;
     }
 
@@ -2075,7 +2075,7 @@ function getLink() {
                 return item.fullname === skinname;
             });
             if (typeof loaded !== 'undefined') {
-                var csmPrice = $(this).attr("cost");
+                var csmPrice = $(this).attr("price");
                 var opsmo = 100 - (loaded['opsprice'] * 100) / (csmPrice * 0.97);
                 opsmo = Math.round(opsmo * 100) / 100;
                 var moops = 100 - loaded['opsprice'] * 95 / csmPrice;
@@ -2571,7 +2571,7 @@ function realEarning() {
             $("#collapseIS .panel-body").css("display", "none");
             var myData = new FormData();
             var onSold = 0;
-            var userdbupd = "https://skinsdb.online/scripts/usersales.php";
+            var userdbupd = "http://skinsdb.online/scripts/usersales.php";
             myData.append("usersales", true);
             GM_xmlhttpRequest({
                 method: "POST",

@@ -1,21 +1,14 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.online/
-// @version      2.29
+// @version      3.0
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
 // @match       https://steamcommunity.com/tradeoffer/*
-// @match       https://cs.money/*
-// @match       http://cs.money/*
-// @match       https://loot.farm/*
-// @match       https://cstrade.gg/*
-// @match       https://csgotrade.me/*
-// @match       https://csoffer.me/*
-// @match       https://trade-skins.com/*
-// @match       https://tradeit.gg/*
 // @match       https://opskins.com/*
 // @match       https://steamcommunity.com/trade/*
+// @match       https://trade.vgounbox.com/*
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
@@ -36,16 +29,10 @@ var version = 2.29;
     var opslink3 = site.split("https://opskins.com/");
 
     if (site == "https://opskins.com/" + opslink3[1]) {
-        include("https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js");
         include("https://code.jquery.com/jquery-3.2.1.min.js");
 
         include("https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js");
 
-        if ($.cookie("pattern_check_cookie")) {
-            pattern_check = true;
-        } else {
-            pattern_check = false;
-        }
         if ($.cookie('user-auth')) {
             console.log("Loaded without server!");
             opsbotload(site);
@@ -81,58 +68,13 @@ var version = 2.29;
             })
         }
     }
-    if (site === "https://loot.farm/") {
+    if (site == "https://trade.vgounbox.com/" || site == "https://trade.vgounbox.com/trade") {
         include("https://code.jquery.com/jquery-3.2.1.min.js");
         include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
 
         setTimeout(function () {
             setInterval(function () {
-                allAnotherGetLink("LootFarm");
-            }, 2000);
-        }, 400);
-    }
-    if (site === "https://csoffer.me/") {
-        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-
-        setTimeout(function () {
-            setInterval(function () {
-                allAnotherGetLink("CSOFFERme");
-            }, 2000);
-        }, 400);
-    }
-    if (site === "https://csgotrade.me/") {
-        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-
-        setTimeout(function () {
-            setInterval(function () {
-                allAnotherGetLink("TradeMe");
-            }, 2000);
-        }, 400);
-    }
-    if (site === "https://trade-skins.com/") {
-        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-
-        setTimeout(function () {
-            setInterval(function () {
-                allAnotherGetLink("TradeSkins");
-            }, 2000);
-        }, 400);
-    }
-    if (site === "https://cstrade.gg/") {
-        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-
-        setTimeout(function () {
-            setInterval(function () {
-                allAnotherGetLink("CSTrade");
-            }, 2000);
-        }, 400);
-    }
-    if (site === "https://tradeit.gg/") {
-        include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
-
-        setTimeout(function () {
-            setInterval(function () {
-                allAnotherGetLink("TradeIt");
+                allAnotherGetLink("vgounbox");
             }, 2000);
         }, 400);
     }
@@ -157,8 +99,6 @@ var version = 2.29;
                     if (JSONdata['success']) {
                         include("https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js");
                         versionChecker(JSONdata['user-version'], JSONdata['current-version']);
-                        csmomenu();
-                        // csmoparser();
                         favSkins = JSONdata['favskins'];
                     }
                 }
@@ -189,7 +129,7 @@ function opsbotload(site) {
     var opslink2 = site.split("?loc=good_deals");
     var opslink3 = site.split("https://opskins.com/");
     var opslink4 = site.split("?loc=shop_view_item");
-    var opslink5 = site.split("?app=730_2");
+    var opslink5 = site.split("?app=1912_1");
     var opslink6 = site.split("index.php?loc=game");
     if (site == "https://opskins.com/" + opslink3[1]) {
         settingsMenu();
@@ -198,7 +138,7 @@ function opsbotload(site) {
     if (site == "https://opskins.com/?loc=shop_checkout") {
         autoBuyclick();
     }
-    if (site == "https://opskins.com/?loc=shop_search" + opslink[1] || site == "https://opskins.com/?app=730_2" + opslink5[1]) {
+    if (site == "https://opskins.com/?loc=shop_search" + opslink[1] || site == "https://opskins.com/?app=1912_1" + opslink5[1]) {
         fullpageparse();
         loadallprices();
         friendssells();
@@ -207,9 +147,8 @@ function opsbotload(site) {
         fullpageparse();
         loadallprices();
         // csmoparser();
-        addFilterBtn();
     }
-    if (site == "https://opskins.com/?loc=shop_browse" || site == "https://opskins.com/?loc=shop_browse&app=578080_2" || site == "https://opskins.com/?loc=shop_browse&app=730_2") {
+    if (site == "https://opskins.com/?loc=shop_browse" || site == "https://opskins.com/?loc=shop_browse&app=1912_1" || site == "https://opskins.com/?loc=shop_browse&app=730_2") {
         fullpageparse();
         loadallprices();
         // csmoparser();
@@ -229,12 +168,6 @@ function opsbotload(site) {
         fullpageparse();
         loadallprices();
     }
-    if (site == "https://opskins.com/?loc=sell") {
-        sellsinvChecker();
-    }
-    if (site == "https://opskins.com/?loc=inventory") {
-        autoWithdraw();
-    }
     if (site == "https://opskins.com/?loc=store_account#manageSales") {
         realEarning();
     }
@@ -243,94 +176,6 @@ function opsbotload(site) {
         loadallprices();
     }
 }
-
-// function csmoparser() {
-//     var myData = new FormData();
-//     myData.append("checkparse", true);
-//     GM_xmlhttpRequest({
-//         method: "POST",
-//         url: scriptUrl,
-//         data: myData,
-//         onload: function (result) {
-//             res = jQuery.parseJSON(result.responseText);
-//             if (res['success']) {
-//                 getQuery();
-//                 setInterval(getQuery, 120000);
-//                 showlogs("Парсер включен!");
-//             }
-//         }
-//     })
-//
-//
-//     function getQuery() {
-//         var url_date = new Date().getTime() / 1000;
-//         var url = "http://cs.money/load_bots_inventory?hash"+url_date;
-//         console.log(url);
-//         GM_xmlhttpRequest({
-//             method: "GET",
-//             url: url,
-//             onload: function (res) {
-//
-//                 if (res.responseText[0] === "<" && site == "https://opskins.com/" + opslink3[1]) {
-//                     window.open("http://cs.money/");
-//                 } else {
-//                     json = JSON.parse(res.responseText);
-//                     // console.log(json);
-//                     var skins = [];
-//                     $.each(json, function (key, item) {
-//                         var skinname = "";
-//                         switch (item['e']) {
-//                             case 'FN' :
-//                                 skinname = item['m'] + " (Factory New)";
-//                                 break;
-//                             case 'MW' :
-//                                 skinname = item['m'] + " (Minimal Wear)";
-//                                 break;
-//                             case 'FT' :
-//                                 skinname = item['m'] + " (Field-Tested)";
-//                                 break;
-//                             case 'WW' :
-//                                 skinname = item['m'] + " (Well-Worn)";
-//                                 break;
-//                             case 'BS' :
-//                                 skinname = item['m'] + " (Battle-Scarred)";
-//                                 break;
-//                             default :
-//                                 skinname = item['m'];
-//                                 break;
-//                         }
-//                         var target = skinname;
-//                         var result = $.grep(skins, function (e) {
-//                             return e.skinname == target;
-//                         });
-//                         if (typeof result[0] == 'undefined' && typeof item['ar'] == 'undefined') {
-//                             console.log(item['ar'] + " - "  + skinname);
-//                             var thisskin = {};
-//                             thisskin['skinname'] = skinname;
-//                             thisskin['csmprice'] = item['p'];
-//                             thisskin['counter'] = 1;
-//                             skins.push(thisskin);
-//                         } else if(typeof result[0] != 'undefined') {
-//                             objIndex = skins.findIndex((obj => obj.skinname == skinname));
-//                             skins[objIndex].counter = skins[objIndex].counter + 1;
-//                         }
-//                     });
-//                     jsonReady = JSON.stringify(skins);
-//                     var myData = new FormData();
-//                     myData.append("csmoprices", jsonReady);
-//                     GM_xmlhttpRequest({
-//                         method: "POST",
-//                         url: "https://skinsdb.online/parsers/money.php",
-//                         data: myData,
-//                         onload: function (result) {
-//                             console.log(result.responseText);
-//                         }
-//                     })
-//                 }
-//             }
-//         })
-//     }
-// }
 
 function autoBuyclick() {
     $("#itemCount").after("<div class='btn btn-warning checkout-btn' id='stopAutoBuyclick' style='width: 61px;position:absolute;left: -72px;top: 13px;border-radius: 3px;'>Стоп</div>");
@@ -480,6 +325,7 @@ function parseprice(red_btn, opd) {
         } else {
             skinName = skinName.trim();
         }
+        console.log(skinName);
         if ($.cookie("savedDisc")) {
             savedDiscount = $.cookie("savedDisc");
         }
@@ -494,8 +340,8 @@ function parseprice(red_btn, opd) {
             data: myData,
             onload: function (result) {
                 var res = jQuery.parseJSON(result.responseText);
-                // console.log(res);
-                if (res['opsMoney']) {
+                console.log(res);
+                if (res['status']) {
                     var dif = savedDiscount - res['opsMoney'];
 
                     if (res['opsMoney'] > savedDiscount) {
@@ -919,7 +765,7 @@ function dopplerChecker() {
                         res = res.replace("$", "");
                         res = res.replace(",", "");
                         var price = res;
-                        res = 100 - (res * 100) / (chprice * 0.97);
+                        res = 100 - (res * 100) / (chprice * 0.95);
                         res = Math.round(res * 100) / 100;
                         var date = new Date();
                         $(btn).parent().find("#count-" + id).parent().find(".opskins").html(price + "$");
@@ -1110,12 +956,13 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    if ($.cookie("changer") === "Opskins AVG" || $.cookie("changer") === "CS.Money") {
-                        var comission = 0.95;
-                    } else {
-                        var comission = 0.97;
-                    }
-                    var resom = 100 - (skinPrice * 100) / (loaded[0].price * comission);
+                    var comission = 0.913;
+
+                    var changerPrice = loaded[0].price * comission;
+                    if($.cookie('changer') == "VGOUNBOX"){ if(skinName.indexOf('Key') > -1) {
+                        changerPrice = 2.5;
+                    }}
+                    var resom = 100 - (skinPrice * 100) / changerPrice;
                     var res1 = Math.round(resom * 100) / 100;
                     var dif = savedDiscount - res1;
                     var overpayThis = false;
@@ -1124,71 +971,7 @@ function newloadallprices(opd) {
                     if (typeof currBoxWear.html() != 'undefined') {
                         var skinfloat = parseFloat(currBoxWear.html().replace("Wear: ", "").replace("%", ""));
                     }
-                    if (loaded[0]['overpay'][0] !== "no" && typeof currBoxWear.html() !== 'undefined') {
 
-                        var closestFloat = null;
-                        var goal = parseFloat(currBoxWear.html().replace("Wear: ", "").replace("%", ""));
-                        var currentFloat = goal;
-                        var max = 0;
-                        $.each(loaded[0].overpay, function (a, b) {
-                            if (loaded[0]['overpay'][a]['reason'] === 'float') {
-                                $.each(b, function (c, d) {
-                                    if (c == "skinfloat") {
-                                        if (d > max) {
-                                            max = d;
-                                        }
-                                        if (closestFloat == null || Math.abs(d - goal) < Math.abs(closestFloat - goal)) {
-                                            closestFloat = d;
-                                            overpayByFloat = loaded[0]['overpay'][a]['overpay'];
-                                            overpayCloseDate = loaded[0]['overpay'][a]['overpay_date'];
-                                            overpayCloseFloat = loaded[0]['overpay'][a]['skinfloat'];
-                                        }
-                                    }
-                                })
-                            }
-                        })
-
-                        if (currentFloat < max) {
-                            // route.prepend("<div style='position: absolute;top: 49%; left: 3%;background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;z-index: 99;'>Closest float: "+overpayCloseFloat+" from "+overpayCloseDate+"</div>")
-                            overpayThis = true;
-                            currBoxWear.css({
-                                "color": "yellow",
-                                "font-weight": "bold",
-                                "font-size": "100%",
-                                "cursor": "pointer"
-                            });
-                            var curChangerPrice = parseFloat(overpayByFloat) + parseFloat(loaded[0].price);
-                            var overpayCounter = 100 - (skinPrice * 100) / (curChangerPrice * 0.97);
-                            var overpayVal = Math.round(overpayCounter * 100) / 100;
-                            $(this).css("border", "10px solid grey");
-                            currBoxWear.attr("href", "#");
-                            currBoxWear.attr("data-toggle", "modal");
-                            currBoxWear.attr("data-target", "#skinsDbSales");
-                            currBoxWear.attr("overpayByFloat", overpayByFloat);
-                            currBoxWear.addClass("overpayByFloat");
-                            currBoxWear.on("click", function () {
-                                $("#skinsDbSales .modal-body").html("Подожди");
-                                data = [loaded[0].overpay];
-                                var opsPrice = skinPrice;
-                                var moneyPrice = loaded[0].price;
-                                makeTable($("#skinsDbSales .modal-body"), data, closestFloat, moneyPrice, opsPrice);
-                                setTimeout(function () {
-                                    var rowpos = $("#skinsDbSales .modal-body").find("tr.Selected").position();
-                                    $("#skinsDbSales").scrollTop(rowpos.top);
-
-                                    $(".calculateOverp").unbind().on("click", function () {
-                                        var csm = $(this).attr("money-price");
-                                        var ops = $(this).attr("ops-price");
-                                        var currOverpay = $(this).closest("tr").find("td.overpay").text();
-                                        var currentZaliv = Math.round((parseFloat(currOverpay) + parseFloat(csm)) * 0.97 * 100) / 100;
-                                        console.log(currentZaliv);
-                                        var result = Math.round((100 - ops * 100 / currentZaliv) * 100) / 100;
-                                        alert("По текущим данным залив составит: " + result + "%. Цена залива: " + currentZaliv + "$");
-                                    })
-                                }, 1000);
-                            })
-                        }
-                    }
                     if (res1 >= savedDiscount || overpayThis == true && overpayVal >= savedDiscount) {
                         if (loaded[0].actual === 'fine') {
                             if (typeof $(this).find(".buyers-club-icon").html() === 'undefined' && dif < -1 && skinPrice > 5) {
@@ -1245,19 +1028,6 @@ function newloadallprices(opd) {
                     if (typeof route.find(".item-buttons > a").html() !== 'undefined') {
                         inspectExt(this, skinId, inspectId);
                         inspectPaternId(this, skinId, inspectIdFull);
-
-                        if (pattern_check && typeof route.find(".ext_pattern").html() === 'undefined') {
-                            route.find(".item-amount").after("<span class='ext_pattern' style='font-size: 0.85em'></span>");
-                            var pattern_this = [];
-                            pattern_this['item'] = this;
-                            pattern_this['inspectId'] = inspectId;
-                            pattern_this['skinName'] = skinName;
-                            pattern_this['csmoney'] = loaded[0].price;
-                            pattern_this['skinPrice'] = skinPrice;
-                            pattern_this['skinfloat'] = skinfloat;
-
-                            patterns.push(pattern_this);
-                        }
                     }
                     // console.log(loaded[0]);
                     route.prepend("<div class='skinDBupd' style='position: absolute;top: 28%;left: 3%; background: rgba(0, 0, 0, 0.37); padding: 3px 2px;color: #d9d9d9;' skin-id='" + skinId + "'>" + loaded[0].dataupd + "<span class='changer_price' style='color: #d69909; font-weight: bold;'> (" + loaded[0].price + "$)" + (loaded[0].counter ? " - " + loaded[0].counter + " шт." : "") + "</span></div>");
@@ -1273,129 +1043,7 @@ function newloadallprices(opd) {
                 }
             }
         })
-        if (pattern_check && patterns.length > 0) {
-            ext_pattern(patterns, 0);
-        }
-    }
 
-    function ext_pattern(array, counter) {
-
-        var item = array[counter]['item'];
-        var inspectId = array[counter]['inspectId'];
-        var skin = array[counter]['skinName'];
-        var money = array[counter]['csmoney'];
-        var ops = array[counter]['skinPrice'];
-        var float = array[counter]['skinfloat'];
-
-        if ($(item).find(".ext_pattern").html() === '') {
-            var inspectLink = "https://api.csgofloat.com:1738/?s="; //?m=563330426657599553&a=6710760926&d=9406593057029549017"
-            var s = inspectId.substring(inspectId.indexOf('%20S') + 4);
-            s = s.substring(0, s.indexOf('A'));
-            var a = inspectId.substring(inspectId.indexOf('A') + 1);
-            a = a.substring(0, a.indexOf("D"));
-            var d = inspectId.substring(inspectId.indexOf('D') + 1);
-            inspectLink += s + "&a=" + a + "&d=" + d;
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: inspectLink,
-                onload: function (result) {
-                    var check = IsJsonString(result.responseText);
-                    if (check) {
-                        var info = JSON.parse(result.responseText);
-                        if (info.iteminfo) {
-                            $(item).find(".ext_pattern").text(" Pattern ID: " + info.iteminfo.paintseed);
-                            var findSkin = $.grep(skinsdbprices, function (e) {
-                                return e.skinname == skin;
-                            });
-                            if (findSkin[0]) {
-                                var findPattern = $.grep(findSkin[0]['overpay'], function (e) {
-                                    if (e.reason == 'pattern' && e.pattern_id == info.iteminfo.paintseed) {
-                                        return e;
-                                    }
-                                })
-                                if (findPattern.length > 0) {
-                                    var closestFloat = null;
-                                    var currentFloat = float;
-                                    var max = 0;
-                                    var itemInfo = findPattern.length - 1;
-
-                                    $.each(findPattern, function (a, b) {
-                                        $.each(b, function (c, d) {
-                                            if (c == "skinfloat") {
-                                                if (d > max) {
-                                                    max = d;
-                                                }
-                                                if (closestFloat == null || Math.abs(d - currentFloat) < Math.abs(closestFloat - currentFloat)) {
-                                                    closestFloat = d;
-                                                    itemInfo = a;
-                                                }
-                                            }
-                                        })
-                                    })
-
-                                    var itemOverpay = Number(findPattern[itemInfo]['overpay']);
-                                    console.log(findPattern);
-                                    if ($(item).find(".overpayByFloat").attr("overpayByFloat")) {
-                                        itemOverpay += Number($(item).find(".overpayByFloat").attr("overpayByFloat"));
-                                        itemOverpay = Math.round(itemOverpay * 100) / 100;
-                                    }
-                                    var onChange = (Number(money) + itemOverpay) * 0.97;
-                                    onChange = Math.round(onChange * 100) / 100;
-                                    var resom = 100 - (Number(ops) * 100) / onChange;
-                                    var res1 = Math.round(resom * 100) / 100;
-                                    var currentDisc = $(item).find(".priceBtn").text();
-                                    $(item).find(".priceBtn").html("<span class='realOpsmo'>" + res1 + "</span>% | " + currentDisc);
-                                    if (res1 >= savedDiscount) {
-                                        var skinId = $(item).find(".skinDBupd").attr("skin-id");
-                                        skin = [];
-                                        skin['skinlink'] = "#" + skinId;
-                                        skinsLoaded.push(skin);
-                                        $("#ThatisDisc").html(skinsLoaded.length);
-                                        $("#ThatisDisc").attr("href", skinsLoaded[0]['skinlink']);
-                                        if ($("#ThatisDisc").css('display') === 'none') {
-                                            $("#ThatisDisc").show();
-                                        }
-                                        $(item).find(".ext_pattern").closest(".scanned").css("border", "10px dashed green");
-                                    } else {
-                                        $(item).find(".ext_pattern").closest(".scanned").css("border", "10px dashed grey");
-                                    }
-                                    $(item).find(".ext_pattern").attr("pattern-overpay", findPattern[itemInfo]['overpay']);
-                                    $(item).find(".ext_pattern").attr("pattern-overpays", JSON.stringify(findPattern));
-                                    $(item).find(".ext_pattern").attr("full-overpay", itemOverpay);
-                                    $(item).find(".ext_pattern").attr("money-price", money);
-                                    $(item).find(".ext_pattern").attr("ops-price", ops);
-                                    $(item).find(".ext_pattern").attr("overpay-upd", findPattern[itemInfo]['overpay_date']);
-                                    $(item).find(".ext_pattern").attr("overpay-float", closestFloat);
-
-                                    $(item).find(".ext_pattern").css({
-                                        "cursor": "pointer",
-                                        "color": "orange"
-                                    });
-                                    console.log(findPattern[itemInfo]);
-                                }
-                                counter++;
-                                if (counter < array.length) {
-                                    ext_pattern(array, counter);
-                                } else {
-                                    showlogs("Паттерны прогружены!");
-                                }
-                            } else {
-                                ext_pattern(array, counter);
-                            }
-                        } else {
-                            console.log(info);
-                            if (counter < array.length) {
-                                ext_pattern(array, counter);
-                            }
-                        }
-                    }
-                },
-                onerror: function (res) {
-                    sendAlert("danger", "Ошибка запроса");
-                    console.log(res.responseText);
-                }
-            })
-        }
     }
 
     function inspectExt(item, id, inspectId) {
@@ -1480,7 +1128,7 @@ function newloadallprices(opd) {
     })
     $(".ext_pattern").unbind().on("click", function () {
         if ($(this).attr("pattern-overpay")) {
-            var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("full-overpay"))) * 0.97;
+            var onChange = (Number($(this).attr("money-price")) + Number($(this).attr("full-overpay"))) * 0.95;
             onChange = Math.round(onChange * 100) / 100;
             var resom = 100 - (Number($(this).attr("ops-price")) * 100) / onChange;
             var res1 = Math.round(resom * 100) / 100;
@@ -1588,11 +1236,7 @@ function newloadallprices(opd) {
 
 function loadallprices() {
     $("body").append("<a id='ThatisDisc' style='position:fixed; display: none; right: 6%; bottom: 6%; padding: 20px 26px; border: 3px solid transparent; background: green; border-radius:60%; font-size: 26px;z-index: 999999; color: #fff; cursor: pointer;'>" + skinsLoaded.length + "</a>");
-    if (pattern_check) {
-        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightgreen;'>Pattern Index ON</a></li>")
-    } else {
-        $("body").find(".weapon-nav .nav-pills").append("<li><a class='patterns_go' style='cursor: pointer; color: lightblue;'>Pattern Index</a></li>")
-    }
+
     newgetprices(true);
     setInterval(function () {
         newgetprices();
@@ -1601,14 +1245,7 @@ function loadallprices() {
     $(document).ajaxComplete(function () {
         newloadallprices();
     });
-    $(".patterns_go").on("click", function () {
-        var paternCheckerLife = new Date();
-        paternCheckerLife.setTime(paternCheckerLife.getTime() + (60 * 1000));
-        pattern_check = true;
-        $.cookie("pattern_check_cookie", true, {expires: paternCheckerLife, path: location.href});
-        $(this).css("color", "lightgreen");
-        $(this).text("Pattern Index ON");
-    })
+
     $("#ThatisDisc").on("click", function () {
         skinsLoaded.splice(0, 1);
         // console.table(skinsLoaded);
@@ -1702,7 +1339,7 @@ function settingsMenu() {
         location.reload();
     })
     $("#savDisc").on("click", function () {
-        if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1 || site.indexOf("https://opskins.com/?loc=game") > -1 ) {
+        if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1 || site.indexOf("https://opskins.com/?loc=game") > -1) {
             sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
         } else {
             sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
@@ -1716,9 +1353,9 @@ function settingsMenu() {
         if (event.keyCode == 115 || event.keyCode == 92 || event.keyCode == 1110 || event.keyCode == 1099) {  // S и ]
             if (site.indexOf("https://opskins.com/index.php?loc=game&type=3&market_name=") > -1) {
                 sortUsingNestedText($(".panel-body .row"), "div.scanned", ".priceBtn .realOpsmo");
-            } else if (site.indexOf("https://opskins.com/?loc=game") > -1){
+            } else if (site.indexOf("https://opskins.com/?loc=game") > -1) {
                 sortUsingNestedText($("body"), "div.scanned", ".priceBtn .realOpsmo");
-            }else {
+            } else {
                 sortUsingNestedText($("#scroll"), "div.scanned", ".priceBtn .realOpsmo");
                 console.log("in sort function");
             }
@@ -1749,447 +1386,6 @@ function saveDiscount(discount) {
     })
 }
 
-function autoWithdraw() {
-    $(".btn-primary:contains('Select None')").after("<button class='btn btn-primary autowithdraw' style='margin-left: 10px;'>Авто-вывод" + mark + "</button>");
-
-    $(".autowithdraw").on("click", function () {
-        $(this).html("Сбор информации.." + mark);
-        $.get("https://api.opskins.com/IInventory/GetInventory/v1/?key=" + $.cookie("apikey")).done(function (res) {
-            if (res['status'] === 1) {
-                $(".autowithdraw").html("Собираю офферы.." + mark);
-                var skins = res['response']['items'];
-                var skinForOut = [];
-                var partsForOut = [];
-                var i, n, z = 0, h, p;
-                if (skins.length === 0) {
-                    $(".autowithdraw").html("Скинов нет!" + mark);
-                } else {
-
-                    function openoffers(items, element, i) {
-
-                        $.post("https://api.opskins.com/IInventory/Withdraw/v1/", {
-                            key: $.cookie("apikey"),
-                            items: items
-                        }).done(function (res) {
-                            if (typeof res['message'] !== "undefined") {
-                                chromemes(res['message']);
-                            }
-                            var tradeoffers = res['response']['offers'];
-                            $.each(tradeoffers, function (i, lvl) {
-                                if (lvl['tradeoffer_id'] !== null) {
-                                    var win = window.open("https://steamcommunity.com/tradeoffer/" + lvl['tradeoffer_id'] + "/", "_blank");
-                                    self.focus();
-
-                                }
-                            })
-                            $(element).html("Готово!" + mark);
-                        }).fail(function (res) {
-                            console.log(res);
-                            $(element).html("Я обкакался, заберай сам(");
-                            showlogs("Пачка " + i + " зафейлилась!");
-                        })
-                    }
-
-                    for (i = 0; i < skins.length; i++) {
-                        if (skins[i]['offer_id'] !== null) {
-                            n++;
-                        }
-                        if (skins[i]['can_repair'] == null && skins[i]['offer_id'] == null) {
-                            skinForOut.push(skins[i]['id']);
-                            z++;
-                        }
-                    }
-                    console.log(skinForOut);
-                    if (n !== skins.length - 1 && z !== 0) {
-                        var maxPart = 15;
-                        var startMaxPart = maxPart;
-                        var colParts = Math.ceil(skinForOut.length / maxPart);
-                        if (skinForOut.length > maxPart) {
-                            p = 0;
-                            var part = [];
-                            for (h = 0; h < skinForOut.length; h++) {
-                                part.push(skinForOut[h]);
-                                partsForOut[p] = part;
-                                if (h === maxPart - 1) {
-                                    p++;
-                                    maxPart = maxPart + startMaxPart;
-                                    part = [];
-                                }
-                            }
-                            console.log(partsForOut);
-                            $("body").prepend("<div style='z-index: 999; width: 100%;height: 100%;position:absolute;background-color: rgba(0, 0, 0, 0.74);text-align: center;'><ul class='btnslist' style='margin: 8% auto; list-style-type: none;'><h3>Вскрой каждого из нас!</h3></ul></div>");
-                            for (i = 0; i < partsForOut.length; i++) {
-                                $(".btnslist").append("<li><a class='btn btn-primary btn-lg offersBtn' items='" + partsForOut[i] + "' id='" + i + "'>Пачка №" + (i + 1) + "</a></li>");
-                            }
-                            $(".offersBtn").on("click", function () {
-                                $(this).html("Готовлю офферы!");
-                                openoffers($(this).attr("items"), this, $(this).attr("id"));
-                            });
-                        } else {
-                            openoffers(skinForOut.join(), ".autowithdraw");
-                        }
-                    } else {
-                        $(".autowithdraw").html("Ошибка!" + mark)
-                    }
-                }
-            } else {
-                $(".autowithdraw").html("Ошибка!" + mark);
-            }
-        })
-    })
-}
-
-
-function csmobot() {
-    setInterval(getLink, 2000);
-
-    csmocounters();
-
-    $(".block_items.hint_aim_4.hint_clickable .hint_aim_6").append("<div style='width: 100%; text-align: center;'><button class='btn' id='csmbtns' style='padding: 4px 8px; margin: 10px 0;border: 10x solid transparent;border-radius:20px;outline: none;'>Отобразить кнопки</button></div><div class='csmbtns hidden' style='margin: 10px 0 20px;overflow: hidden;width: 100%;border-top:2px dashed #ff010147;padding: 20px;'><button id='scannerdb' class='btn btn-primary' style='float: right; margin-right: 32px; padding: 8px 4px;'>Сканер " + mark + "</button></div>");
-    // $("#scannerdb").before("<div class='btn btn-warning checkout-btn' id='favSkinView' style='margin-left: 32px; padding: 8px 4px;'>Избранные" + mark + "</div>");
-    $("#scannerdb").after("<button id='sortbyopsmo' class='btn btn-danger' style='float: right; margin-right: 32px;padding: 8px 4px;'>Opskins -> CS.Money</button></div>");
-    $("#sortbyopsmo").after("<button id='sortbymoops' class='btn btn-success' style='float: right; margin-right: 32px;padding: 8px 4px;'>CS.Money -> Opskins</button></div>");
-    $(".block_bottom .block_header").css("flex-wrap", "wrap");
-    $("#sortbymoops").on("click", function () {
-        sortUsingNestedText($('#inventory_bot'), "div.item", "div.parse_done .moopsval");
-        $(".offer_container_inventory_steam").animate({
-            scrollTop: 0
-        }, 'fast');
-    })
-    $("#sortbyopsmo").on("click", function () {
-        sortUsingNestedText($('#inventory_bot'), "div.item", "div.parse_done .opsmoval");
-        $(".offer_container_inventory_steam").animate({
-            scrollTop: 0
-        }, 'fast');
-    })
-    // $("#favSkinView").on("click", function () {
-    //     if (favSkins.length > 0) {
-    //         var favSkinsViewer = [];
-    //         var hash = Date.parse(new Date());
-    //         var url = "https://cs.money/load_bots_inventory?hash="+hash;
-    //         $.get(url).done(function (result) {
-    //             res = jQuery.parseJSON(result);
-    //             var i;
-    //             for (i = 0; i < favSkins.length; i++) {
-    //                 $.each(res, function (items, value) {
-    //                     var skinname = "";
-    //                     switch (value['e']) {
-    //                         case 'FN' :
-    //                             skinname = value['m'] + " (Factory New)";
-    //                             break;
-    //                         case 'MW' :
-    //                             skinname = value['m'] + " (Minimal Wear)";
-    //                             break;
-    //                         case 'FT' :
-    //                             skinname = value['m'] + " (Field-Tested)";
-    //                             break;
-    //                         case 'WW' :
-    //                             skinname = value['m'] + " (Well-Worn)";
-    //                             break;
-    //                         case 'BS' :
-    //                             skinname = value['m'] + " (Battle-Scarred)";
-    //                             break;
-    //                         default :
-    //                             skinname = value['m'];
-    //                             break;
-    //                     }
-    //                     if(skinname === favSkins[i]){
-    //                         favSkinsViewer.push(value);
-    //                     }
-    //                 })
-    //             }
-    //             console.log(favSkinsViewer);
-    //             if (favSkinsViewer.length > 0) {
-    //                 $("#inventory_bot").children(".item").remove();
-    //                 var n;
-    //                 for (n = 0; n < favSkinsViewer.length; n++) {
-    //                     $("#inventory_bot").append('<div class="item"  hash="' + favSkinsViewer[n]['m'] + '" cost="' + favSkinsViewer[n]['p'] + '" id="' + favSkinsViewer[n]['id'] + '" style="position: relative">' +
-    //                         '<div class="im" style="background-image: url(https://pic.money/'+favSkinsViewer[n]['u']+'_s.jpg?v=13)"></div>' +
-    //                         '<div class="r">'+favSkinsViewer[n]['e']+'</div>' +
-    //                         '<div class="f"><span>x</span>'+favSkinsViewer[n]['f'].length+'</div>' +
-    //                         '<div class="p"><span>$ </span>'+favSkinsViewer[n]['p']+'</div>' +
-    //                         '<div class="favourite-skin hidden"></div>' +
-    //                         '<div class="ws"></div>'
-    //                     );
-    //                     if(favSkinsViewer[n]['f'].length > 1){
-    //                         $(".item .ws").append('<div class="ws"><span class="cr">+</span></div>');
-    //                     }
-    //                     if (favSkinsViewer[n]['m'].indexOf("StatTrak™") > -1) {
-    //                         $(".item").append('<img class="st" src="/images/stattrak-small.svg">');
-    //                     }
-    //                     $(".item").each(function () {
-    //                         if (!$(this).children("favourite-skin")) {
-    //                             $(this).remove();
-    //                         }
-    //                     })
-    //                     $(".popover.fade.bottom.in").remove();
-    //                 }
-    //             } else {
-    //                 $(this).html("Избранных cейчас нет!" + mark);
-    //                 showlogs("Избранных cейчас нет!" + mark);
-    //             }
-    //         });
-    //         // <div market_hash_name=" StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" cost="5278" id="1090937021476561198315968061" class="offer_container_invertory" bot_steamid="76561198315968061" assetid="10909370214" data-original-title="" title="" style="background-color: rgba(39, 179, 22, 0.35);"><div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 29%;z-index: 999;width: 22px; color: #fff;"><img class="opsprice" src="https://skinsdb.xyz/design/images/opskins_logo.png" alt="opsprice" style="width: 100%; height: auto;"></div><div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 18px; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; bottom: 2px;">X</div><a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=%E2%98%85%20%20Karambit%20%7C%20Gamma%20Doppler&amp;sort=lh&amp;exterior=fn&amp;stat=1&amp;phase=ge" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 20px; font-family: Helvetica;">Link</a><img src="img/st.png" class="st"><div class="invertory_container_links"> <a title="view on marketplace" href="https://steamcommunity.com/market/listings/730/ StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" class="invertory_link_view" target="_blank">VIEW</a> <a title="inspect in steam" href="steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S76561198315968061A10909370214D4964839033136993975" class="invertory_link">INSPECT</a> </div><div class="offer_container_invertory_inactive"></div><div class="invertory_title_container"> <div class="invertory_title_text_quantity"> x<span class="count_in_stack">1</span> </div> <div class="invertory_title_container_marka">FN</div> </div> <img alt=" StatTrak™ Karambit | Gamma Doppler Emerald (Factory New)" src="https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJlY20kvrxIbrdklRc6ddzhuzI74nxt1i9rBsofT-ld9LDJgVsY1nX-QLtlejqg5bu7Zydm3Q1uSVzsXmOmUe3ghFKauBxxavJdWR7Gog/96x72" class="offer_container_img"> <div class="price_animation"></div> <div class="price">5278$</div> </div>
-    //     }
-    //     else {
-    //         $(this).html("Добавь хоть один скин!" + mark);
-    //         showlogs("Добавь хоть один скин!" + mark);
-    //     }
-    // })
-    $("#scannerdb").on("click", function () {
-        $(this).html("Загрузка...");
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: "https://api.opskins.com/IPricing/GetAllLowestListPrices/v1/?appid=730",
-            onload: function (result) {
-                var res = jQuery.parseJSON(result.responseText);
-
-                $("#scannerdb").html("Готово" + mark);
-                res = res['response'];
-                _.each(res, function (item, index) {
-                    var loaded = _.find(skinsLoaded, function (i) {
-                        return i.fullname === index;
-                    });
-                    if (typeof loaded === 'undefined') {
-                        var skin = {};
-                        skin['fullname'] = index;
-                        var price = item['price'] / 100;
-                        skin['opsprice'] = price;
-                        skinsLoaded.push(skin);
-                    }
-                })
-                $(".parse_button").remove();
-                getLink();
-            },
-            onerror: function (res) {
-                $("#scannerdb").html("Ошибка" + mark);
-                var msg = "An error occurred."
-                    + "\nresponseText: " + res.responseText
-                    + "\nreadyState: " + res.readyState
-                    + "\nresponseHeaders: " + res.responseHeaders
-                    + "\nstatus: " + res.status
-                    + "\nstatusText: " + res.statusText
-                    + "\nfinalUrl: " + res.finalUrl;
-                alert(msg);
-            }
-        })
-    })
-}
-
-function getLink() {
-    $(".items").children().each(function () {
-        if (typeof $(this).children(".parse_button").html() === 'undefined' && $(this).hasClass("item")) {
-
-            $(this).css("position", "relative");
-
-            var name, phase, ext, stat;
-            var phase = "";
-            var type = "";
-            stat = (typeof $(this).children(".st").html() !== 'undefined') ? 1 : 0;
-            // ext = $(this).find(".r").text().trim();
-            ext = $(this).find(".r").contents().filter(function () {
-                return this.nodeType !== 1
-            }).text().trim()
-            var sticker = $(this).attr("hash").indexOf("Sticker");
-            if (sticker > -1) {
-                name = $(this).attr("hash").replace("Sticker | ", "");
-            } else {
-                name = $(this).attr("hash").split("(");
-                var gd = name[0].split("Gamma Doppler ");
-                var d = name[0].split("Doppler ");
-                name = name[0].replace("StatTrak™", "").replace(d[1], "").replace(gd[1], "").trim();
-
-                type = (name.indexOf("|") < 0) ? "&vanilla=1" : "";
-                var checkd = d[1];
-                var checkgd = gd[1];
-                phase = "";
-                if (typeof checkd !== 'undefined') {
-                    var fixd = checkd.trim();
-                    switch (fixd) {
-                        case 'Phase 1' :
-                            phase = '&phase=d1';
-                            break;
-                        case 'Phase 2' :
-                            phase = '&phase=d2';
-                            break;
-                        case 'Phase 3' :
-                            phase = '&phase=d3';
-                            break;
-                        case 'Phase 4' :
-                            phase = '&phase=d4';
-                            break;
-                        case 'Ruby' :
-                            phase = '&phase=dr';
-                            break;
-                        case 'Sapphire' :
-                            phase = '&phase=ds';
-                            break;
-                        case 'Black Pearl' :
-                            phase = '&phase=db';
-                            break;
-                    }
-                }
-                if (typeof checkgd !== 'undefined') {
-                    var fixgd = checkgd.trim();
-                    switch (fixgd) {
-                        case 'Phase 1' :
-                            phase = '&phase=g1';
-                            break;
-                        case 'Phase 2' :
-                            phase = '&phase=g2';
-                            break;
-                        case 'Phase 3' :
-                            phase = '&phase=g3';
-                            break;
-                        case 'Phase 4' :
-                            phase = '&phase=g4';
-                            break;
-                        case 'Emerald' :
-                            phase = '&phase=ge';
-                            break;
-                    }
-                }
-            }
-            var skinname = $(this).attr("hash");
-
-            if (typeof $(this).find(".link_button").html() === 'undefined') {
-                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=&quot;' + encodeURI(name) + '&quot;&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute;z-index: 999; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;">Link</a>');
-
-                if (favSkins.length > 0) {
-                    var favs;
-                    favs = _.find(favSkins, function (item) {
-                        return item == skinname;
-                    })
-                    if (typeof favs !== 'undefined') {
-                        Fav(this);
-                    } else {
-                        NotFav(this);
-                    }
-                } else {
-                    NotFav(this);
-                }
-            }
-
-            var loaded;
-            loaded = _.find(skinsLoaded, function (item) {
-                return item.fullname === skinname;
-            });
-            if (typeof loaded !== 'undefined') {
-                var csmPrice = $(this).attr("price");
-                var opsmo = 100 - (loaded['opsprice'] * 100) / (csmPrice * 0.97);
-                opsmo = Math.round(opsmo * 100) / 100;
-                var moops = 100 - loaded['opsprice'] * 95 / csmPrice;
-                moops = Math.round(moops * 100) / 100;
-                if (moops > 0) {
-                    moops = -moops;
-                } else if (moops < 0) {
-                    moops = moops + moops * (-2);
-                }
-                $(this).prepend('<div class="parse_button parse_done" data-ops="' + loaded['opsprice'] + '" style="height: 17px; min-width: 40px; cursor: pointer; position: absolute; color: #000; background-color: transparent; margin-top: 40px; font-size: 12px; margin-left: -8px; padding-left: 2px; padding-right: 2px; z-index: 999; width: 108%;text-align: center;"></div>');
-                $(this).prepend("<span style='position: absolute;top: 61%;right: 0;font-size: 13px;z-index: 999; font-weight: bold; color: #000;background: #fff'>" + loaded['opsprice'] + "$</span>");
-                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="CSMoney > OPSkins" style="width: 50%; background-color: rgb(45, 121, 45); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px; float: left;"><span class="moopsval">' + moops + '</span>%</div>');
-                $(this).children(".parse_done").prepend('<div class="parse_indicator" title="OPSkins > CSMoney" style="width: 50%;background-color: rgb(210, 29, 37); white-space: nowrap; vertical-align: baseline;padding:2px 1px;color: #fff;border-radius:3px; font-size: 12px;  float: right;"><span class="opsmoval">' + opsmo + '</span>%</div>');
-
-            } else {
-                //cfdfsfs
-                $(this).prepend('<div class="parse_button parse_event" style="position:absolute;left:3%; bottom: 42%;z-index: 999;width: 22px; color: #000;"><img class="opsprice" src="https://static-cdn.jtvnw.net/emoticons/v1/87/1.0" alt="opsprice" style="width: 100%; height: auto;"></div>');
-            }
-        }
-        $(this).children(".link_button").unbind().on("click", function () {
-            var link = $(this).attr("href");
-            window.open(link);
-            return false;
-        });
-        $(this).children(".parse_event").unbind().on("click", function () {
-            var allThis = $('div[hash="' + $(this).parent().attr("hash") + '"]');
-            allThis.children(".parse_button").html("Load..");
-            var nameToSave = $(this).parent().attr("hash");
-            var link = $(this).parent().find(".link_button").attr("href");
-            getPrice(nameToSave, link, allThis, "hash", getLink);
-            return false;
-        });
-        $(this).children(".parse_done").unbind().on("click", function () {
-            alert($(this).attr("data-ops") + "$ на Opskins");
-            return false;
-        })
-        if (typeof $(this).children(".add_favourite").html() !== 'undefined') {
-            $(this).children(".add_favourite").unbind().on("click", function () {
-                var skinname = $(this).parent().attr("hash");
-                var skinurl = $(this).parent().children(".link_button").attr("href");
-                var myData = new FormData();
-                myData.append("add_fav", skinname);
-                myData.append("add_fav_url", skinurl);
-                var BtnParent = $(this).parent();
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: scriptUrl,
-                    data: myData,
-                    onload: function (result) {
-                        var res = jQuery.parseJSON(result.responseText);
-                        console.log(res);
-                        if (res['success']) {
-                            Fav(BtnParent, skinname);
-                        } else {
-                            showlogs("Предмет в избранных!");
-                        }
-                    }
-                });
-                return false;
-            })
-        } else {
-            $(this).children(".rem_favourite").unbind().on("click", function () {
-                var skinname = $(this).parent().attr("hash");
-                var myData = new FormData();
-                myData.append("rem_fav", skinname);
-                var BtnParent = $(this).parent();
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: scriptUrl,
-                    data: myData,
-                    onload: function (result) {
-                        var res = jQuery.parseJSON(result.responseText);
-                        console.log(res);
-                        if (res['succces']) {
-                            NotFav(BtnParent, skinname);
-                        } else {
-                            showlogs("Ошибка удаления!");
-                        }
-                    }
-                });
-                return false;
-            })
-        }
-    });
-
-    function NotFav(elem, pack = "false") {
-        if (pack === "false") {
-            $(elem).find(".favourite").remove();
-            $(elem).prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $(elem).css("background-color", "");
-        } else {
-            $('div[hash="' + pack + '"]').find(".favourite").remove();
-            $('div[hash="' + pack + '"]').prepend('<div class="favourite add_favourite" title="Добавить в избранном" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(52, 136, 52, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $('div[hash="' + pack + '"]').css("background-color", "");
-            favSkins.splice(favSkins.indexOf(pack), 1);
-        }
-    }
-
-    function Fav(elem, pack = "false") {
-        if (pack === "false") {
-            $(elem).find(".favourite").remove();
-            $(elem).prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $(elem).css("background-color", "rgba(39, 179, 22, 0.35)");
-        } else {
-            $('div[hash="' + pack + '"]').find(".favourite").remove();
-            $('div[hash="' + pack + '"]').prepend('<div class="favourite rem_favourite" title="Удалить из избранного" style="cursor: pointer; position: absolute; color: rgba(255, 255, 255, 0.97); width: 22px;text-align: center; height: 16px; background-color: rgba(208, 22, 22, 0.6); margin-top: -14px; margin-left: -8px; z-index: 999; top: 14px;right:0;">X</div>');
-            $('div[hash="' + pack + '"]').css("background-color", "rgba(39, 179, 22, 0.35)");
-            favSkins.push(pack);
-        }
-    }
-
-
-}
-
 function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
     GM_xmlhttpRequest({
         method: "POST",
@@ -2199,10 +1395,10 @@ function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
             var resC = txt.replace(/<img[^>]*>/g, "");
             if ($(resC).find(".alert-danger").html()) {
                 console.log($(resC).find(".alert-danger").html());
-                $("div[" + blockName + "='" + fullName + "']").children(".parse_button").html("Not Found");
+                $("div[" + blockName + "='" + fullName + "']").find(".parse_button").html("Not Found");
             } else if ($(resC).find(".error#message").html()) {
                 var newWindow = window.open(opsUrl);
-                $("div[" + blockName + "='" + fullName + "']").children(".parse_button").html("Try again");
+                $("div[" + blockName + "='" + fullName + "']").find(".parse_button").html("Try again");
             } else {
                 var res = $(resC).find(".item-amount").html().replace("$", "").replace(",", "");
                 skin = {};
@@ -2212,11 +1408,7 @@ function getPrice(fullName, opsUrl, BtnParent, blockName, func = "getLink") {
                 skinsLoaded.push(skin);
                 $(".popover.fade.bottom.in").remove();
                 $(BtnParent).children(".parse_button").remove();
-                if (func = "getLink") {
-                    getLink();
-                } else {
-                    allAnotherGetLink(func);
-                }
+                allAnotherGetLink(func);
             }
         }
     });
@@ -2227,164 +1419,63 @@ function allAnotherGetLink(changer) {
     var phase = "";
     var type = "";
     switch (changer) {
-        case 'CSOFFERme':
-            statArg = ".st";
-            extArg = ".invertory_title_container_marka";
-            nameArg = "market_hash_name";
-            currentItem = ".offer_container_invertory";
-            priceArg = "cost";
-            items = $(".invertory_container").children();
-            zindex = "z-index: 10000;";
-
-            break;
-        case 'LootFarm' :
-            statArg = ".it_st";
-            extArg = ".it_ext";
-            nameArg = "data-name";
-            currentItem = ".itemblock";
-            priceArg = "data-p";
-            items = $(".oitems").find(currentItem);
-            zindex = "";
-
-            break;
-        case 'TradeMe' :
-            statArg = ".st";
-            extArg = ".images_title_right";
-            nameArg = "market_hash_name";
-            currentItem = ".images.tooltip";
-            priceArg = "cost";
-            items = $("#bot_inventory").children();
-            zindex = "z-index: 10000;";
-
-            break;
-        case 'TradeSkins' :
-            statArg = ".st";
-            extArg = ".invertory_title_container_marka";
-            nameArg = "market_hash_name";
-            currentItem = ".offer_container_invertory";
-            priceArg = "cost";
-            items = $(".invertory_container").children();
-            zindex = "z-index: 10000;";
-
-            break;
-        case 'CSTrade' :
-            statArg = ".stattrak-label";
-            extArg = ".wear-name";
-            nameArg = "data-name";
-            currentItem = ".single-item";
-            priceArg = ".item-price";
-            items = $("#box-bot-inventory").children();
-            zindex = "z-index: 10000;";
-
-            break;
-        case 'TradeIt' :
-            statArg = ".stattrak";
-            extArg = ".quality";
-            nameArg = "data-original-title";
-            currentItem = ".item";
-            priceArg = "data-price";
-            items = $(".sactive-game-inv").children();
-            zindex = "z-index: 10000;";
+        case 'vgounbox' :
+            extArg = ".wearShort_VXf8i_75b73";
+            nameArg = [".name_N6hUO_4568b", ".type_3eJEV_9f1a3"];
+            currentItem = ".skin_1lCCa_0bb97";
+            priceArg = ".wearShort_VXf8i_75b73";
+            items = $(".skinsContainer_pOZGQ_44c57").children();
+            zindex = "z-index: 1000;";
 
             break;
     }
     items.each(function () {
         if (typeof $(this).find(".parse_button").html() === 'undefined') {
 
-            // $(this).css("position", "relative");
-            if (changer == "TradeIt") {
-                $(this).css("position", "relative");
-            }
-            stat = (typeof $(this).find(statArg).html() !== 'undefined') ? 1 : 0;
             ext = $(this).find(extArg).text();
-            var sticker = $(this).attr(nameArg).indexOf("Sticker");
-            if (sticker > -1) {
-                name = $(this).attr(nameArg).replace("Sticker | ", "");
-            } else {
-                name = $(this).attr(nameArg).split("(");
-                var gd = name[0].split("Gamma Doppler ");
-                var d = name[0].split("Doppler ");
-                name = name[0].replace("StatTrak™", "").replace(d[1], "").replace(gd[1], "").trim();
 
-                type = (name.indexOf("|") < 0) ? "&vanilla=1" : "";
-                var checkd = d[1];
-                var checkgd = gd[1];
-                phase = "";
-                if (typeof checkd !== 'undefined') {
-                    var fixd = checkd.trim();
-                    switch (fixd) {
-                        case 'Phase 1' :
-                            phase = '&phase=d1';
-                            break;
-                        case 'Phase 2' :
-                            phase = '&phase=d2';
-                            break;
-                        case 'Phase 3' :
-                            phase = '&phase=d3';
-                            break;
-                        case 'Phase 4' :
-                            phase = '&phase=d4';
-                            break;
-                        case 'Ruby' :
-                            phase = '&phase=dr';
-                            break;
-                        case 'Sapphire' :
-                            phase = '&phase=ds';
-                            break;
-                        case 'Black Pearl' :
-                            phase = '&phase=db';
-                            break;
-                    }
-                }
-                if (typeof checkgd !== 'undefined') {
-                    var fixgd = checkgd.trim();
-                    switch (fixgd) {
-                        case 'Phase 1' :
-                            phase = '&phase=g1';
-                            break;
-                        case 'Phase 2' :
-                            phase = '&phase=g2';
-                            break;
-                        case 'Phase 3' :
-                            phase = '&phase=g3';
-                            break;
-                        case 'Phase 4' :
-                            phase = '&phase=g4';
-                            break;
-                        case 'Emerald' :
-                            phase = '&phase=ge';
-                            break;
-                    }
-                }
+            switch (ext) {
+                case 'FN' :
+                ext =  " (Factory New)";
+                    break;
+                case 'MW' :
+                ext = " (Minimal Wear)";
+                    break;
+                case 'FT' :
+                ext = " (Field-Tested)";
+                    break;
+                case 'WW' :
+                ext =" (Well-Worn)";
+                    break;
+                case 'BS' :
+                ext = " (Battle-Scarred)";
+                    break;
             }
-            var skinname = $(this).attr(nameArg);
+            price = +$(this).find(priceArg).next().text().replace("$", "").replace(",","");
+            // console.log(price);
+            name = $(this).find(nameArg[0]).html().trim() + " | " + $(this).find(nameArg[1]).text().trim() + ext;
+            $(this).closest(".skin_1lCCa_0bb97").attr("data-name", name);
+            // console.log(name);
+            var skinname = name;
             if (typeof $(this).find(".link_button").html() === 'undefined') {
-                if($("#bLoadGame").attr('data-game') == 578080){
-                    $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=578080_2&amp;search_item=&quot;' + encodeURI(skinname) + '&quot;&amp;sort=lh" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '">Link</a>');
-                }else{
-                    $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=730_2&amp;search_item=' + encodeURI(name) + '&amp;sort=lh&amp;exterior=' + ext.toLowerCase() + '&amp;stat=' + stat + phase + type + '" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '">Link</a>');
-                }
+                $(this).prepend('<a class="link_button" href="https://opskins.com/?loc=shop_search&amp;app=1912_1&amp;search_item=&quot;' + encodeURI(skinname) + '&quot;&amp;sort=lh" target="_blank" style="background:rgba(0, 0, 0, 0.32); position:absolute; right: 0; top: 22%;padding: 1px 10px; color: #fff; font-size:14px; line-height: 18px; font-family: Helvetica;text-decoration: none;' + zindex + '" data-name="'+name+'">Link</a>');
             }
+
             var loaded;
             loaded = _.find(skinsLoaded, function (item) {
                 return item.fullname === skinname;
             });
             if (typeof loaded !== 'undefined') {
-                if (changer === "LootFarm" || changer == "TradeIt") {
-                    var changerPrice = $(this).attr(priceArg) / 100;
-                } else if (changer === "CSTrade") {
-                    var changerPrice = $(this).find(priceArg).html().replace("$", "");
-                } else {
-                    var changerPrice = $(this).attr(priceArg);
-                }
-                if (changer == "TradeIt") {
-                    var comission = 0.981;
-                } else {
-                    var comission = 0.97;
-                }
-                var opsmo = 100 - (loaded['opsprice'] * 100) / (changerPrice * comission);
+
+                var comission = 0.913;
+
+                var changerPrice = price * comission;
+                // if($.cookie('changer') == "VGOUNBOX"){ if(skinname.indexOf('Key') > -1) {
+                //     changerPrice = 2.5;
+                // }}
+                var opsmo = 100 - (loaded['opsprice'] * 100) / changerPrice;
                 opsmo = Math.round(opsmo * 100) / 100;
-                var moops = 100 - loaded['opsprice'] * 95 / changerPrice;
+                var moops = 100 - loaded['opsprice'] * 100 / price;
                 moops = Math.round(moops * 100) / 100;
                 if (moops > 0) {
                     moops = -moops;
@@ -2415,149 +1506,18 @@ function allAnotherGetLink(changer) {
             return false;
         });
         $(this).find(".parse_event").unbind().on("click", function () {
-            if (changer !== 'TradeIt') {
-                var allThis = $('div[' + nameArg + '="' + $(this).parent().attr(nameArg) + '"]');
-            } else {
-                var allThis = $("li[" + nameArg + "='" + $(this).parent().attr(nameArg) + "']");
-            }
+            var allThis = $('a[data-name="' + $(this).parent().find('.link_button').attr('data-name') + '"]').closest('.skin_1lCCa_0bb97');
+
             allThis.children(".parse_button").html("Load..");
-            var nameToSave = $(this).parent().attr(nameArg);
+            var nameToSave = $(this).parent().find('.link_button').attr('data-name');
             var link = $(this).parent().find(".link_button").attr("href");
-            getPrice(nameToSave, link, allThis, nameArg, changer);
+            getPrice(nameToSave, link, allThis, "data-name", changer);
             return false;
         });
         $(this).children(".parse_done").unbind().on("click", function () {
             alert($(this).attr("data-ops") + "$ на Opskins");
             return false;
         });
-    })
-}
-
-function csmomenu() {
-    csmobot();
-    $("#csmbtns").on("click", function () {
-        $(".csmbtns").toggle('slow', function () {
-            $(this).toggleClass("hidden");
-            $("#csmbtns").val("Скрыть кнопки");
-        })
-    })
-}
-
-function csmocounters() {
-    $(".column-2 .sidebar").css("height", "94%");
-    $(".bonus").css("top", "89%");
-
-    var user_offer = $("#user_offer_sum").text().replace("$", "").trim();
-    var bot_offer = $("#bots_offer_sum").text().replace("$", "").trim();
-
-    $("#total_value_user").after("<span id='fullB'></span>")
-    setInterval(function () {
-        var counts = 0;
-        $("#inventory_user").children().each(function () {
-            var ct = $(this).find(".ct").text().trim();
-            if (ct.length === 0) {
-                ct = 1;
-            }
-            counts += Number($(this).attr("cost") * ct);
-            if (counts === 0) {
-                $("#fullB").html(" / $ 0.00");
-            } else {
-                $("#fullB").html(" / $ " + Math.round(counts * 100) / 100);
-            }
-        })
-    }, 1600)
-}
-
-function sellsinvChecker() {
-    $(document).ajaxComplete(function (event, xhr, settings) {
-        if (settings['url'] == '/ajax/get_inventory.php?appid=730&contextid=2&osi=0') {
-            setTimeout(salesInfo, 500);
-        }
-    })
-};
-
-function salesInfo() {
-    showlogs("Загружено!" + mark);
-    $(".sell-item").on("click", function sellitem() {
-        $("#sell-selected-inspect-btn").attr("disabled", "disabled");
-        $("#realLowestPrice").remove();
-        var url,
-            skinname;
-        $("#sell-selected-inspect-btn").attr("href", "#");
-        $("#sell-selected-inspect-btn").attr("data-toggle", "modal");
-        $("#sell-selected-inspect-btn").attr("data-target", "#skinsDbSales");
-        $("#sell-selected-inspect-btn").css("background", "green");
-        $("#sell-selected-inspect-btn").text("Check Solds");
-        $('#sell-selected-suggestedprice').children("strong").after("<strong id='realLowestPrice' style='color:red'><br>Загрузка..</strong>");
-        url = $("#sell-selected-box").children(".sell-selected-btn").attr("href");
-        skinname = url.split("&sort");
-        skinname = skinname[0].split("&search_item=");
-        skinname = decodeURI(skinname[1]);
-        $("#modalSkinName").text(skinname);
-        var loaded = $.grep(skinsLoaded, function (e) {
-            return e.skinname == skinname;
-        });
-        if (typeof loaded[0] !== 'undefined') {
-            $("#skinsDbSales .modal-body").html("Not Loaded!");
-            $("#realLowestPrice").css("color", "green");
-            $("#realLowestPrice").html("<br>Real Lowest Price: " + loaded[0].price + "<div style='position:absolute;right: 2%; top: -22%;'><span class='label label-success moneyOps'>" + loaded[0].moneyOps + "%</span>" +
-                "<span class='label label-success opsMoney'style='background-color:#dc1010'>" + loaded[0].opsMoney + "%</span></div>");
-            $("#sell-selected-inspect-btn").removeAttr("disabled");
-            if (typeof loaded[0].sels !== 'undefined') {
-                $("#skinsDbSales .modal-body").html(loaded[0].sels);
-            } else {
-                var index = -1;
-                for (var i = 0, len = skinsLoaded.length; i < len; i++) {
-                    if (skinsLoaded[i].skinnname === skinname) {
-                        index = i;
-                        break;
-                    }
-                }
-                skinsLoaded.splice(index, 1);
-            }
-            last20date("sell");
-            las20btn("sell");
-        } else {
-            $.post(url).done(function (e) {
-                var price = $(e).find(".item-amount").html();
-                var link = $(e).find(".market-link").attr("href");
-                if (typeof price !== 'undefined') {
-                    price = price.replace("$", "") + " $";
-                    $("#realLowestPrice").css("color", "green");
-                    var myData = new FormData();
-                    myData.append("data", skinname);
-                    myData.append("price", price);
-                    GM_xmlhttpRequest({
-                        method: "POST",
-                        url: scriptUrl,
-                        data: myData,
-                        onload: function (result) {
-                            skin = [];
-                            skin['skinname'] = skinname;
-                            skin['price'] = price;
-                            var res = jQuery.parseJSON(result.responseText);
-                            if (res['opsMoney']) {
-                                skin['moneyOps'] = res['moneyOps'];
-                                skin['opsMoney'] = res['opsMoney'];
-                            } else if (res['error']) {
-                                skin['opsMoney'] = res['Not Found'];
-                            } else {
-                                skin['opsMoney'] = res['Error'];
-                            }
-                            var newLink = "https://opskins.com/" + link;
-                            $.post(newLink).done(function (res) {
-                                var sels = $(res).find(".widget.clearfix").html();
-                                skin['sels'] = sels;
-                                skinsLoaded.push(skin);
-                            })
-                            sellitem();
-                        }
-                    })
-                } else {
-                    $("#realLowestPrice").html("<br>Ошибка!");
-                }
-            })
-        }
     })
 }
 
@@ -2605,7 +1565,7 @@ function realEarning() {
                                 $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").text("$" + res[i]["csmoney"]);
                                 $("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".skinDBcsmprice").css("text-align", "center");
                                 var opsprice = parseFloat($("#iTrans table tbody td:contains('" + res[i]['id'] + "')").parent().find(".editable").text().replace("$", "").trim());
-                                var resmo = 100 - opsprice * 95 / res[i]["csmoney"];
+                                var resmo = 100 - opsprice * 100 / res[i]["csmoney"];
                                 var res2 = Math.round(resmo * 100) / 100;
                                 ;
                                 if (res2 > 0) {
@@ -2634,12 +1594,6 @@ function realEarning() {
             })
         }
     })
-}
-
-function addFilterBtn() {
-    var balance = parseFloat($(".op-count").html().replace("$", "").replace(",", ""));
-    var url = "https://opskins.com/?loc=good_deals&app=730_2&search_item=&min=&max=" + balance + "&sort=dhl&stat=&grade=&exterior=&souvenir=&wear_range_low=0&wear_range_high=&type=&phase=&want_stickers=&sticker_search=";
-    $(".jumbotron").find(".btn-orange").before("<a href='" + url + "' class='btn btn-info' style='margin-right: 5px;'>Search " + mark + "</a>")
 }
 
 function friendssells() {
@@ -2676,7 +1630,6 @@ function friendssells() {
 
     }
 }
-
 
 function buyerChecker() {
 
@@ -2718,20 +1671,20 @@ function buyerChecker() {
     }
 }
 
-function botOpsChecker() {
-    opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";
-    GM_xmlhttpRequest({
-        method: "POST",
-        url: opsUrl,
-        onload: function (result) {
-            if ($(result.responseText).find(".error#message").html()) {
-                location.reload();
-            } else {
-                showlogs("Бото-проверка прошла успешно!");
-            }
-        }
-    });
-}
+// function botOpsChecker() {
+//     opsUrl = "https://opskins.com/?loc=shop_search&sort=lh&exterior=bs&app=730_2&search_item=%22Gut+Knife+%7C+Crimson+Web%22&search_internal=1";
+//     GM_xmlhttpRequest({
+//         method: "POST",
+//         url: opsUrl,
+//         onload: function (result) {
+//             if ($(result.responseText).find(".error#message").html()) {
+//                 location.reload();
+//             } else {
+//                 showlogs("Бото-проверка прошла успешно!");
+//             }
+//         }
+//     });
+// }
 
 function reloadpage(display, timetorealod) {
     startTimer(timetorealod * 60, display);

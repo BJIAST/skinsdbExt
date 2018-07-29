@@ -23,7 +23,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 2.29;
+var version = 3;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");

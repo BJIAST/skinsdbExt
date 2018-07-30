@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.online/
-// @version      3.0
+// @version      3.01
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -23,7 +23,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 3;
+var version = 3.01;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -112,7 +112,6 @@ var version = 3;
 }());
 
 function versionChecker(userdbV) {
-
     if (version > userdbV) {
         var myData = new FormData();
         myData.append("version_update", version);
@@ -956,7 +955,7 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    var comission = 0.913;
+                    var comission = 0.905;
 
                     var changerPrice = loaded[0].price * comission;
                     if($.cookie('changer') == "VGOUNBOX"){ if(skinName.indexOf('Key') > -1) {
@@ -1467,7 +1466,7 @@ function allAnotherGetLink(changer) {
             });
             if (typeof loaded !== 'undefined') {
 
-                var comission = 0.913;
+                var comission = 0.905;
 
                 var changerPrice = price * comission;
                 // if($.cookie('changer') == "VGOUNBOX"){ if(skinname.indexOf('Key') > -1) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.online/
-// @version      3.01
+// @version      3.02
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -23,7 +23,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 3.01;
+var version = 3.02;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -955,11 +955,21 @@ function newloadallprices(opd) {
                     if ($.cookie("savedDisc")) {
                         savedDiscount = $.cookie("savedDisc");
                     }
-                    var comission = 0.905;
+                   if($.cookie('changer') == "VGOUNBOX"){
+                       var comission = 0.905;
+                   }else if($.cookie('changer') == "Skinsjar") {
+                       var comission = 0.98;
+                   }else if($.cookie('changer') == "VGOTrading") {
+                       var comission = 0.925;
+                   }else{
+                       var comission = 1;
+                   }
+
 
                     var changerPrice = loaded[0].price * comission;
                     if($.cookie('changer') == "VGOUNBOX"){ if(skinName.indexOf('Key') > -1) {
                         changerPrice = 2.5;
+                        console.log(skinName);
                     }}
                     var resom = 100 - (skinPrice * 100) / changerPrice;
                     var res1 = Math.round(resom * 100) / 100;
@@ -1466,12 +1476,17 @@ function allAnotherGetLink(changer) {
             });
             if (typeof loaded !== 'undefined') {
 
-                var comission = 0.905;
-
+                if(changer == "vgounbox"){
+                    var comission = 0.905;
+                }else if(changer == "skinsjar") {
+                    var comission = 0.98;
+                }else if(changer == "vgotrading") {
+                    var comission = 0.925;
+                }
                 var changerPrice = price * comission;
-                // if($.cookie('changer') == "VGOUNBOX"){ if(skinname.indexOf('Key') > -1) {
-                //     changerPrice = 2.5;
-                // }}
+                if(changer == "vgounbox"){ if(skinname.indexOf('Key') > -1) {
+                    changerPrice = 2.5;
+                }}
                 var opsmo = 100 - (loaded['opsprice'] * 100) / changerPrice;
                 opsmo = Math.round(opsmo * 100) / 100;
                 var moops = 100 - loaded['opsprice'] * 100 / price;

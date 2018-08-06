@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         skinsdbExt
 // @namespace   http://skinsdb.online/
-// @version      3.02
+// @version      3.03
 // @description  try to hard!
 // @author       BJIAST
 // @match       http://skinsdb.online/*
@@ -23,7 +23,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 3.02;
+var version = 3.03;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -1482,6 +1482,8 @@ function allAnotherGetLink(changer) {
                     var comission = 0.98;
                 }else if(changer == "vgotrading") {
                     var comission = 0.925;
+                }else{
+                    var comission = 1;
                 }
                 var changerPrice = price * comission;
                 if(changer == "vgounbox"){ if(skinname.indexOf('Key') > -1) {

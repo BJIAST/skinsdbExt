@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         skinsdbExt
-// @namespace   http://skinsdb.online/
-// @version      3.03
+// @namespace   http://skinsdb.site/
+// @version      3.04
 // @description  try to hard!
 // @author       BJIAST
-// @match       http://skinsdb.online/*
+// @match       http://skinsdb.site/*
 // @match       https://steamcommunity.com/tradeoffer/*
 // @match       https://opskins.com/*
 // @match       https://steamcommunity.com/trade/*
@@ -13,9 +13,9 @@
 // ==/UserScript==
 
 
-var scriptUrl = "http://skinsdb.online/scripts/opsinc.php";
+var scriptUrl = "http://skinsdb.site/scripts/opsinc.php";
 var soundAccept = new Audio('https://raw.githubusercontent.com/BJIAST/SATC/master/sounds/done.mp3');
-var soundFound = new Audio('http://skinsdb.online/assets/ready.mp3');
+var soundFound = new Audio('http://skinsdb.site/assets/ready.mp3');
 var site = location.href;
 var mark = " | skinsdbExt";
 var skinsLoaded = [];
@@ -23,7 +23,7 @@ var skinsdbprices = [];
 var favSkins = [];
 
 
-var version = 3.03;
+var version = 3.04;
 
 (function () {
     var opslink3 = site.split("https://opskins.com/");
@@ -105,7 +105,7 @@ var version = 3.03;
             })
         }, 600)
     }
-    if (site == "http://skinsdb.online/?doppler_search" || site == "http://skinsdb.online/?favsearch") {
+    if (site == "http://skinsdb.site/?doppler_search" || site == "http://skinsdb.site/?favsearch") {
         dopplerChecker();
     }
     steamAccept();
@@ -161,7 +161,6 @@ function opsbotload(site) {
         last20date();
         las20btn();
         oneItemDiscount();
-        buyerChecker();
     }
     if (site == "https://opskins.com/?loc=shop_checkout") {
         fullpageparse();
@@ -169,6 +168,9 @@ function opsbotload(site) {
     }
     if (site == "https://opskins.com/?loc=store_account#manageSales") {
         realEarning();
+    }
+    if (site == "https://opskins.com/?loc=inventory") {
+        // packSales();
     }
     if (site == "https://opskins.com/index.php?loc=game" + opslink6[1] || site == "https://opskins.com/?loc=game") {
         fullpageparse();
@@ -1547,7 +1549,7 @@ function realEarning() {
             $("#collapseIS .panel-body").css("display", "none");
             var myData = new FormData();
             var onSold = 0;
-            var userdbupd = "http://skinsdb.online/scripts/usersales.php";
+            var userdbupd = "http://skinsdb.site/scripts/usersales.php";
             myData.append("usersales", true);
             GM_xmlhttpRequest({
                 method: "POST",
@@ -1647,43 +1649,65 @@ function friendssells() {
     }
 }
 
-function buyerChecker() {
+function packSales(){
+    $('body').append('<div class="listToSale" style="position: fixed;text-align: center; top: 200px; right: 30px; z-index:9999;width: 600px; height: auto; background-color: #000; border: 2px solid black; padding: 16px 0;"><ol></ol></div>')
+    var skinsToSale = [];
+    var inventorySkins = $(".featured-item");
+    inventorySkins.each(function () {
+        var skinname = $(this).find('.market-name.market-link').html().trim() + " (" + $(this).find('small.text-muted').html().trim() + ")";
+        var skinid = $(this).attr('id').replace("cartItem","");
+        $(this).find('.re-sell').after("<button class='btn btn-success addtolist' data-name='"+skinname+"' data-id='"+skinid+"'>Add to list</button>");
+    })
+    $(".addtolist").on("click", function(){
+        var thisskin = {};
+        thisskin['skinname'] = $(this).attr('data-name');
+        thisskin['id'] = $(this).attr('data-id');
+        skinsToSale.push(thisskin);
+        drawList();
+    })
 
-    if (typeof $("#shopSellAmt").html() != "undefined") {
-        $("#shopSellAmt").attr("autocomplete", "off");
-    }
+    function drawList(){
+        $(".listToSale ol").html("");
+        for (i = 0; i < skinsToSale.length; i++){
+            $(".listToSale ol").append(`<li array-id="${i}">${skinsToSale[i]['skinname']} ( ${skinsToSale[i]['id']} )</li>`);
+        }
+        if(skinsToSale.length === 1) {
+            $(".listToSale ol").after('<button class="clearList btn btn-danger">Очистить</button>');
+            $(".listToSale ol").after('<button class="packToSale btn btn-primary">Продать</button>');
 
-    if (typeof $(document).find(".buyers-club-icon span").html() !== 'undefined') {
-        $(".item-amount").after("<span class='fa fa-spinner fa-spin'></span>")
-        var timer = $(".item-amount").after("<div class='skinsdbTimer'></div>");
-        var timetoupd = 3000;
-        n = 60;
-
-        var IntChecker = setInterval(function () {
-            var currentBuyer = $(document).find(".buyers-club-icon span").attr("class");
-            $.post(site).done(function (callback) {
-                var updatedBuyer = $(callback).find(".buyers-club-icon span").attr("class");
-                if (typeof $(callback).find(".buyers-club-icon").html() !== 'undefined') {
-                    $(document).find(".buyers-club-icon").html($(callback).find(".buyers-club-icon").html());
-                    if (currentBuyer !== updatedBuyer && updatedBuyer.indexOf("red") > -1 && $(".skinsdbTimer").html() === "") {
-                        startTimer(60, $(".skinsdbTimer"));
-                    }
-                    if (currentBuyer.indexOf("red") > -1) {
-                        n = n - 5;
-                        if (n < 20) {
-                            timetoupd = 1000;
-                        }
-                    }
-                    console.log(n);
-                    console.log(currentBuyer);
-                } else {
-                    clearInterval(IntChecker);
-                    $(document).find(".buyers-club-icon").remove();
-                    $(document).find(".skinsdbTimer").remove();
-                    $(document).find(".fa-spin").remove();
-                }
+            $(".clearList").on("click", function () {
+                skinsToSale = [];
+                $(".listToSale ol").html("");
+                $(".clearList").remove();
+                $(".packToSale").remove();
             });
-        }, timetoupd)
+            $('.packToSale').on('click', function () {
+                var price = prompt('По чем продать?').replace(",", ".").trim();
+                price = price * 100;
+                if(isNaN(price)){
+                    sendAlert('danger', price + " не число!");
+                    return;
+                }
+                skinsToSaleData = {};
+                for (i = 0; i < skinsToSale.length; i++){
+                    skinsToSaleData[skinsToSale[i]['id']] = price;
+                }
+                console.log(skinsToSaleData);
+                $.post("https://api.opskins.com/ISales/EditPriceMulti/v1/", {
+                    "items": skinsToSaleData,
+                    "key": $.cookie("apikey")
+                }).done(function (res) {
+                    if (res['status'] === 1) {
+                        sendAlert("success", "Скины поставлены в очередь на продажу!" + mark);
+                    } else {
+                        sendAlert("danger", res['message'] + mark); // 2012 - no changeed
+                    }
+                }).fail(function (res) {
+                    res = res.responseJSON;
+                    sendAlert("danger", res['message'] + mark); // 2012 - no changeed
+                })
+            });
+        }
     }
 }
 
